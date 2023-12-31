@@ -1,0 +1,3 @@
+[submodule "ramayanam_data"]
+	path = ramayanam_data
+	url = https://github.com/naren-m/ramayanam_data.git
