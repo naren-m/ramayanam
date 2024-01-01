@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fuzzy Search</title>
+    <title>Ramayanam Fuzzy Search</title>
     <style>
         .result {
             margin-bottom: 20px;
@@ -11,30 +11,70 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
+        #loading-message {
+            display: none;
+            margin-top: 20px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-<h1>Fuzzy Search</h1>
-<label for="query">Enter Query:</label>
-<input type="text" id="query" name="query">
-<button onclick="performFuzzySearch()">Search</button>
+<h1>Ramayanam Fuzzy Search</h1>
+<label for="queryEnglish">Enter Query (English):</label>
+<input type="text" id="queryEnglish" name="queryEnglish">
+<button onclick="performFuzzySearch('English')">Search</button>
+
+<br>
+
+<label for="querySanskrit">Enter Query (Sanskrit):</label>
+<input type="text" id="querySanskrit" name="querySanskrit">
+<button onclick="performFuzzySearch('Sanskrit')">Search</button>
+
+<div id="loading-message">Processing...</div>
 
 <div id="results-container"></div>
 
-<script>
-    function performFuzzySearch() {
-        // Get the query from the input field
-        const query = document.getElementById('query').value;
 
-        // Fetch data from the API
-        fetch(`http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search?query=${query}`)
+<style>
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+    }
+</style>
+<script>
+    function performFuzzySearch(language) {
+        // Get the query from the respective input field
+        const queryId = language === 'English' ? 'queryEnglish' : 'querySanskrit';
+        const query = document.getElementById(queryId).value;
+        // Display loading message
+        document.getElementById('loading-message').style.display = 'block';
+
+        // Clear previous results
+        document.getElementById('results-container').innerHTML = '';
+
+        // Fetch data from the API based on the selected language
+        let apiUrl;
+        if (language === 'English') {
+            apiUrl = `http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search?query=${query}`;
+        } else {
+            apiUrl = `http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}`;
+        }
+
+        fetch(apiUrl)
             .then(response => response.json())
             .then(results => {
+                // Hide loading message
+                document.getElementById('loading-message').style.display = 'none';
+
                 // Display search results
                 displayResults(results);
             })
             .catch(error => {
+               // Hide loading message
+               document.getElementById('loading-message').style.display = 'none';
+
                 console.error('Error fetching data:', error);
             });
     }
@@ -64,14 +104,19 @@
         }
     }
 
-    // Add an event listener for the "Enter" key press
-    document.getElementById('query').addEventListener('keyup', function (event) {
+    // Add event listeners for the "Enter" key press on both input fields
+    document.getElementById('queryEnglish').addEventListener('keyup', function (event) {
         if (event.key === 'Enter') {
-            performFuzzySearch();
+            performFuzzySearch('English');
+        }
+    });
+
+    document.getElementById('querySanskrit').addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+            performFuzzySearch('Sanskrit');
         }
     });
 </script>
-
 
 </body>
 </html>

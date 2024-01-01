@@ -67,10 +67,15 @@ def fuzzy_search_slokas():
     # Retrieve slokas data from the app's context
 
     # Perform fuzzy search on slokas
-    results = fuzzy_search_service.search_sloka_fuzzy(query)
+    results = fuzzy_search_service.search_translation_fuzzy(query)
 
     return jsonify(results)
 
+@sloka_blueprint.route('/slokas/fuzzy-search-sanskrit', methods=['GET'])
+def fuzzy_search_slokas_sanskrit():
+    query = request.args.get('query', '')
+    results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query)
+    return jsonify(results)
 
 @sloka_blueprint.route('/slokas/fuzzy-search-stream', methods=['GET'])
 def fuzzy_search_slokas_stream():
@@ -78,7 +83,7 @@ def fuzzy_search_slokas_stream():
 
     def generate_results():
         # Perform fuzzy search on slokas
-        for result in fuzzy_search_service.search_sloka_fuzzy(query):
+        for result in fuzzy_search_service.search_translation_fuzzy(query):
             yield jsonify(result) + '\n'
 
     return Response(generate_results(), content_type='application/json; charset=utf-8')
