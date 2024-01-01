@@ -2,9 +2,11 @@ from flask import Blueprint, jsonify, request
 from api.models.sloka_model import Sloka
 # from api.services.fuzzy_search_service import fuzzy_search_slokas
 from api.services.sloka_reader import SlokaReader
+import logging
 
 sloka_blueprint = Blueprint('sloka', __name__)
-
+# Set up logging
+logger = logging.getLogger(__name__)
 
 # Assuming the SlokaReader is correctly implemented in sloka_reader.py
 sloka_reader = SlokaReader('ramayanam_data/Slokas')
@@ -28,16 +30,22 @@ def get_kanda_name(kanda_number):
 
 @sloka_blueprint.route('/kandas/<kanda_name>/sargas/<int:sarga_number>/slokas', methods=['GET'])
 def get_slokas_by_kanda_sarga(kanda_name, sarga_number):
-    # Use the sloka_reader to fetch slokas, meanings, and translations
-    sloka_text = sloka_reader.read_sloka(kanda_name, sarga_number)
-    meaning = sloka_reader.read_meaning(kanda_name, sarga_number)
-    translation = sloka_reader.read_translation(kanda_name, sarga_number)
+    try:
+        # Use the sloka_reader to fetch slokas, meanings, and translations
+        sloka_text = sloka_reader.read_sloka(kanda_name, sarga_number)
+        meaning = sloka_reader.read_meaning(kanda_name, sarga_number)
+        translation = sloka_reader.read_translation(kanda_name, sarga_number)
 
-    # Create a Sloka instance
-    sloka = Sloka(sloka_id=f'{kanda_name}_{sarga_number}', sloka_text=sloka_text, meaning=meaning, translation=translation)
+        # Create a Sloka instance
+        sloka = Sloka(sloka_id=f'{kanda_name}_{sarga_number}', sloka_text=sloka_text, meaning=meaning, translation=translation)
 
-    # Serialize the Sloka instance and return as JSON
-    return jsonify(sloka.serialize())
+        # Serialize the Sloka instance and return as JSON
+        return jsonify(sloka.serialize())
+
+    except Exception as e:
+        # Log any exceptions
+        logger.exception(f"Error processing request for kanda {kanda_name}, sarga {sarga_number}: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), 500
 
 @sloka_blueprint.route('/slokas/fuzzy-search', methods=['GET'])
 def fuzzy_search():
