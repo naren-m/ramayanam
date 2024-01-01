@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, Response
 from api.models.sloka_model import Sloka
 from api.services.fuzzy_search_service import FuzzySearchService
 from api.services.sloka_reader import SlokaReader
@@ -72,4 +72,13 @@ def fuzzy_search_slokas():
     return jsonify(results)
 
 
-# Add more endpoints as needed (e.g., get_sloka_by_id, add_sloka, etc.)
+@sloka_blueprint.route('/slokas/fuzzy-search-stream', methods=['GET'])
+def fuzzy_search_slokas():
+    query = request.args.get('query', '')
+
+    def generate_results():
+        # Perform fuzzy search on slokas
+        for result in fuzzy_search_service.search_sloka_fuzzy(query):
+            yield jsonify(result) + '\n'
+
+    return Response(generate_results(), content_type='application/json; charset=utf-8')
