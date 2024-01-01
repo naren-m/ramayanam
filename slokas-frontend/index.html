@@ -3,22 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Ramayana Slokas</title>
+    <title>Fuzzy Search</title>
 </head>
 <body>
-    <div class="sloka-container">
-        <div class="sloka">
-            <!-- Devanagari Script -->
-            <div class="devanagari">तपस्स्वाध्यायनिरतं तपस्स्वाध्यायनिरतं</div>
-            <!-- Transliteration -->
-            <div class="transliteration">Tapas-svādhyāya-nirataṁ tapas-svādhyāya-nirataṁ</div>
-            <!-- Meaning -->
-            <div class="meaning">Engaged in austerity and study</div>
-            <!-- Translation -->
-            <div class="translation">Translation of the sloka in English</div>
-        </div>
-        <!-- Add more slokas as needed -->
-    </div>
+
+<h1>Fuzzy Search</h1>
+<label for="query">Enter Query:</label>
+<input type="text" id="query" name="query">
+<button onclick="performFuzzySearch()">Search</button>
+
+<div id="results-container"></div>
+
+<script>
+    function performFuzzySearch() {
+        // Get the query from the input field
+        const query = document.getElementById('query').value;
+
+        // Fetch data from the API
+        fetch(`http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search?query=${query}`)
+            .then(response => response.json())
+            .then(results => {
+                // Display search results
+                displayResults(results);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    function displayResults(results) {
+        const resultsContainer = document.getElementById('results-container');
+
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<p>No results found.</p>';
+        } else {
+            // Display each result
+            results.forEach(result => {
+                const resultElement = document.createElement('p');
+                resultElement.textContent = `Sloka Number: ${result.sloka_number}, Ratio: ${result.ratio}\n. Sloka: ${result.sloka}, Meaning: ${result.meaning}, Translation: ${result.translation}`;
+                resultsContainer.appendChild(resultElement);
+            });
+        }
+    }
+</script>
+
 </body>
 </html>

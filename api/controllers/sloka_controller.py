@@ -12,7 +12,6 @@ sloka_blueprint = Blueprint('sloka', __name__)
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# Assuming the SlokaReader is correctly implemented in sloka_reader.py
 sloka_reader = SlokaReader('/home/narenuday/Projects/ramayanam_data/slokas/Slokas')
 fuzzy_search_service = FuzzySearchService(ramayanam_data)
 

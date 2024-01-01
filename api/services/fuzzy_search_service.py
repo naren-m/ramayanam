@@ -1,7 +1,6 @@
 from fuzzywuzzy import fuzz
 # fuzzy_search_service.py
 import logging
-logger = logging.getLogger(__name__)
 
 class FuzzySearchService:
     def __init__(self, ramayanam_data):
@@ -28,7 +27,7 @@ class FuzzySearchService:
                     ratio = fuzz.partial_ratio(text, query)
                     self.logger.debug(f"Checking sloka {kanda_number}.{sarga_number}.{sloka_number} - Ratio: {ratio}")
                     if ratio > 50:  # Adjust the threshold as needed
-                        results.append({"sloka_number": sloka.id, "sloka":sloka.translation, "ratio": ratio})
+                        results.append({"sloka_number": sloka.id, "sloka":sloka.text, "translation":sloka.translation, "meaning":sloka.meaning, "ratio": ratio})
 
         results.sort(key=lambda x: x["ratio"], reverse=True)
         # self.logger.debug(f"Fuzzy search results: {results}")
