@@ -1,41 +1,55 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from api.models.sloka_model import Sloka
-# from api.services.fuzzy_search_service import fuzzy_search_slokas
+from api.services.fuzzy_search_service import FuzzySearchService
 from api.services.sloka_reader import SlokaReader
 import logging
+from ramayanam import Ramayanam
+
+# Load Ramayanam instance on app start
+ramayanam_data = Ramayanam.load()
 
 sloka_blueprint = Blueprint('sloka', __name__)
 # Set up logging
 logger = logging.getLogger(__name__)
 
 # Assuming the SlokaReader is correctly implemented in sloka_reader.py
-sloka_reader = SlokaReader('ramayanam_data/Slokas')
+sloka_reader = SlokaReader('/home/narenuday/Projects/ramayanam_data/slokas/Slokas')
+fuzzy_search_service = FuzzySearchService(ramayanam_data)
 
-# Define Kanda enumeration
-KANDA = {
-    1: 'BalaKanda',
-    2: 'AyodhyaKanda',
-    3: 'AranyaKanda',
-    4: 'SundaraKanda',
-    5: 'YudhaKanda',
-}
 
 @sloka_blueprint.route('/kanda/<int:kanda_number>', methods=['GET'])
 def get_kanda_name(kanda_number):
-    kanda_name = KANDA.get(kanda_number)
+    kanda_name = ramayanam_data.kandaDetails.get(kanda_number, {}).get('name')
     if kanda_name:
         return jsonify({'kanda_name': kanda_name})
     else:
         return jsonify({'error': 'Invalid Kanda number'}), 404
 
-@sloka_blueprint.route('/kandas/<kanda_name>/sargas/<int:sarga_number>/slokas', methods=['GET'])
-def get_slokas_by_kanda_sarga(kanda_name, sarga_number):
+@sloka_blueprint.route('/kandas/<int:kanda_number>/sargas/<int:sarga_number>/slokas/<int:sloka_number>', methods=['GET'])
+def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
     try:
-        # Use the sloka_reader to fetch slokas, meanings, and translations
-        sloka_text = sloka_reader.read_sloka(kanda_name, sarga_number)
-        meaning = sloka_reader.read_meaning(kanda_name, sarga_number)
-        translation = sloka_reader.read_translation(kanda_name, sarga_number)
+        # Use the ramayanam_instance to fetch slokas, meanings, and translations
+        kanda = ramayanam_data.kandas[kanda_number]
+        logger.debug("Processing for kanda %s, sarga %s", kanda_number, sarga_number)
+        if not kanda:
+            logger.error("Unable to get %s kanda details from the corpus ", kanda_number)
+            return jsonify({"error": f"Kanda '{kanda_number}' not found"}), 404
 
+        sarga = kanda.sargas.get(sarga_number)
+        if not sarga:
+            return jsonify({"error": f"Sarga '{sarga_number}' not found for Kanda '{kanda_number}'"}), 404
+
+        logger.debug("sarga %s, sloka number %d", sarga, sloka_number)
+        # Access sloka data using ramayanam_instance
+        sloka_text = sarga.slokas[sloka_number].text
+        meaning = sarga.slokas[sloka_number].meaning  # Replace with your logic to get the meaning
+        translation = sarga.slokas[sloka_number].translation  # Replace with your logic to get the translation
+
+        kanda_name = ramayanam_data.kandaDetails.get(kanda_number, {}).get('name')
+        if not kanda_name:
+            return jsonify({'error': 'Invalid Kanda number'}), 404
+
+        logger.debug("Kanda name %s", kanda_name)
         # Create a Sloka instance
         sloka = Sloka(sloka_id=f'{kanda_name}_{sarga_number}', sloka_text=sloka_text, meaning=meaning, translation=translation)
 
@@ -48,12 +62,13 @@ def get_slokas_by_kanda_sarga(kanda_name, sarga_number):
         return jsonify({"error": "Internal Server Error"}), 500
 
 @sloka_blueprint.route('/slokas/fuzzy-search', methods=['GET'])
-def fuzzy_search():
-    # Get the search query from the request parameters
-    query = request.args.get('query')
+def fuzzy_search_slokas():
+    query = request.args.get('query', '')
+
+    # Retrieve slokas data from the app's context
 
     # Perform fuzzy search on slokas
-    results = fuzzy_search_slokas(query, sample_slokas)  # Replace with actual search logic
+    results = fuzzy_search_service.search_sloka_fuzzy(query)
 
     return jsonify(results)
 
