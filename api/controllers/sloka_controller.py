@@ -73,7 +73,7 @@ def fuzzy_search_slokas():
 
 
 @sloka_blueprint.route('/slokas/fuzzy-search-stream', methods=['GET'])
-def fuzzy_search_slokas():
+def fuzzy_search_slokas_stream():
     query = request.args.get('query', '')
 
     def generate_results():
