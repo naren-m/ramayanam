@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Search</title>
+    <style>
+        .result {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 
@@ -42,8 +50,15 @@
         } else {
             // Display each result
             results.forEach(result => {
-                const resultElement = document.createElement('p');
-                resultElement.textContent = `Sloka Number: ${result.sloka_number}, Ratio: ${result.ratio}\n. Sloka: ${result.sloka}, Meaning: ${result.meaning}, Translation: ${result.translation}`;
+                const resultElement = document.createElement('div');
+                resultElement.classList.add('result');
+                resultElement.innerHTML = `
+                    <p>Sloka Number: ${result.sloka_number}</p>
+                    <p>Ratio: ${result.ratio}</p>
+                    <p>Sloka: ${result.sloka}</p>
+                    <p>Meaning: ${result.meaning}</p>
+                    <p>Translation: ${result.translation}</p>
+                `;
                 resultsContainer.appendChild(resultElement);
             });
         }
