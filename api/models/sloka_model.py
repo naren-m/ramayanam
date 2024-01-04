@@ -9,7 +9,6 @@ class Sloka:
         self.translation = translation
 
     def serialize(self):
-        print(self.sloka_text)
         return {
             'sloka_id': self.sloka_id,
             'sloka_text': self.sloka_text,

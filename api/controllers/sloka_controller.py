@@ -40,6 +40,7 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
 
         logger.debug("sarga %s, sloka number %d", sarga, sloka_number)
         # Access sloka data using ramayanam_instance
+        sloka = sarga.slokas[sloka_number]
         sloka_text = sarga.slokas[sloka_number].text
         meaning = sarga.slokas[sloka_number].meaning  # Replace with your logic to get the meaning
         translation = sarga.slokas[sloka_number].translation  # Replace with your logic to get the translation
@@ -50,7 +51,7 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
 
         logger.debug("Kanda name %s", kanda_name)
         # Create a Sloka instance
-        sloka = Sloka(sloka_id=f'{kanda_name}_{sarga_number}', sloka_text=sloka_text, meaning=meaning, translation=translation)
+        sloka = Sloka(sloka_id=f'{sloka.id}', sloka_text=sloka_text, meaning=meaning, translation=translation)
 
         # Serialize the Sloka instance and return as JSON
         return jsonify(sloka.serialize())
@@ -63,8 +64,6 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
 @sloka_blueprint.route('/slokas/fuzzy-search', methods=['GET'])
 def fuzzy_search_slokas():
     query = request.args.get('query', '')
-
-    # Retrieve slokas data from the app's context
 
     # Perform fuzzy search on slokas
     results = fuzzy_search_service.search_translation_fuzzy(query)
