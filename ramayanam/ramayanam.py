@@ -8,7 +8,9 @@ __all__ = ['Ramayanam']
 PICKLE_FILE = os.path.join(os.path.dirname(__file__), 'ramayanam.pkl')
 DB_FILE = os.path.join(os.path.dirname(__file__), 'ramayanam.db')
 
+
 class AttrDict(dict):
+
     def __setattr__(self, attr, value):
         self[attr] = value
 
@@ -30,32 +32,32 @@ class AttrDict(dict):
 
 class Ramayanam:
     kandaDetails = dict({
-            1: {
-                'id': 1,
-                'name': "BalaKanda",
-                'sargas': 77
-            },
-            2: {
-                'id': 2,
-                'name': "AyodhyaKanda",
-                'sargas': 119
-            },
-            3: {
-                'id': 3,
-                'name': "AranyaKanda",
-                'sargas': 75
-            },
-            4: {
-                'id': 4,
-                'name': "KishkindaKanda",
-                'sargas': 67
-            },
-            5: {
-                'id': 5,
-                'name': "SundaraKanda",
-                'sargas': 68
-            }
-        })
+        1: {
+            'id': 1,
+            'name': "BalaKanda",
+            'sargas': 77
+        },
+        2: {
+            'id': 2,
+            'name': "AyodhyaKanda",
+            'sargas': 119
+        },
+        3: {
+            'id': 3,
+            'name': "AranyaKanda",
+            'sargas': 75
+        },
+        4: {
+            'id': 4,
+            'name': "KishkindaKanda",
+            'sargas': 67
+        },
+        5: {
+            'id': 5,
+            'name': "SundaraKanda",
+            'sargas': 68
+        }
+    })
 
     def __init__(self):
         self.kandas = dict()
@@ -74,7 +76,7 @@ class Ramayanam:
         translation = list()
         for k, v in self.kandas.items():
             translation.extend(v.all())
-        
+
         return translation
 
     def details(self):
@@ -83,6 +85,7 @@ class Ramayanam:
 
     @classmethod
     def load(cls, dbName=DB_FILE, pickleFile=PICKLE_FILE):
+
         def _readFromPickle(pickleFile):
             with open(pickleFile, 'rb') as f:
                 r = pickle.load(f)
@@ -99,7 +102,7 @@ class Ramayanam:
             db.close()
             with open(PICKLE_FILE, 'wb') as f:
                 pickle.dump(r, f)
-            
+
             return r
 
         if pickleFile and os.path.exists(pickleFile):
@@ -112,6 +115,7 @@ class Ramayanam:
 
 
 class Kanda:
+
     def __init__(self, name, number, totalSargas):
         self.name = name
         self.number = number
@@ -119,7 +123,8 @@ class Kanda:
         self.sargas = dict()
 
     def __str__(self):
-        return '{} has {} Sargas and a total of {} Slokas'.format(self.name, self.totalSargas, len(self.all()))
+        return '{} has {} Sargas and a total of {} Slokas'.format(
+            self.name, self.totalSargas, len(self.all()))
 
     def __repr__(self):
         return str(self)
@@ -142,12 +147,14 @@ class Kanda:
         translation = list()
         for k, v in self.sargas.items():
             translation.extend(v.slokas)
-        
+
         return translation
 
     @classmethod
     def createKandaFromDict(cls, kandaMetadata, db):
-        kanda = cls(name=kandaMetadata['name'], number=kandaMetadata['id'], totalSargas=kandaMetadata['sargas'])
+        kanda = cls(name=kandaMetadata['name'],
+                    number=kandaMetadata['id'],
+                    totalSargas=kandaMetadata['sargas'])
         for s in range(kanda.totalSargas):
             sarga = Sarga.loadFromDB(number=s, kanda=kanda, db=db)
             kanda.addSarga(sarga)
@@ -155,14 +162,17 @@ class Kanda:
 
 
 class Sarga:
+
     def __init__(self, number, kanda):
         self.number = number
         self.kanda = kanda
         self.slokas = dict()
 
     def __str__(self):
-        return 'Sarga {} of {} has {} slokas'.format(self.number, self.kanda.name, len(self.slokas))
-    
+        return 'Sarga {} of {} has {} slokas'.format(self.number,
+                                                     self.kanda.name,
+                                                     len(self.slokas))
+
     def __repr__(self) -> str:
         return str(self)
 
@@ -178,23 +188,26 @@ class Sarga:
         self.slokas[sloka.number] = sloka
 
     def sloka(self, id):
-        return self.slokas[id-1]
+        return self.slokas[id - 1]
 
     @classmethod
     def loadFromDB(cls, number, kanda, db):
         sarga = cls(number=number, kanda=kanda)
         columns = 'kanda_id, sarga_id, sloka_id, sloka, meaning, translation'
-        where = 'kanda_id={} and sarga_id={}'.format(kanda.number, sarga.number)
+        where = 'kanda_id={} and sarga_id={}'.format(kanda.number,
+                                                     sarga.number)
         rows = db.get(table='slokas', columns=columns, where=where)
 
         for row in rows:
             row = AttrDict(row)
-            sloka = Sloka(sarga, row.sloka_id, row.sloka, row.meaning, row.translation)
+            sloka = Sloka(sarga, row.sloka_id, row.sloka, row.meaning,
+                          row.translation)
             sarga.addSloka(sloka)
         return sarga
 
 
 class Sloka:
+
     def __init__(self, sarga, number, text, meaning, translation):
         self.number = number
         self.sarga = sarga

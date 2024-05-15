@@ -6,13 +6,9 @@ help:
 	@echo "make format     run yapf formatter"
 	@echo "make build      genrate binary with pyinstaller"
 
-test: clean test-ut coverage-html coverage-badge
 
-test-all: clean test-ut test-ft coverage-html coverage-badge
-
-test-ut:
-	pytest --cov=lib --durations=3 --flakes --show-capture=no test -W error::ResourceWarning
-
+test: clean
+	pytest  tests
 
 coverage: coverage-html coverage-xml
 

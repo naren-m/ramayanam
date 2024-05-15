@@ -9,6 +9,7 @@ import sqlite3
 
 
 class Database:
+
     def __init__(self, name=None):
         self.conn = None
         self.cursor = None
@@ -17,6 +18,7 @@ class Database:
             self.open(name)
 
     def open(self, name):
+
         def dict_factory(cursor, row):
             d = {}
             for idx, col in enumerate(cursor.description):

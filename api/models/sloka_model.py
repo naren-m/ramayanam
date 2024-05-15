@@ -2,6 +2,7 @@ import logging
 
 
 class Sloka:
+
     def __init__(self, sloka_id, sloka_text, meaning, translation):
         self.sloka_id = sloka_id
         self.sloka_text = sloka_text
