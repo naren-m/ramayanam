@@ -6,11 +6,8 @@ help:
 	@echo "make format     run yapf formatter"
 	@echo "make build      genrate binary with pyinstaller"
 
-test: clean test-ut coverage-html coverage-badge
 
-test-all: clean test-ut test-ft coverage-html coverage-badge
-
-test-ut:
+test: clean
 	pytest  tests
 
 coverage: coverage-html coverage-xml

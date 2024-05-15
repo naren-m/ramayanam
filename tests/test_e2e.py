@@ -1,10 +1,6 @@
 # tests.py
 
 import unittest
-# from ..api import app
-
-import sys
-sys.path.append("/home/narenuday/Projects/ramayanam")
 
 from api import app
 
