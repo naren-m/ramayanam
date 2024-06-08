@@ -13,7 +13,7 @@ sloka_blueprint = Blueprint('sloka', __name__)
 logger = logging.getLogger(__name__)
 
 sloka_reader = SlokaReader(
-    '/home/narenuday/Projects/ramayanam_data/slokas/Slokas')
+    '/home/narenuday/Projects/ramayanam/data/slokas/Slokas')
 fuzzy_search_service = FuzzySearchService(ramayanam_data)
 
 
