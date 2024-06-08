@@ -41,10 +41,10 @@ class FuzzySearchService:
 
     def search_translation_fuzzy(self, query):
         query = query.lower()  # Convert query to lowercase
-
+        self.logger.info("Searching for query %s", query)
         results = []
         for kanda_number, kanda in self.ramayanam_data.kandas.items():
-            self.logger.debug("Kadna %s", kanda)
+            self.logger.info("Kadna %s", kanda)
             for sarga_number, sarga in kanda.sargas.items():
                 if not sarga:
                     self.logger.error(

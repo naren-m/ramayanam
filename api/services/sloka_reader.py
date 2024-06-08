@@ -4,6 +4,9 @@ import os
 class SlokaReader:
 
     def __init__(self, base_path):
+        if not os.path.exists(base_path):
+            raise FileNotFoundError(f"The provided base path '{base_path}' does not exist.")
+
         self.base_path = base_path
         self.corpus_path = base_path
 

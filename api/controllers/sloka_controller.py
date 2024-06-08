@@ -5,20 +5,22 @@ from api.services.sloka_reader import SlokaReader
 import logging
 from ramayanam import Ramayanam
 
-# Load Ramayanam instance on app start
-ramayanam_data = Ramayanam.load()
 
 sloka_blueprint = Blueprint('sloka', __name__)
 # Set up logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+sloka_path = '/app/data/slokas/Slokas'
+sloka_reader = SlokaReader(sloka_path)
 
-sloka_reader = SlokaReader(
-    '/home/narenuday/Projects/ramayanam/data/slokas/Slokas')
+# Load Ramayanam`` instance on app start
+ramayanam_data = Ramayanam.load()
 fuzzy_search_service = FuzzySearchService(ramayanam_data)
 
 
 @sloka_blueprint.route('/kanda/<int:kanda_number>', methods=['GET'])
 def get_kanda_name(kanda_number):
+    logger.debug("Request", kanda_number)
     kanda_name = ramayanam_data.kandaDetails.get(kanda_number, {}).get('name')
     if kanda_name:
         return jsonify({'kanda_name': kanda_name})
@@ -82,7 +84,7 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
 @sloka_blueprint.route('/slokas/fuzzy-search', methods=['GET'])
 def fuzzy_search_slokas():
     query = request.args.get('query', '')
-
+    logger.debug(query)
     # Perform fuzzy search on slokas
     results = fuzzy_search_service.search_translation_fuzzy(query)
 
