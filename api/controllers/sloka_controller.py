@@ -83,28 +83,63 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
         # Serialize the Sloka instance and return as JSON
         return jsonify(sloka.serialize())
 
-    except Exception as e:
+    except (KeyError, IndexError) as e:
         # Log any exceptions
         logger.exception(
-            f"Error processing request for kanda {kanda_name}, sarga {sarga_number}: {str(e)}"
+            "Error processing request for kanda %s, sarga %s: %s", kanda_name, sarga_number, str(e)
         )
         return jsonify({"error": "Internal Server Error"}), 500
 
 
 @sloka_blueprint.route("/slokas/fuzzy-search", methods=["GET"])
 def fuzzy_search_slokas():
-    query = request.args.get("query", "")
-    logger.debug(query)
-    # Perform fuzzy search on slokas
-    results = fuzzy_search_service.search_translation_fuzzy(query)
+    """
+    Fuzzy search for slokas based on a query and an optional kanda.
 
+    This function retrieves the search query and kanda from the request arguments.
+    It performs a fuzzy search for translations of slokas. If the kanda is specified
+    and is not zero, it searches within that specific kanda; otherwise, it searches
+    across all kandas.
+
+    Returns:
+        JSON response containing the search results.
+    """
+    query = request.args.get("query", "")
+    kanda = request.args.get("kanda", "")
+    # search_translation_in_kanda_fuzzy
+    logger.debug("Query: %s, Kanda: %s", query, kanda)
+    kanda = int(kanda)
+    if kanda == 0:
+        results = fuzzy_search_service.search_translation_fuzzy(query)
+    else:
+        results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda, query, 70)
     return jsonify(results)
 
 
 @sloka_blueprint.route("/slokas/fuzzy-search-sanskrit", methods=["GET"])
 def fuzzy_search_slokas_sanskrit():
+    """
+    Fuzzy search for slokas in Sanskrit based on a query and optional kanda.
+
+    This function retrieves a search query and kanda from the request arguments,
+    performs a fuzzy search for slokas in Sanskrit, and returns the results as JSON.
+
+    Parameters:
+        query (str): The search term to look for in the slokas.
+        kanda (int): The specific kanda to limit the search to. If 0, searches all kandas.
+
+    Returns:
+        Response: A JSON response containing the search results.
+    """
     query = request.args.get("query", "")
-    results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query)
+    kanda = request.args.get("kanda", "")
+    # search_translation_in_kanda_fuzzy
+    logger.debug("Query: %s, Kanda: %s", query, kanda)
+    kanda = int(kanda)
+    if kanda == 0:
+        results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query)
+    else:
+        results = fuzzy_search_service.search_sloka_sanskrit_in_kanda_fuzzy(kanda, query, 70)
     return jsonify(results)
 
 

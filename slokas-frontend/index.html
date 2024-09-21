@@ -22,32 +22,25 @@
 <body>
 
 <h1>Ramayanam Fuzzy Search</h1>
-<label for="queryEnglish">Enter Query (English):</label>
+
+<label for="queryEnglish">Enter Query (Sanskrit):</label>
 <input type="text" id="queryEnglish" name="queryEnglish">
+
+<button onclick="performFuzzySearch('English')">Search</button>
 <label for="kanda">Select Kanda:</label>
 <select id="kanda" name="kanda">
-    <option value="balakanda">Bala Kanda</option>
-    <option value="ayodhyakanda">Ayodhya Kanda</option>
-    <option value="aranyakanda">Aranya Kanda</option>
-    <option value="kishkindhakanda">Kishkindha Kanda</option>
-    <option value="sundarakanda">Sundara Kanda</option>
-    <option value="yuddhakanda">Yuddha Kanda</option>
+    <option value="0">All</option>
+    <option value="1">Bala Kanda</option>
+    <option value="2">Ayodhya Kanda</option>
+    <option value="3">Aranya Kanda</option>
+    <option value="4">Kishkindha Kanda</option>
+    <option value="5">Sundara Kanda</option>
+    <option value="6">Yuddha Kanda</option>
 </select>
-<button onclick="performFuzzySearch('English')">Search</button>
-
 <br>
 
 <label for="querySanskrit">Enter Query (Sanskrit):</label>
 <input type="text" id="querySanskrit" name="querySanskrit">
-<label for="kanda">Select Kanda:</label>
-<select id="kanda" name="kanda">
-    <option value="balakanda">Bala Kanda</option>
-    <option value="ayodhyakanda">Ayodhya Kanda</option>
-    <option value="aranyakanda">Aranya Kanda</option>
-    <option value="kishkindhakanda">Kishkindha Kanda</option>
-    <option value="sundarakanda">Sundara Kanda</option>
-    <option value="yuddhakanda">Yuddha Kanda</option>
-</select>
 <button onclick="performFuzzySearch('Sanskrit')">Search</button>
 
 <div id="loading-message">Processing...</div>
@@ -66,6 +59,7 @@
         // Get the query from the respective input field
         const queryId = language === 'English' ? 'queryEnglish' : 'querySanskrit';
         const query = document.getElementById(queryId).value;
+        const kanda = document.getElementById('kanda').value;
         // Display loading message
         document.getElementById('loading-message').style.display = 'block';
 
@@ -75,9 +69,9 @@
         // Fetch data from the API based on the selected language
         let apiUrl;
         if (language === 'English') {
-            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search?query=${query}`;
+            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search?query=${query}&kanda=${kanda}`;
         } else {
-            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}`;
+            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}&kanda=${kanda}`;
         }
 
         fetch(apiUrl)
