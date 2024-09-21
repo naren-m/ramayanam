@@ -1,0 +1,7 @@
+services:
+  app:
+    image: narenm/ramayanam
+    ports:
+      - "5001:5000"
+    environment:
+      - ENV=production

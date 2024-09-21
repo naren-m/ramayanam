@@ -32,6 +32,8 @@ down:
 
 
 prod:
+	@docker pull narenm/ramayanam
+	@docker-compose -f docker-compose.prod.yml down
 	@docker-compose -f docker-compose.prod.yml up
 
 test: clean
