@@ -17,6 +17,11 @@
             margin-top: 20px;
             font-style: italic;
         }
+
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -48,13 +53,9 @@
 <div id="results-container"></div>
 
 
-<style>
-    .highlight {
-        background-color: yellow;
-        font-weight: bold;
-    }
-</style>
 <script>
+    const BASE_URL = 'http://127.0.0.1:5001/api/ramayanam/slokas';
+
     function performFuzzySearch(language) {
         // Get the query from the respective input field
         const queryId = language === 'English' ? 'queryEnglish' : 'querySanskrit';
@@ -69,9 +70,9 @@
         // Fetch data from the API based on the selected language
         let apiUrl;
         if (language === 'English') {
-            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search?query=${query}&kanda=${kanda}`;
+            apiUrl = `${BASE_URL}/fuzzy-search?query=${query}&kanda=${kanda}`;
         } else {
-            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}&kanda=${kanda}`;
+            apiUrl = `${BASE_URL}/fuzzy-search-sanskrit?query=${query}&kanda=${kanda}`;
         }
 
         fetch(apiUrl)
@@ -96,7 +97,6 @@
 
         // Clear previous results
         resultsContainer.innerHTML = '';
-
         if (results.length === 0) {
             resultsContainer.innerHTML = '<p>No results found.</p>';
         } else {
