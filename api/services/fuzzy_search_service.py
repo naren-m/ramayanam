@@ -1,4 +1,5 @@
 from fuzzywuzzy import fuzz
+
 # fuzzy_search_service.py
 import logging
 from difflib import SequenceMatcher
@@ -14,7 +15,7 @@ class FuzzySearchService:
 
     def tokenize(self, text):
         # Splitting based on spaces, |, and ||
-        tokens = re.split(r'\s+|\|\|?|\n', text)
+        tokens = re.split(r"\s+|\|\|?|\n", text)
         return [token for token in tokens if token]
 
     def similarity(self, a, b):
@@ -27,16 +28,18 @@ class FuzzySearchService:
 
         for i, token in enumerate(tokens):
             if query.lower() == token.lower():
-                highlighted_tokens.append('<span class="highlight">' + token +
-                                          '</span>')
+                highlighted_tokens.append(
+                    '<span class="highlight">' + token + "</span>"
+                )
             elif self.similarity(query, token) >= threshold:
-                highlighted_tokens.append('<span class="highlight">' + token +
-                                          '</span>')
+                highlighted_tokens.append(
+                    '<span class="highlight">' + token + "</span>"
+                )
             else:
                 highlighted_tokens.append(token)
 
         # Joining tokens to recreate sentences/phrases for output
-        highlighted_text = ' '.join(highlighted_tokens)
+        highlighted_text = " ".join(highlighted_tokens)
         return highlighted_text
 
     def search_translation_fuzzy(self, query):
@@ -54,11 +57,11 @@ class FuzzySearchService:
 
                 for sloka_number, sloka in sarga.slokas.items():
                     if sloka is None or sloka.translation is None:
-                        self.logger.debug("Kanda %s, Sarga %s, Sloka %s",
-                                          kanda, sarga, sloka)
+                        self.logger.debug(
+                            "Kanda %s, Sarga %s, Sloka %s", kanda, sarga, sloka
+                        )
                         continue
-                    text = sloka.translation.lower(
-                    )  # Convert sloka text to lowercase
+                    text = sloka.translation.lower()  # Convert sloka text to lowercase
                     highlighted_text = self.search_and_highlight(text, query)
 
                     # ratio = fuzz.ratio(text, query)
@@ -67,13 +70,15 @@ class FuzzySearchService:
                         f"Checking sloka {kanda_number}.{sarga_number}.{sloka_number} - Ratio: {ratio}"
                     )
                     if ratio > 70:  # Adjust the threshold as needed
-                        results.append({
-                            "sloka_number": sloka.id,
-                            "sloka": sloka.text,
-                            "translation": highlighted_text,
-                            "meaning": sloka.meaning,
-                            "ratio": ratio
-                        })
+                        results.append(
+                            {
+                                "sloka_number": sloka.id,
+                                "sloka": sloka.text,
+                                "translation": highlighted_text,
+                                "meaning": sloka.meaning,
+                                "ratio": ratio,
+                            }
+                        )
 
         results.sort(key=lambda x: x["ratio"], reverse=True)
 
@@ -94,27 +99,30 @@ class FuzzySearchService:
 
                 for sloka_number, sloka in sarga.slokas.items():
                     if sloka is None or sloka.text is None or sloka.meaning is None:
-                        self.logger.debug("Kanda %s, Sarga %s, Sloka %s",
-                                          kanda, sarga, sloka)
+                        self.logger.debug(
+                            "Kanda %s, Sarga %s, Sloka %s", kanda, sarga, sloka
+                        )
                         continue
-                    text = sloka.text.lower(
-                    )  # Convert sloka text to lowercase
+                    text = sloka.text.lower()  # Convert sloka text to lowercase
                     highlighted_text = self.search_and_highlight(text, query)
                     highlighted_meaning = self.search_and_highlight(
-                        sloka.meaning.lower(), query)
+                        sloka.meaning.lower(), query
+                    )
 
                     ratio = fuzz.partial_ratio(text, query)
                     self.logger.debug(
                         f"Checking sloka {kanda_number}.{sarga_number}.{sloka_number} - Ratio: {ratio}"
                     )
                     if ratio > threshold:  # Adjust the threshold as needed
-                        results.append({
-                            "sloka_number": sloka.id,
-                            "sloka": highlighted_text,
-                            "translation": sloka.translation,
-                            "meaning": highlighted_meaning,
-                            "ratio": ratio
-                        })
+                        results.append(
+                            {
+                                "sloka_number": sloka.id,
+                                "sloka": highlighted_text,
+                                "translation": sloka.translation,
+                                "meaning": highlighted_meaning,
+                                "ratio": ratio,
+                            }
+                        )
 
         results.sort(key=lambda x: x["ratio"], reverse=True)
         return results

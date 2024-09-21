@@ -24,12 +24,30 @@
 <h1>Ramayanam Fuzzy Search</h1>
 <label for="queryEnglish">Enter Query (English):</label>
 <input type="text" id="queryEnglish" name="queryEnglish">
+<label for="kanda">Select Kanda:</label>
+<select id="kanda" name="kanda">
+    <option value="balakanda">Bala Kanda</option>
+    <option value="ayodhyakanda">Ayodhya Kanda</option>
+    <option value="aranyakanda">Aranya Kanda</option>
+    <option value="kishkindhakanda">Kishkindha Kanda</option>
+    <option value="sundarakanda">Sundara Kanda</option>
+    <option value="yuddhakanda">Yuddha Kanda</option>
+</select>
 <button onclick="performFuzzySearch('English')">Search</button>
 
 <br>
 
 <label for="querySanskrit">Enter Query (Sanskrit):</label>
 <input type="text" id="querySanskrit" name="querySanskrit">
+<label for="kanda">Select Kanda:</label>
+<select id="kanda" name="kanda">
+    <option value="balakanda">Bala Kanda</option>
+    <option value="ayodhyakanda">Ayodhya Kanda</option>
+    <option value="aranyakanda">Aranya Kanda</option>
+    <option value="kishkindhakanda">Kishkindha Kanda</option>
+    <option value="sundarakanda">Sundara Kanda</option>
+    <option value="yuddhakanda">Yuddha Kanda</option>
+</select>
 <button onclick="performFuzzySearch('Sanskrit')">Search</button>
 
 <div id="loading-message">Processing...</div>
