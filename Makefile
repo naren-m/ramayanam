@@ -25,7 +25,11 @@ push:
 	@docker push $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
 compose:
-	@docker-compose up
+	@docker-compose up --build
+
+down:
+	@docker-compose down
+
 
 prod:
 	@docker-compose -f docker-compose.prod.yml up

@@ -57,9 +57,9 @@
         // Fetch data from the API based on the selected language
         let apiUrl;
         if (language === 'English') {
-            apiUrl = `http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search?query=${query}`;
+            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search?query=${query}`;
         } else {
-            apiUrl = `http://127.0.0.1:5000/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}`;
+            apiUrl = `http://127.0.0.1:5001/api/ramayanam/slokas/fuzzy-search-sanskrit?query=${query}`;
         }
 
         fetch(apiUrl)
