@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM python:3.9-slim-buster
 
 # Set the working directory to /app
 WORKDIR /app
@@ -20,5 +20,4 @@ EXPOSE 5000
 ENV FLASK_APP=api/app.py
 
 # Run app.py when the container launches
-# CMD ["flask", "run", "--host=0.0.0.0"]
-CMD ["python3", "app.py"]
+CMD ["flask", "run", "--host=0.0.0.0"]
