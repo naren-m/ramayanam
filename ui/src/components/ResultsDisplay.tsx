@@ -1,14 +1,42 @@
 import React from 'react';
-import { AlertCircle, BookOpen } from 'lucide-react';
+import { AlertCircle, BookOpen, Download, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useSearch } from '../contexts/SearchContext';
 import VerseCard from './VerseCard';
 import LoadingSpinner from './LoadingSpinner';
 
 const ResultsDisplay: React.FC = () => {
-  const { verses, loading, error, totalResults, searchQuery, searchType } = useSearch();
+  const { 
+    verses, 
+    loading, 
+    streamingProgress,
+    error, 
+    pagination, 
+    searchQuery, 
+    searchType,
+    useStreaming,
+    loadNextPage,
+    toggleStreamingMode
+  } = useSearch();
 
-  if (loading) {
-    return <LoadingSpinner />;
+  if (loading && verses.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <LoadingSpinner />
+        {useStreaming && streamingProgress > 0 && (
+          <div className="mt-4">
+            <div className="w-64 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mx-auto">
+              <div 
+                className="bg-gradient-to-r from-saffron-500 to-gold-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${streamingProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              Loading results... {Math.round(streamingProgress)}%
+            </p>
+          </div>
+        )}
+      </div>
+    );
   }
 
   if (error) {
@@ -19,11 +47,8 @@ const ResultsDisplay: React.FC = () => {
           <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
             Search Error
           </h3>
-          <p className="text-red-600 dark:text-red-300 mb-4">
+          <p className="text-red-600 dark:text-red-300">
             {error}
-          </p>
-          <p className="text-sm text-red-500 dark:text-red-400">
-            Showing sample data instead.
           </p>
         </div>
       </div>
@@ -72,17 +97,41 @@ const ResultsDisplay: React.FC = () => {
     );
   }
 
+  const totalResults = pagination?.total_results || verses.length;
+  const hasMore = pagination?.has_next || false;
+
   return (
     <div className="space-y-6">
       {/* Results Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
             Search Results
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Found {totalResults} verses matching "{searchQuery}" in {searchType} search
+            {useStreaming ? (
+              <>Found {verses.length}{totalResults > verses.length ? ` of ${totalResults}` : ''} verses matching "{searchQuery}"</>
+            ) : (
+              <>Showing {verses.length} of {totalResults} verses matching "{searchQuery}"</>
+            )} in {searchType} search
           </p>
+        </div>
+        
+        {/* Controls */}
+        <div className="flex items-center gap-4">
+          {/* Streaming Mode Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {useStreaming ? 'Streaming' : 'Paginated'}
+            </span>
+            <button
+              onClick={toggleStreamingMode}
+              className="text-gold-500 hover:text-gold-600 transition-colors"
+              title={useStreaming ? 'Switch to paginated mode' : 'Switch to streaming mode'}
+            >
+              {useStreaming ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -97,12 +146,36 @@ const ResultsDisplay: React.FC = () => {
         ))}
       </div>
 
-      {/* Load More */}
-      {verses.length >= 10 && (
+      {/* Loading More Indicator */}
+      {loading && verses.length > 0 && (
+        <div className="text-center py-6">
+          <div className="inline-flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gold-500"></div>
+            <span>Loading more results...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Load More Button */}
+      {!useStreaming && hasMore && !loading && (
         <div className="text-center pt-8">
-          <button className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors">
+          <button 
+            onClick={loadNextPage}
+            className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
+          >
             Load More Results
           </button>
+        </div>
+      )}
+
+      {/* End of Results */}
+      {((useStreaming && streamingProgress === 100) || (!useStreaming && !hasMore)) && verses.length > 0 && (
+        <div className="text-center pt-8">
+          <div className="inline-flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+            <Download className="w-4 h-4" />
+            <span>All results loaded ({totalResults} total)</span>
+          </div>
         </div>
       )}
     </div>

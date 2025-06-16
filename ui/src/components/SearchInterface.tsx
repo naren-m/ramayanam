@@ -14,7 +14,7 @@ const KANDAS = [
 ];
 
 const SearchInterface: React.FC = () => {
-  const { searchVerses, filters, setFilters, clearSearch, loading } = useSearch();
+  const { searchVerses, filters, setFilters, clearSearch, loading, useStreaming, pagination } = useSearch();
   const [englishQuery, setEnglishQuery] = useState('');
   const [sanskritQuery, setSanskritQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -161,6 +161,28 @@ const SearchInterface: React.FC = () => {
                 className="w-full h-2 bg-gold-200 rounded-lg appearance-none cursor-pointer"
               />
             </div>
+            {!useStreaming && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Search Mode
+                </label>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <p>📥 Paginated mode: {pagination?.page_size || 20} results per page</p>
+                  <p className="text-xs mt-1">Switch to streaming mode for progressive loading</p>
+                </div>
+              </div>
+            )}
+            {useStreaming && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Search Mode
+                </label>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <p>🔄 Streaming mode: Results load progressively</p>
+                  <p className="text-xs mt-1">Switch to paginated mode for controlled loading</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

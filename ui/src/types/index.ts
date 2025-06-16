@@ -12,6 +12,20 @@ export interface SearchFilters {
   threshold?: number;
 }
 
+export interface PaginationInfo {
+  page: number;
+  page_size: number;
+  total_results: number;
+  total_pages: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+export interface PaginatedResponse {
+  results: Verse[];
+  pagination: PaginationInfo;
+}
+
 export interface SearchHistory {
   id: string;
   query: string;

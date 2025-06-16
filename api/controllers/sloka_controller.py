@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, Response
 from api.models.sloka_model import Sloka
-from api.services.fuzzy_search_service import FuzzySearchService
+from api.services.optimized_fuzzy_search_service import OptimizedFuzzySearchService
 from api.services.sloka_reader import SlokaReader
 from api.config import Config
 from api.exceptions import (
@@ -23,7 +23,7 @@ sloka_reader = SlokaReader(Config.SLOKAS_PATH)
 # Load Ramayanam instance on app start
 try:
     ramayanam_data = Ramayanam.load()
-    fuzzy_search_service = FuzzySearchService(ramayanam_data)
+    fuzzy_search_service = OptimizedFuzzySearchService(ramayanam_data)
     logger.info("Successfully loaded Ramayanam data")
 except Exception as e:
     logger.error(f"Failed to load Ramayanam data: {e}")
@@ -97,12 +97,14 @@ def get_slokas_by_kanda_sarga(kanda_number, sarga_number, sloka_number):
 @sloka_blueprint.route("/slokas/fuzzy-search", methods=["GET"])
 def fuzzy_search_slokas():
     """
-    Fuzzy search for slokas based on English translation query.
+    Fuzzy search for slokas based on English translation query with pagination.
     
     Query parameters:
         - query (str): Search query for English translations
         - kanda (int, optional): Specific kanda to search in (0 for all kandas)
         - threshold (int, optional): Minimum similarity threshold (default: 70)
+        - page (int, optional): Page number (1-based, default: 1)
+        - page_size (int, optional): Number of results per page (default: 10, max: 50)
     """
     try:
         query = request.args.get("query", "").strip()
@@ -111,23 +113,53 @@ def fuzzy_search_slokas():
             
         kanda = request.args.get("kanda", "0")
         threshold = int(request.args.get("threshold", Config.DEFAULT_FUZZY_THRESHOLD))
+        page = int(request.args.get("page", 1))
+        page_size = min(int(request.args.get("page_size", Config.DEFAULT_PAGE_SIZE)), Config.MAX_PAGE_SIZE)
         
         try:
             kanda_num = int(kanda) if kanda else 0
         except ValueError:
             return jsonify({"error": "Invalid kanda parameter"}), 400
             
-        logger.debug("Fuzzy search - Query: %s, Kanda: %s, Threshold: %d", query, kanda_num, threshold)
-        
-        if kanda_num == 0:
-            results = fuzzy_search_service.search_translation_fuzzy(query)
-        else:
-            results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda_num, query, threshold)
+        if page < 1:
+            return jsonify({"error": "Page number must be >= 1"}), 400
             
-        # Limit results for performance
-        limited_results = results[:Config.MAX_SEARCH_RESULTS]
+        logger.debug("Fuzzy search - Query: %s, Kanda: %s, Threshold: %d, Page: %d, Size: %d", 
+                    query, kanda_num, threshold, page, page_size)
         
-        return jsonify(limited_results)
+        # Get all results first - use optimized search with result limit
+        max_total_results = page_size * 100  # Limit total results to avoid memory issues
+        if kanda_num == 0:
+            all_results = fuzzy_search_service.search_translation_fuzzy(query, max_total_results)
+        else:
+            all_results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda_num, query, threshold)
+            
+        # Calculate pagination
+        total_results = len(all_results)
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        # Get page results
+        page_results = all_results[start_idx:end_idx]
+        
+        # Calculate pagination metadata
+        total_pages = (total_results + page_size - 1) // page_size
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        response = {
+            "results": page_results,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total_results": total_results,
+                "total_pages": total_pages,
+                "has_next": has_next,
+                "has_prev": has_prev
+            }
+        }
+        
+        return jsonify(response)
         
     except Exception as e:
         logger.error(f"Error in fuzzy_search_slokas: {e}")
@@ -137,12 +169,14 @@ def fuzzy_search_slokas():
 @sloka_blueprint.route("/slokas/fuzzy-search-sanskrit", methods=["GET"])
 def fuzzy_search_slokas_sanskrit():
     """
-    Fuzzy search for slokas in Sanskrit text and meaning.
+    Fuzzy search for slokas in Sanskrit text and meaning with pagination.
     
     Query parameters:
         - query (str): Search query for Sanskrit text
         - kanda (int, optional): Specific kanda to search in (0 for all kandas)
         - threshold (int, optional): Minimum similarity threshold (default: 70)
+        - page (int, optional): Page number (1-based, default: 1)
+        - page_size (int, optional): Number of results per page (default: 10, max: 50)
     """
     try:
         query = request.args.get("query", "").strip()
@@ -151,23 +185,53 @@ def fuzzy_search_slokas_sanskrit():
             
         kanda = request.args.get("kanda", "0")
         threshold = int(request.args.get("threshold", Config.DEFAULT_FUZZY_THRESHOLD))
+        page = int(request.args.get("page", 1))
+        page_size = min(int(request.args.get("page_size", Config.DEFAULT_PAGE_SIZE)), Config.MAX_PAGE_SIZE)
         
         try:
             kanda_num = int(kanda) if kanda else 0
         except ValueError:
             return jsonify({"error": "Invalid kanda parameter"}), 400
             
-        logger.debug("Sanskrit fuzzy search - Query: %s, Kanda: %s, Threshold: %d", query, kanda_num, threshold)
-        
-        if kanda_num == 0:
-            results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query, threshold)
-        else:
-            results = fuzzy_search_service.search_sloka_sanskrit_in_kanda_fuzzy(kanda_num, query, threshold)
+        if page < 1:
+            return jsonify({"error": "Page number must be >= 1"}), 400
             
-        # Limit results for performance
-        limited_results = results[:Config.MAX_SEARCH_RESULTS]
+        logger.debug("Sanskrit fuzzy search - Query: %s, Kanda: %s, Threshold: %d, Page: %d, Size: %d", 
+                    query, kanda_num, threshold, page, page_size)
         
-        return jsonify(limited_results)
+        # Get all results first - use optimized search with result limit
+        max_total_results = page_size * 100  # Limit total results to avoid memory issues
+        if kanda_num == 0:
+            all_results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query, threshold, max_total_results)
+        else:
+            all_results = fuzzy_search_service.search_sloka_sanskrit_in_kanda_fuzzy(kanda_num, query, threshold)
+            
+        # Calculate pagination
+        total_results = len(all_results)
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        # Get page results
+        page_results = all_results[start_idx:end_idx]
+        
+        # Calculate pagination metadata
+        total_pages = (total_results + page_size - 1) // page_size
+        has_next = page < total_pages
+        has_prev = page > 1
+        
+        response = {
+            "results": page_results,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total_results": total_results,
+                "total_pages": total_pages,
+                "has_next": has_next,
+                "has_prev": has_prev
+            }
+        }
+        
+        return jsonify(response)
         
     except Exception as e:
         logger.error(f"Error in fuzzy_search_slokas_sanskrit: {e}")
@@ -176,21 +240,60 @@ def fuzzy_search_slokas_sanskrit():
 
 @sloka_blueprint.route("/slokas/fuzzy-search-stream", methods=["GET"])
 def fuzzy_search_slokas_stream():
-    """Streaming fuzzy search for real-time results."""
+    """Streaming fuzzy search for progressive loading of results."""
     try:
         query = request.args.get("query", "").strip()
         if not query:
             return jsonify({"error": "Query parameter is required"}), 400
             
+        kanda = request.args.get("kanda", "0")
+        threshold = int(request.args.get("threshold", Config.DEFAULT_FUZZY_THRESHOLD))
+        batch_size = int(request.args.get("batch_size", Config.STREAM_BATCH_SIZE))
+        
+        try:
+            kanda_num = int(kanda) if kanda else 0
+        except ValueError:
+            return jsonify({"error": "Invalid kanda parameter"}), 400
+            
         def generate_results():
             try:
-                for result in fuzzy_search_service.search_translation_fuzzy(query):
-                    yield f"{jsonify(result).get_data(as_text=True)}\n"
+                # Get search results iterator
+                if kanda_num == 0:
+                    all_results = fuzzy_search_service.search_translation_fuzzy(query)
+                else:
+                    all_results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda_num, query, threshold)
+                
+                import json
+                
+                # Send total count first
+                total_count = len(all_results)
+                yield f'data: {json.dumps({"type": "total", "count": total_count})}\n\n'
+                
+                # Send results in batches
+                for i in range(0, len(all_results), batch_size):
+                    batch = all_results[i:i + batch_size]
+                    batch_data = {
+                        "type": "batch",
+                        "results": batch,
+                        "batch_number": (i // batch_size) + 1,
+                        "has_more": i + batch_size < len(all_results)
+                    }
+                    yield f'data: {json.dumps(batch_data)}\n\n'
+                    
+                # Send completion signal
+                yield f'data: {json.dumps({"type": "complete"})}\n\n'
+                
             except Exception as e:
+                import json
                 logger.error(f"Error in streaming search: {e}")
-                yield f'{jsonify({"error": "Search failed"}).get_data(as_text=True)}\n'
+                yield f'data: {json.dumps({"type": "error", "message": "Search failed"})}\n\n'
 
-        return Response(generate_results(), content_type="application/json; charset=utf-8")
+        return Response(generate_results(), 
+                       content_type="text/event-stream",
+                       headers={
+                           "Cache-Control": "no-cache",
+                           "Connection": "keep-alive"
+                       })
         
     except Exception as e:
         logger.error(f"Error in fuzzy_search_slokas_stream: {e}")

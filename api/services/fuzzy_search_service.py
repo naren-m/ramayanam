@@ -1,9 +1,15 @@
 from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz as rapid_fuzz
+from rapidfuzz import utils as rapid_utils
 
 # fuzzy_search_service.py
 import logging
 from difflib import SequenceMatcher
 import re
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import hashlib
+from functools import lru_cache
 
 
 class FuzzySearchService:
@@ -49,6 +55,31 @@ class FuzzySearchService:
         self.ramayanam_data = ramayanam_data
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
+        # Simple cache for search results
+        self._search_cache = {}
+        self._cache_lock = threading.Lock()
+        # Pre-build search indices for faster lookups
+        self._build_search_indices()
+
+    def _get_cache_key(self, query, search_type, kanda=None, threshold=70):
+        \"\"\"Generate a cache key for search results.\"\"\"
+        key_string = f\"{search_type}:{query}:{kanda}:{threshold}\"
+        return hashlib.md5(key_string.encode()).hexdigest()
+    
+    def _get_cached_result(self, cache_key):
+        \"\"\"Get cached search result if available.\"\"\"
+        with self._cache_lock:
+            return self._search_cache.get(cache_key)
+    
+    def _cache_result(self, cache_key, result):
+        \"\"\"Cache search result with size limit.\"\"\"
+        with self._cache_lock:
+            # Simple cache size management - keep only 50 most recent searches
+            if len(self._search_cache) >= 50:
+                # Remove oldest entry
+                oldest_key = next(iter(self._search_cache))
+                del self._search_cache[oldest_key]
+            self._search_cache[cache_key] = result
 
     def tokenize(self, text):
         """
@@ -172,7 +203,7 @@ class FuzzySearchService:
                 text = sloka.translation.lower()  # Convert sloka text to lowercase
                 highlighted_text = self.search_and_highlight(text, query)
 
-                ratio = fuzz.partial_ratio(text, query)
+                ratio = rapid_fuzz.partial_ratio(text, query)
                 self.logger.debug(
                     "Checking sloka %s.%s.%s - Ratio: %s",
                     kanda_number,
@@ -264,7 +295,7 @@ class FuzzySearchService:
                     sloka.meaning.lower(), query
                 )
 
-                ratio = fuzz.partial_ratio(text, query)
+                ratio = rapid_fuzz.partial_ratio(text, query)
                 self.logger.debug(
                     "Checking sloka %s.%s.%s - Ratio: %s",
                     kanda_number,

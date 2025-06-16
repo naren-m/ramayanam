@@ -1,25 +1,27 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Verse, SearchFilters, SearchHistory, FavoriteVerse } from '../types';
+import { Verse, SearchFilters, SearchHistory, FavoriteVerse, PaginationInfo } from '../types';
 import { searchAPI, APIError } from '../utils/api';
 
 interface SearchContextType {
   verses: Verse[];
   loading: boolean;
+  streamingProgress: number;
   error: string | null;
   searchHistory: SearchHistory[];
   favorites: FavoriteVerse[];
-  totalResults: number;
-  currentPage: number;
+  pagination: PaginationInfo | null;
   searchQuery: string;
   searchType: 'english' | 'sanskrit';
   filters: SearchFilters;
+  useStreaming: boolean;
   
   searchVerses: (query: string, type: 'english' | 'sanskrit') => Promise<void>;
+  loadNextPage: () => Promise<void>;
   setFilters: (filters: SearchFilters) => void;
   addToFavorites: (verse: Verse) => void;
   removeFromFavorites: (verseId: string) => void;
   clearSearch: () => void;
-  setCurrentPage: (page: number) => void;
+  toggleStreamingMode: () => void;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [streamingProgress, setStreamingProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>(() => {
     const stored = localStorage.getItem('ramayana-search-history');
@@ -36,10 +39,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const stored = localStorage.getItem('ramayana-favorites');
     return stored ? JSON.parse(stored) : [];
   });
-  const [totalResults, setTotalResults] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState<'english' | 'sanskrit'>('english');
+  const [useStreaming, setUseStreaming] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     kanda: null,
     minRatio: 0
@@ -48,7 +51,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const searchVerses = useCallback(async (query: string, type: 'english' | 'sanskrit') => {
     if (!query.trim()) {
       setVerses([]);
-      setTotalResults(0);
+      setPagination(null);
       return;
     }
 
@@ -56,12 +59,20 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setError(null);
     setSearchQuery(query);
     setSearchType(type);
-    setCurrentPage(1);
+    setStreamingProgress(0);
 
     try {
-      const results = await searchAPI.search(query, type, filters);
-      setVerses(results);
-      setTotalResults(results.length);
+      // Always use paginated search for better performance
+      const response = await searchAPI.search(query, type, filters, 1, 10);
+      setVerses(response.results);
+      setPagination(response.pagination);
+      
+      // Auto-load more results in background for better UX
+      if (response.pagination.has_next && response.results.length > 0) {
+        setTimeout(() => {
+          loadMorePagesAutomatically(query, type, filters, 2, 2); // Load next 2 pages
+        }, 500);
+      }
 
       // Add to search history
       const historyEntry: SearchHistory = {
@@ -69,7 +80,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         query,
         type,
         timestamp: Date.now(),
-        resultCount: results.length
+        resultCount: verses.length
       };
 
       const updatedHistory = [historyEntry, ...searchHistory.slice(0, 9)];
@@ -85,14 +96,68 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       setError(errorMessage);
       setVerses([]);
-      setTotalResults(0);
+      setPagination(null);
       
       // Log error for debugging
       console.error('Search error:', err);
     } finally {
       setLoading(false);
     }
-  }, [filters, searchHistory]);
+  }, [filters, searchHistory, verses.length]);
+
+  const loadNextPage = useCallback(async () => {
+    if (!pagination?.has_next || !searchQuery || useStreaming) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await searchAPI.search(
+        searchQuery, 
+        searchType, 
+        filters, 
+        pagination.page + 1, 
+        pagination.page_size
+      );
+      
+      setVerses(prev => [...prev, ...response.results]);
+      setPagination(response.pagination);
+    } catch (err) {
+      const errorMessage = err instanceof APIError 
+        ? err.message 
+        : 'Failed to load next page';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [pagination, searchQuery, searchType, filters, useStreaming]);
+
+  const loadMorePagesAutomatically = useCallback(async (
+    query: string, 
+    type: 'english' | 'sanskrit', 
+    searchFilters: SearchFilters,
+    startPage: number, 
+    numPages: number
+  ) => {
+    try {
+      for (let page = startPage; page < startPage + numPages; page++) {
+        const response = await searchAPI.search(query, type, searchFilters, page, 5);
+        if (response.results.length > 0) {
+          setVerses(prev => [...prev, ...response.results]);
+          setPagination(response.pagination);
+          
+          // Small delay between pages to show progressive loading
+          if (page < startPage + numPages - 1) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        } else {
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('Auto-loading failed:', err);
+    }
+  }, []);
 
   const addToFavorites = useCallback((verse: Verse) => {
     const favorite: FavoriteVerse = {
@@ -116,28 +181,35 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setVerses([]);
     setError(null);
     setSearchQuery('');
-    setTotalResults(0);
-    setCurrentPage(1);
+    setPagination(null);
+    setStreamingProgress(0);
   }, []);
+
+  const toggleStreamingMode = useCallback(() => {
+    setUseStreaming(prev => !prev);
+    clearSearch();
+  }, [clearSearch]);
 
   return (
     <SearchContext.Provider value={{
       verses,
       loading,
+      streamingProgress,
       error,
       searchHistory,
       favorites,
-      totalResults,
-      currentPage,
+      pagination,
       searchQuery,
       searchType,
       filters,
+      useStreaming,
       searchVerses,
+      loadNextPage,
       setFilters,
       addToFavorites,
       removeFromFavorites,
       clearSearch,
-      setCurrentPage
+      toggleStreamingMode
     }}>
       {children}
     </SearchContext.Provider>

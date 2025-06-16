@@ -1,4 +1,4 @@
-import { Verse, SearchFilters } from '../types';
+import { Verse, SearchFilters, PaginatedResponse } from '../types';
 
 const API_BASE_URL = '/api/ramayanam/slokas';
 
@@ -29,7 +29,13 @@ class SearchAPI {
   }
 
 
-  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters): Promise<Verse[]> {
+  async search(
+    query: string, 
+    type: 'english' | 'sanskrit', 
+    filters: SearchFilters, 
+    page: number = 1, 
+    pageSize: number = 10
+  ): Promise<PaginatedResponse> {
     if (!query.trim()) {
       throw new APIError('Search query cannot be empty', 400);
     }
@@ -37,19 +43,104 @@ class SearchAPI {
     const endpoint = type === 'english' ? 'fuzzy-search' : 'fuzzy-search-sanskrit';
     const params = new URLSearchParams({
       query: query.trim(),
+      page: page.toString(),
+      page_size: pageSize.toString(),
       ...(filters.kanda && { kanda: filters.kanda.toString() }),
       ...(filters.threshold && { threshold: filters.threshold.toString() })
     });
     
     const url = `${API_BASE_URL}/${endpoint}?${params}`;
-    const results = await this.makeRequest(url);
+    const response = await this.makeRequest(url);
     
-    if (!Array.isArray(results)) {
+    if (!response.results || !Array.isArray(response.results)) {
       throw new APIError('Invalid response format from server', 500);
     }
     
     // Filter by minimum ratio if specified
-    return results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
+    const filteredResults = response.results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
+    
+    return {
+      results: filteredResults,
+      pagination: response.pagination
+    };
+  }
+
+  async searchStream(
+    query: string,
+    type: 'english' | 'sanskrit',
+    filters: SearchFilters,
+    onBatch: (batch: Verse[], hasMore: boolean) => void,
+    onTotal: (total: number) => void,
+    onComplete: () => void,
+    onError: (error: string) => void
+  ): Promise<void> {
+    if (!query.trim()) {
+      throw new APIError('Search query cannot be empty', 400);
+    }
+
+    const params = new URLSearchParams({
+      query: query.trim(),
+      batch_size: '5',
+      ...(filters.kanda && { kanda: filters.kanda.toString() }),
+      ...(filters.threshold && { threshold: filters.threshold.toString() })
+    });
+    
+    const url = `${API_BASE_URL}/fuzzy-search-stream?${params}`;
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new APIError(`HTTP error! status: ${response.status}`, response.status);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new APIError('Failed to get response reader', 500);
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              switch (data.type) {
+                case 'total':
+                  onTotal(data.count);
+                  break;
+                case 'batch':
+                  const filteredBatch = data.results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
+                  onBatch(filteredBatch, data.has_more);
+                  break;
+                case 'complete':
+                  onComplete();
+                  return;
+                case 'error':
+                  onError(data.message);
+                  return;
+              }
+            } catch (e) {
+              console.error('Failed to parse streaming data:', e);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof APIError) {
+        throw error;
+      }
+      onError('Network error occurred during streaming');
+    }
   }
 
   async getKandaName(kandaNumber: number): Promise<string> {
