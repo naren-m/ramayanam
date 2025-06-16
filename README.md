@@ -382,6 +382,3 @@ For issues and questions:
 - Check existing documentation
 - Review deployment guides
 
----
-
-**🕉️ May this digital preservation of the ancient wisdom serve seekers of knowledge and devotees alike.**
