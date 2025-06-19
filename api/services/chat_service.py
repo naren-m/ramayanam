@@ -83,13 +83,22 @@ class ChatMessage:
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses."""
+        context_dict = None
+        if self.context:
+            context_dict = {
+                "active_text": self.context.active_text,
+                "discussion_topic": self.context.discussion_topic,
+                "referenced_units": self.context.referenced_units,
+                "user_intent": self.context.user_intent.value if self.context.user_intent else None
+            }
+        
         return {
             "message_id": self.message_id,
             "role": self.role,
             "content": self.content,
             "timestamp": self.timestamp.isoformat(),
             "references": [asdict(ref) for ref in self.references],
-            "context": asdict(self.context) if self.context else None
+            "context": context_dict
         }
 
 

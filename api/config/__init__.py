@@ -1,3 +1,6 @@
+"""
+Configuration package for the universal sacred text platform.
+"""
 import os
 
 class Config:
