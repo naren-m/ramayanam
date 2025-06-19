@@ -23,8 +23,12 @@ CORS(app, origins=Config.CORS_ORIGINS)
 # Add this for testing
 test_client = app.test_client
 
-# Register the sloka_blueprint
+# Register blueprints
 app.register_blueprint(sloka_blueprint, url_prefix='/api/ramayanam')
+
+# Register chat blueprint
+from api.controllers.chat_controller import chat_blueprint
+app.register_blueprint(chat_blueprint, url_prefix='/api/chat')
 
 # Serve React app
 @app.route('/')
