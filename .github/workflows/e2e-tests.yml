@@ -1,0 +1,127 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: |
+        docker build -t ramayanam:latest .
+
+    - name: Start application container
+      run: |
+        docker run -d \
+          --name ramayanam-app \
+          -p 5000:5000 \
+          -e FLASK_ENV=production \
+          ramayanam:latest
+
+    - name: Wait for application to be ready
+      run: |
+        timeout 300 bash -c '
+          until curl -f http://localhost:5000/ > /dev/null 2>&1; do
+            echo "Waiting for app to be ready..."
+            sleep 5
+          done
+        '
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install ${{ matrix.browser }}
+
+    - name: Run E2E tests
+      run: npx playwright test --project=${{ matrix.browser }} --reporter=line
+      env:
+        CI: true
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: |
+          playwright-report/
+          test-results/
+        retention-days: 30
+
+    - name: Show application logs on failure
+      if: failure()
+      run: |
+        echo "=== Application Logs ==="
+        docker logs ramayanam-app
+
+    - name: Cleanup
+      if: always()
+      run: |
+        docker stop ramayanam-app || true
+        docker rm ramayanam-app || true
+
+  e2e-tests-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Run E2E tests with Docker Compose
+      run: |
+        chmod +x scripts/test-e2e-compose.sh
+        ./scripts/test-e2e-compose.sh
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report-compose
+        path: |
+          playwright-report/
+          test-results/
+        retention-days: 30
+
+  summary:
+    needs: [e2e-tests, e2e-tests-compose]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Check test results
+      run: |
+        if [[ "${{ needs.e2e-tests.result }}" == "success" && "${{ needs.e2e-tests-compose.result }}" == "success" ]]; then
+          echo "✅ All E2E tests passed!"
+        else
+          echo "❌ Some E2E tests failed"
+          echo "Browser tests: ${{ needs.e2e-tests.result }}"
+          echo "Compose tests: ${{ needs.e2e-tests-compose.result }}"
+          exit 1
+        fi

@@ -10,6 +10,9 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import hashlib
 from functools import lru_cache
+import time
+from collections import defaultdict, OrderedDict
+import weakref
 
 
 class FuzzySearchService:
@@ -55,31 +58,129 @@ class FuzzySearchService:
         self.ramayanam_data = ramayanam_data
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        # Simple cache for search results
-        self._search_cache = {}
+        # Advanced caching with TTL and memory management
+        self._search_cache = OrderedDict()
+        self._cache_timestamps = {}
         self._cache_lock = threading.Lock()
+        self._cache_ttl = 300  # 5 minutes TTL
+        self._cache_max_size = 100
         # Pre-build search indices for faster lookups
         self._build_search_indices()
+        # Thread pool for parallel processing
+        self._thread_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="fuzzy-search")
+    
+    def _build_search_indices(self):
+        """Build inverted indices for faster lookups."""
+        self.logger.info("Building search indices...")
+        start_time = time.time()
+        
+        # Inverted index for translations: word -> list of sloka references
+        self.translation_word_index = defaultdict(list)
+        # Inverted index for Sanskrit text: word -> list of sloka references  
+        self.sanskrit_word_index = defaultdict(list)
+        # Full text index for quick lookups
+        self.translation_index = []
+        self.sanskrit_index = []
+        
+        # Validate data structure
+        if self.ramayanam_data is None:
+            raise TypeError("ramayanam_data cannot be None")
+        if not hasattr(self.ramayanam_data, 'kandas'):
+            self.logger.warning("Invalid ramayanam_data structure - no 'kandas' attribute")
+            return
+        
+        sloka_count = 0
+        for kanda_number, kanda in self.ramayanam_data.kandas.items():
+            for sarga_number, sarga in kanda.sargas.items():
+                for sloka_number, sloka in sarga.slokas.items():
+                    if sloka:
+                        sloka_ref = {
+                            'sloka_id': sloka.id,
+                            'sloka_text': sloka.text,
+                            'translation': sloka.translation,
+                            'meaning': sloka.meaning,
+                            'kanda': kanda_number,
+                            'sarga': sarga_number,
+                            'sloka_num': sloka_number
+                        }
+                        
+                        # Build translation indices
+                        if sloka.translation:
+                            words = self._extract_words(sloka.translation.lower())
+                            for word in words:
+                                self.translation_word_index[word].append(sloka_ref)
+                            self.translation_index.append(sloka_ref)
+                        
+                        # Build Sanskrit indices
+                        if sloka.text and sloka.meaning:
+                            # Index both Sanskrit text and meaning
+                            sanskrit_words = self._extract_words(sloka.text.lower())
+                            meaning_words = self._extract_words(sloka.meaning.lower())
+                            all_words = set(sanskrit_words + meaning_words)
+                            
+                            for word in all_words:
+                                self.sanskrit_word_index[word].append(sloka_ref)
+                            self.sanskrit_index.append(sloka_ref)
+                        
+                        sloka_count += 1
+        
+        build_time = time.time() - start_time
+        self.logger.info(f"Built search indices in {build_time:.2f}s: {sloka_count} slokas, "
+                        f"{len(self.translation_word_index)} translation words, "
+                        f"{len(self.sanskrit_word_index)} Sanskrit words")
+    
+    def _extract_words(self, text):
+        """Extract meaningful words from text for indexing."""
+        if not text:
+            return []
+        # Split on various delimiters and filter short words
+        words = re.findall(r'\b\w{3,}\b', text.lower())
+        return [word for word in words if len(word) >= 3]
 
     def _get_cache_key(self, query, search_type, kanda=None, threshold=70):
-        \"\"\"Generate a cache key for search results.\"\"\"
-        key_string = f\"{search_type}:{query}:{kanda}:{threshold}\"
+        """Generate a cache key for search results."""
+        key_string = f"{search_type}:{query}:{kanda}:{threshold}"
         return hashlib.md5(key_string.encode()).hexdigest()
     
     def _get_cached_result(self, cache_key):
-        \"\"\"Get cached search result if available.\"\"\"
+        """Get cached search result if available and not expired."""
         with self._cache_lock:
-            return self._search_cache.get(cache_key)
+            if cache_key in self._search_cache:
+                timestamp = self._cache_timestamps.get(cache_key, 0)
+                if time.time() - timestamp < self._cache_ttl:
+                    # Move to end (mark as recently used)
+                    self._search_cache.move_to_end(cache_key)
+                    return self._search_cache[cache_key]
+                else:
+                    # Remove expired entry
+                    del self._search_cache[cache_key]
+                    del self._cache_timestamps[cache_key]
+            return None
     
     def _cache_result(self, cache_key, result):
-        \"\"\"Cache search result with size limit.\"\"\"
+        """Cache search result with TTL and size limits."""
         with self._cache_lock:
-            # Simple cache size management - keep only 50 most recent searches
-            if len(self._search_cache) >= 50:
-                # Remove oldest entry
+            # Remove oldest entries if cache is full
+            while len(self._search_cache) >= self._cache_max_size:
                 oldest_key = next(iter(self._search_cache))
                 del self._search_cache[oldest_key]
+                del self._cache_timestamps[oldest_key]
+            
+            # Add new entry
             self._search_cache[cache_key] = result
+            self._cache_timestamps[cache_key] = time.time()
+    
+    def _cleanup_expired_cache(self):
+        """Remove expired cache entries."""
+        current_time = time.time()
+        with self._cache_lock:
+            expired_keys = [
+                key for key, timestamp in self._cache_timestamps.items()
+                if current_time - timestamp >= self._cache_ttl
+            ]
+            for key in expired_keys:
+                del self._search_cache[key]
+                del self._cache_timestamps[key]
 
     def tokenize(self, text):
         """
@@ -146,23 +247,138 @@ class FuzzySearchService:
         highlighted_text = " ".join(highlighted_tokens)
         return highlighted_text
 
-    def search_translation_fuzzy(self, query):
+    def search_translation_fuzzy(self, query, max_results=1000):
         """
-        Search for fuzzy translations of a given query across all Kandas in the Ramayanam data.
+        Search for fuzzy translations using inverted indices and caching.
 
         Parameters:
-            query (str): The search term to find translations for. This will be converted to lowercase for case-insensitive matching.
+            query (str): The search term to find translations for.
+            max_results (int): Maximum number of results to return.
 
         Returns:
-            list: A list of results containing fuzzy matches for the provided query from all Kandas.
+            list: A list of results containing fuzzy matches for the provided query.
         """
-        query = query.lower()  # Convert query to lowercase
-        self.logger.info("Searching for query %s", query)
+        query = query.lower().strip()
+        if not query:
+            return []
+            
+        cache_key = self._get_cache_key(query, 'translation_all')
+        
+        # Check cache first
+        cached_result = self._get_cached_result(cache_key)
+        if cached_result:
+            self.logger.info(f"Cache hit for translation search: {query}")
+            return cached_result[:max_results]
+        
+        self.logger.info(f"Searching translations for query: {query}")
+        
+        # Use inverted index for fast candidate retrieval
+        candidates = self._get_translation_candidates(query)
+        
+        if not candidates:
+            # Fallback to full search if no candidates found
+            candidates = self.translation_index
+        
+        # Perform parallel fuzzy matching on candidates
+        results = self._parallel_fuzzy_search(candidates, query, 'translation', threshold=70)
+        
+        # Sort by ratio and limit results
+        results.sort(key=lambda x: x["ratio"], reverse=True)
+        final_results = results[:max_results]
+        
+        # Cache the result
+        self._cache_result(cache_key, final_results)
+        return final_results
+    
+    def _get_translation_candidates(self, query):
+        """Get candidate slokas using inverted index."""
+        query_words = self._extract_words(query)
+        if not query_words:
+            return []
+        
+        # Find slokas that contain any of the query words
+        candidate_refs = set()
+        for word in query_words:
+            if word in self.translation_word_index:
+                candidate_refs.update(self.translation_word_index[word])
+        
+        # Convert to list and deduplicate
+        candidates = list({ref['sloka_id']: ref for ref in candidate_refs}.values())
+        
+        self.logger.debug(f"Found {len(candidates)} candidates for query words: {query_words}")
+        return candidates
+    
+    def _parallel_fuzzy_search(self, candidates, query, search_type, threshold=70):
+        """Perform parallel fuzzy search on candidates."""
+        if not candidates:
+            return []
+        
+        # Split candidates into chunks for parallel processing
+        chunk_size = max(50, len(candidates) // 4)
+        chunks = [candidates[i:i+chunk_size] for i in range(0, len(candidates), chunk_size)]
+        
+        all_results = []
+        futures = []
+        
+        for chunk in chunks:
+            future = self._thread_pool.submit(self._search_chunk, chunk, query, search_type, threshold)
+            futures.append(future)
+        
+        for future in futures:
+            try:
+                chunk_results = future.result(timeout=30)  # 30 second timeout
+                all_results.extend(chunk_results)
+            except Exception as e:
+                self.logger.error(f"Error in parallel search: {e}")
+        
+        return all_results
+    
+    def _search_chunk(self, chunk, query, search_type, threshold):
+        """Search a chunk of candidates."""
         results = []
-        for kanda_number, kanda in self.ramayanam_data.kandas.items():
-            self.logger.info("Kadna %s", kanda)
-            r = self.search_translation_in_kanda_fuzzy(kanda_number, query, 70)
-            results.extend(r)
+        
+        for item in chunk:
+            try:
+                if search_type == 'translation':
+                    if not item.get('translation'):
+                        continue
+                    text = item['translation'].lower()
+                    ratio = rapid_fuzz.partial_ratio(text, query)
+                    
+                    if ratio > threshold:
+                        highlighted_text = self.search_and_highlight(text, query)
+                        results.append({
+                            "sloka_number": item['sloka_id'],
+                            "sloka": item['sloka_text'],
+                            "translation": highlighted_text,
+                            "meaning": item['meaning'],
+                            "ratio": ratio,
+                        })
+                        
+                elif search_type == 'sanskrit':
+                    if not item.get('sloka_text') or not item.get('meaning'):
+                        continue
+                    text = item['sloka_text'].lower()
+                    meaning = item['meaning'].lower()
+                    
+                    text_ratio = rapid_fuzz.partial_ratio(text, query)
+                    meaning_ratio = rapid_fuzz.partial_ratio(meaning, query)
+                    ratio = max(text_ratio, meaning_ratio)
+                    
+                    if ratio > threshold:
+                        highlighted_text = self.search_and_highlight(text, query)
+                        highlighted_meaning = self.search_and_highlight(meaning, query)
+                        results.append({
+                            "sloka_number": item['sloka_id'],
+                            "sloka": highlighted_text,
+                            "translation": item['translation'],
+                            "meaning": highlighted_meaning,
+                            "ratio": ratio,
+                        })
+            except Exception as e:
+                self.logger.error(f"Error processing item {item.get('sloka_id', 'unknown')}: {e}")
+                continue
+        
         return results
 
     def search_translation_in_kanda_fuzzy(self, kanda_number, query, threshold=70):
@@ -225,30 +441,67 @@ class FuzzySearchService:
         results.sort(key=lambda x: x["ratio"], reverse=True)
         return results
 
-    def search_sloka_sanskrit_fuzzy(self, query, threshold=70):
+    def search_sloka_sanskrit_fuzzy(self, query, threshold=70, max_results=1000):
         """
-        Search for slokas in Sanskrit using a fuzzy matching algorithm.
+        Search for slokas in Sanskrit using inverted indices and parallel processing.
 
         Parameters:
             query (str): The search query in Sanskrit to be matched.
             threshold (int, optional): The minimum similarity threshold for fuzzy matching. Defaults to 70.
+            max_results (int): Maximum number of results to return.
 
         Returns:
             list: A list of slokas that match the query based on the fuzzy search criteria.
-
-        Logs:
-            - Logs the search query and each kanda being searched.
         """
-        query = query.lower()  # Convert query to lowercase
-        self.logger.info("Searching for query %s", query)
-        results = []
-        for kanda_number, kanda in self.ramayanam_data.kandas.items():
-            self.logger.info("Kadna %s", kanda)
-            r = self.search_sloka_sanskrit_in_kanda_fuzzy(
-                kanda_number, query, threshold
-            )
-            results.extend(r)
-        return results
+        query = query.lower().strip()
+        if not query:
+            return []
+            
+        cache_key = self._get_cache_key(query, 'sanskrit_all', threshold=threshold)
+        
+        # Check cache first
+        cached_result = self._get_cached_result(cache_key)
+        if cached_result:
+            self.logger.info(f"Cache hit for Sanskrit search: {query}")
+            return cached_result[:max_results]
+            
+        self.logger.info(f"Searching Sanskrit for query: {query}")
+        
+        # Use inverted index for fast candidate retrieval
+        candidates = self._get_sanskrit_candidates(query)
+        
+        if not candidates:
+            # Fallback to full search if no candidates found
+            candidates = self.sanskrit_index
+        
+        # Perform parallel fuzzy matching on candidates
+        results = self._parallel_fuzzy_search(candidates, query, 'sanskrit', threshold=threshold)
+        
+        # Sort by ratio and limit results
+        results.sort(key=lambda x: x["ratio"], reverse=True)
+        final_results = results[:max_results]
+        
+        # Cache the result
+        self._cache_result(cache_key, final_results)
+        return final_results
+    
+    def _get_sanskrit_candidates(self, query):
+        """Get candidate slokas for Sanskrit search using inverted index."""
+        query_words = self._extract_words(query)
+        if not query_words:
+            return []
+        
+        # Find slokas that contain any of the query words
+        candidate_refs = set()
+        for word in query_words:
+            if word in self.sanskrit_word_index:
+                candidate_refs.update(self.sanskrit_word_index[word])
+        
+        # Convert to list and deduplicate
+        candidates = list({ref['sloka_id']: ref for ref in candidate_refs}.values())
+        
+        self.logger.debug(f"Found {len(candidates)} Sanskrit candidates for query words: {query_words}")
+        return candidates
 
     def search_sloka_sanskrit_in_kanda_fuzzy(self, kanda_number, query, threshold=70):
         """

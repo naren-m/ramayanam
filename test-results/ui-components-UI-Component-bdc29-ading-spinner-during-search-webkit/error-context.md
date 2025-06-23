@@ -1,0 +1,341 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - img
+  - heading "Ramayana Digital Corpus" [level=1]
+  - paragraph: Search the Ancient Epic
+  - button "1":
+    - img
+    - text: "1"
+  - button "0":
+    - img
+    - text: "0"
+  - button "Switch to Dark Mode":
+    - img
+- main:
+  - img
+  - textbox "Search English translations...": rama
+  - button:
+    - img
+  - img
+  - textbox "खोजें (Search in Sanskrit)..."
+  - button "Filters":
+    - img
+    - text: Filters
+    - img
+  - combobox:
+    - option "All Kandams" [selected]
+    - option "Bala Kandam"
+    - option "Ayodhya Kandam"
+    - option "Aranya Kandam"
+    - option "Kishkindha Kandam"
+    - option "Sundara Kandam"
+    - option "Yuddha Kandam"
+  - heading "Search Results" [level=2]
+  - paragraph: Showing 20 of 500 verses matching "rama" in english search
+  - text: Paginated
+  - button "Switch to streaming mode":
+    - img
+  - text: 1.1.8 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "इक्ष्वाकुवंशप्रभवो रामो नाम जनैश्श्रुत: ।नियतात्मा महावीर्यो द्युतिमान्धृतिमान् वशी ।।1.1.8।। people have heard his name as rama, who was born in the race of king ikshvaku, having steady nature, possessing incomprehensible prowess, selfeffulgent, selfcommanding and subjecting senses under his control."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=8
+    - text: View Source
+    - img
+  - text: 1.1.9 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "बुद्धिमान्नीतिमान्वाग्मी श्रीमान् शत्रुनिबर्हण: ।विपुलांसो महाबाहु: कम्बुग्रीवो महाहनु: ।।1.1.9।। he (sri rama) is a great intellectual, adherent to rules, eloquent, handsome, destroyer of foes (sins), broadshouldered, strongarmed, having conchshaped neck and prominent cheeks."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=9
+    - text: View Source
+    - img
+  - text: 1.1.13 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: प्रजापतिसमश्श्रीमान् धाता रिपुनिषूदनः ।रक्षिता जीवलोकस्य धर्मस्य परिरक्षिता ।।1.1.13।। auspicious like brahma, sri rama is the sustainer of this world, destroyer of enemies and protector of all living beings and of the moral code.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=13
+    - text: View Source
+    - img
+  - text: 1.1.15 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: सर्वशास्त्रार्थतत्त्वज्ञस्स्मृतिमान्प्रतिभानवान् ।सर्वलोकप्रियस्साधुरदीनात्मा विचक्षणः ।।1.1.15।। sri rama knows the true meaning of all scriptures and has a retentive memory. he is talented (possessing brightness of conception). he is beloved and welldisposed towards all people (and courteous even towards those who have done him harm). he has an unperturbed mind (even in times of extreme grief) and is circumspect (in doing right things at the right time).
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=15
+    - text: View Source
+    - img
+  - text: 1.1.16 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: सर्वदाभिगतस्सद्भिस्समुद्र इव सिन्धुभिः ।आर्यस्सर्वसमश्चैव सदैकप्रियदर्शनः ।।1.1.16।। sri rama, like sea to rivers, is accessible to men of virtue and has equal disposition towards all. he always has a pleasing appearance.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=16
+    - text: View Source
+    - img
+  - text: 1.1.17 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "स च सर्वगुणोपेत: कौसल्यानन्दवर्धन: ।समुद्र इव गाम्भीर्ये धैर्येण हिमवानिव ।।1.1.17।। sri rama, bestowed with all virtues, enhanced the joys of kausalya, he is like the sea in deportment and like himavant in fortitude."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=17
+    - text: View Source
+    - img
+  - text: 1.1.18 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "विष्णुना सदृशो वीर्ये सोमवत्प्रियदर्शन: ।कालाग्निसदृश: क्रोधे क्षमया पृथिवीसम: ।।1.1.18।।धनदेन समस्त्यागे सत्ये धर्म इवापर: । sri rama is like visnu in prowess, the moon in pleasing appearance, the allconsuming fire in anger, the earth in patience, kubera in chartiy and the sun in steadfastness."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=18
+    - text: View Source
+    - img
+  - text: 1.1.19 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "तमेवं गुणसम्पन्नं रामं सत्यपराक्रमम् ।।1.1.19।।ज्येष्ठं श्रेष्ठगुणैर्युक्तं प्रियं दशरथस्सुतम् । प्रकृतीनां हितैर्युक्तं प्रकृतिप्रियकाम्यया ।।1.1.20।।यौवराज्येन संयोक्तुमैच्छत्प्रीत्या महीपति: । with a desire to promote the welfare of the people king dasaratha decided to install sri rama, his eldest and affectionate son as heir (apparent) who was bestowed with all excellent qualities and true prowess, beloved of the people he was ever intent in the welfare of the people."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=19
+    - text: View Source
+    - img
+  - text: 1.1.20 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: तस्याभिषेकसम्भारान्दृष्ट्वा भार्याऽथ कैकयी ।।1.1.21।।पूर्वं दत्तवरा देवी वरमेनमयाचत । विवासनं च रामस्य भरतस्याभिषेचनम् ।।1.1.22।। thereafter, having seen the preparations for installation of rama, queen kaikeyi who had been promised earlier with boons by dasaratha demanded of him the exile of rama and enthronement of bharata.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=20
+    - text: View Source
+    - img
+  - text: 1.1.21 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "स सत्यवचनाद्राजा धर्मपाशेन संयत: ।विवासयामास सुतं रामं दशरथ: प्रियम् ।।1.1.23।। dasaratha, true to his word and restrained by the bond of duty, sent his beloved son rama to the forest."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=21
+    - text: View Source
+    - img
+  - text: 1.1.17 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "स च सर्वगुणोपेत: कौसल्यानन्दवर्धन: ।समुद्र इव गाम्भीर्ये धैर्येण हिमवानिव ।।1.1.17।। sri rama, bestowed with all virtues, enhanced the joys of kausalya, he is like the sea in deportment and like himavant in fortitude."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=17
+    - text: View Source
+    - img
+  - text: 1.1.18 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "विष्णुना सदृशो वीर्ये सोमवत्प्रियदर्शन: ।कालाग्निसदृश: क्रोधे क्षमया पृथिवीसम: ।।1.1.18।।धनदेन समस्त्यागे सत्ये धर्म इवापर: । sri rama is like visnu in prowess, the moon in pleasing appearance, the allconsuming fire in anger, the earth in patience, kubera in chartiy and the sun in steadfastness."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=18
+    - text: View Source
+    - img
+  - text: 1.1.19 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "तमेवं गुणसम्पन्नं रामं सत्यपराक्रमम् ।।1.1.19।।ज्येष्ठं श्रेष्ठगुणैर्युक्तं प्रियं दशरथस्सुतम् । प्रकृतीनां हितैर्युक्तं प्रकृतिप्रियकाम्यया ।।1.1.20।।यौवराज्येन संयोक्तुमैच्छत्प्रीत्या महीपति: । with a desire to promote the welfare of the people king dasaratha decided to install sri rama, his eldest and affectionate son as heir (apparent) who was bestowed with all excellent qualities and true prowess, beloved of the people he was ever intent in the welfare of the people."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=19
+    - text: View Source
+    - img
+  - text: 1.1.20 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: तस्याभिषेकसम्भारान्दृष्ट्वा भार्याऽथ कैकयी ।।1.1.21।।पूर्वं दत्तवरा देवी वरमेनमयाचत । विवासनं च रामस्य भरतस्याभिषेचनम् ।।1.1.22।। thereafter, having seen the preparations for installation of rama, queen kaikeyi who had been promised earlier with boons by dasaratha demanded of him the exile of rama and enthronement of bharata.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=20
+    - text: View Source
+    - img
+  - text: 1.1.21 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "स सत्यवचनाद्राजा धर्मपाशेन संयत: ।विवासयामास सुतं रामं दशरथ: प्रियम् ।।1.1.23।। dasaratha, true to his word and restrained by the bond of duty, sent his beloved son rama to the forest."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=21
+    - text: View Source
+    - img
+  - text: 1.1.22 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "स जगाम वनं वीर: प्रतिज्ञामनुपालयन्।पितुर्वचननिर्देशात्कैकेय्या: प्रियकारणात् ।।1.1.24।। mighty sri rama inorder to please kaikeyi and obey the word of command of his father, went to the forest and help the king to keep his promise to kaikeyi."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=22
+    - text: View Source
+    - img
+  - text: 1.1.23 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "तं व्रजन्तं प्रियो भ्राता लक्ष्मणोऽनुजगाम ह ।स्नेहाद्विनयसम्पन्नस्सुमित्रानन्दवर्धन: ।।1.1.25।।भ्रातरं दयितो भ्रातुस्सौभ्रात्रमनुदर्शयन् । lakshmana beloved brother to rama is drawn towards him. endowed with modesty he is an enhancer of the joy of his mother sumitra. displaying his fraternal love, he followed rama who was departing to the forest."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=23
+    - text: View Source
+    - img
+  - text: 1.1.24 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: "रामस्य दयिता भार्या नित्यं प्राणसमा हिता ।।1.1.26।।जनकस्य कुले जाता देवमायेव निर्मिता ।सर्वलक्षणसम्पन्ना नारीणामुत्तमा वधू: ।।1.1.27।।सीताप्यनुगता रामं शशिनं रोहिणी यथा । born in the race of janaka and daughterinlaw of dasaratha, sita, beloved spouse of rama is like his vital breath always desired the wellbeing of rama she followed him like rohini, the moon. endowed with all virtues she is the foremost woman."
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=24
+    - text: View Source
+    - img
+  - text: 1.1.25 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: पौरैरनुगतो दूरं पित्रा दशरथेन च ।।1.1.28।।शृङ्गिबेरपुरे सूतं गङ्गाकूले व्यसर्जयत् । गुहमासाद्य धर्मात्मा निषादाधिपतिं प्रियम् ।।1.1.29।।गुहेन सहितो रामो लक्ष्मणेन च सीतया । the citizens and dasaratha followed rama for a long distance. rama of righteous nature having approached guha, king of nishadas, at shrungiberapura sent back charioteer sumantra and rama along with sita and lakshmana crossed river ganga.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=25
+    - text: View Source
+    - img
+  - text: 1.1.28 100% match
+  - button "Add to favorites":
+    - img
+  - button "Copy verse":
+    - img
+  - button "Share verse":
+    - img
+  - text: चित्रकूटं गते रामे पुत्रशोकातुरस्तथा ।।1.1.32।।राजा दशरथस्स्वर्गं जगाम विलपन्सुतम् । when rama had set out to chitrakuta, king dasaratha, stricken by the grief over the separation from his son and mourning over him departed to heavens.
+  - button "Sanskrit Meaning":
+    - text: Sanskrit Meaning
+    - img
+  - link "View Source":
+    - /url: https://valmiki.iitk.ac.in/sloka?field_kanda_tid=1&field_sarga_value=1&field_sloka_value=28
+    - text: View Source
+    - img
+  - button "Load More Results"
+```
