@@ -140,7 +140,7 @@ run_model_tests() {
 # Function to run performance tests
 run_performance_tests() {
     print_section "Performance Tests"
-    run_test_suite "Performance" "tests" "-m slow --tb=short"
+    run_test_suite "Performance" "tests/performance" "-m performance --tb=short -v"
 }
 
 # Function to run all tests with coverage

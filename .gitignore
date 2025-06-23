@@ -1,5 +1,5 @@
 *.pyc
-
+app.log
 dist/
 build/
 *.egg-info/
