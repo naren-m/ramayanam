@@ -297,12 +297,12 @@ class FuzzySearchService:
             return []
         
         # Find slokas that contain any of the query words
-        candidate_refs = set()
+        candidate_refs = []
         for word in query_words:
             if word in self.translation_word_index:
-                candidate_refs.update(self.translation_word_index[word])
+                candidate_refs.extend(self.translation_word_index[word])
         
-        # Convert to list and deduplicate
+        # Deduplicate by sloka_id
         candidates = list({ref['sloka_id']: ref for ref in candidate_refs}.values())
         
         self.logger.debug(f"Found {len(candidates)} candidates for query words: {query_words}")
@@ -492,12 +492,12 @@ class FuzzySearchService:
             return []
         
         # Find slokas that contain any of the query words
-        candidate_refs = set()
+        candidate_refs = []
         for word in query_words:
             if word in self.sanskrit_word_index:
-                candidate_refs.update(self.sanskrit_word_index[word])
+                candidate_refs.extend(self.sanskrit_word_index[word])
         
-        # Convert to list and deduplicate
+        # Deduplicate by sloka_id
         candidates = list({ref['sloka_id']: ref for ref in candidate_refs}.values())
         
         self.logger.debug(f"Found {len(candidates)} Sanskrit candidates for query words: {query_words}")

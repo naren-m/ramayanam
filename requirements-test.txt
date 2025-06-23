@@ -12,5 +12,8 @@ factory-boy==3.3.0
 faker==20.1.0
 responses==0.24.1
 
+# Performance monitoring
+psutil==5.9.6
+
 # Include main dependencies
 -r requirements.txt
