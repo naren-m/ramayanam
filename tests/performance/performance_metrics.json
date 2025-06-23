@@ -1,0 +1,376 @@
+{
+  "runs": [
+    {
+      "benchmark_results": {
+        "FuzzySearchService": {
+          "sanskrit_common_character_medium_results": {
+            "query": "hanuman",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_common_word_high_results": {
+            "query": "rama",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_high_threshold_fewer_results": {
+            "query": "sita",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 85
+          },
+          "sanskrit_phrase_search_medium_results": {
+            "query": "devotion to rama",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_sanskrit_concept_varied_results": {
+            "query": "dharma",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_specific_object_very_low_results": {
+            "query": "weapon",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_story_context_low_results": {
+            "query": "forest exile",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "sanskrit_uncommon_word_low_results": {
+            "query": "celestial",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_common_character_medium_results": {
+            "query": "hanuman",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_common_word_high_results": {
+            "query": "rama",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_high_threshold_fewer_results": {
+            "query": "sita",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 85
+          },
+          "translation_phrase_search_medium_results": {
+            "query": "devotion to rama",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_sanskrit_concept_varied_results": {
+            "query": "dharma",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_specific_object_very_low_results": {
+            "query": "weapon",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_story_context_low_results": {
+            "query": "forest exile",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          },
+          "translation_uncommon_word_low_results": {
+            "query": "celestial",
+            "stats": {
+              "error": "All benchmark iterations failed",
+              "iterations": 0
+            },
+            "threshold": 70
+          }
+        },
+        "OptimizedFuzzySearchService": {
+          "cache_miss_vs_hit": {
+            "query": "rama",
+            "stats": {
+              "cache_hit_time_ms": 0.13,
+              "cache_miss_time_ms": 0.208,
+              "cache_speedup": 1.6,
+              "cache_stats": {
+                "cache_size": 16,
+                "hit_rate": 76.47,
+                "search_stats": {
+                  "avg_response_time": 0,
+                  "total_searches": 0
+                },
+                "total_evictions": 0,
+                "total_hits": 52,
+                "total_misses": 16
+              }
+            },
+            "threshold": 70
+          },
+          "sanskrit_common_character_medium_results": {
+            "query": "hanuman",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 665,
+              "avg_time_ms": 0.124,
+              "iterations": 3,
+              "max_time_ms": 0.177,
+              "min_time_ms": 0.095,
+              "std_dev_ms": 0.046
+            },
+            "threshold": 70
+          },
+          "sanskrit_common_word_high_results": {
+            "query": "rama",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 1000,
+              "avg_time_ms": 0.127,
+              "iterations": 3,
+              "max_time_ms": 0.19,
+              "min_time_ms": 0.091,
+              "std_dev_ms": 0.055
+            },
+            "threshold": 70
+          },
+          "sanskrit_high_threshold_fewer_results": {
+            "query": "sita",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 990,
+              "avg_time_ms": 0.132,
+              "iterations": 3,
+              "max_time_ms": 0.192,
+              "min_time_ms": 0.094,
+              "std_dev_ms": 0.053
+            },
+            "threshold": 85
+          },
+          "sanskrit_phrase_search_medium_results": {
+            "query": "devotion to rama",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 31,
+              "avg_time_ms": 0.127,
+              "iterations": 3,
+              "max_time_ms": 0.19,
+              "min_time_ms": 0.086,
+              "std_dev_ms": 0.056
+            },
+            "threshold": 70
+          },
+          "sanskrit_sanskrit_concept_varied_results": {
+            "query": "dharma",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 274,
+              "avg_time_ms": 0.134,
+              "iterations": 3,
+              "max_time_ms": 0.206,
+              "min_time_ms": 0.097,
+              "std_dev_ms": 0.062
+            },
+            "threshold": 70
+          },
+          "sanskrit_specific_object_very_low_results": {
+            "query": "weapon",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 200,
+              "avg_time_ms": 0.13,
+              "iterations": 3,
+              "max_time_ms": 0.199,
+              "min_time_ms": 0.091,
+              "std_dev_ms": 0.06
+            },
+            "threshold": 70
+          },
+          "sanskrit_story_context_low_results": {
+            "query": "forest exile",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 62,
+              "avg_time_ms": 0.138,
+              "iterations": 3,
+              "max_time_ms": 0.194,
+              "min_time_ms": 0.092,
+              "std_dev_ms": 0.052
+            },
+            "threshold": 70
+          },
+          "sanskrit_uncommon_word_low_results": {
+            "query": "celestial",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 87,
+              "avg_time_ms": 0.139,
+              "iterations": 3,
+              "max_time_ms": 0.222,
+              "min_time_ms": 0.091,
+              "std_dev_ms": 0.072
+            },
+            "threshold": 70
+          },
+          "translation_common_character_medium_results": {
+            "query": "hanuman",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 924,
+              "avg_time_ms": 0.133,
+              "iterations": 3,
+              "max_time_ms": 0.194,
+              "min_time_ms": 0.1,
+              "std_dev_ms": 0.053
+            },
+            "threshold": 70
+          },
+          "translation_common_word_high_results": {
+            "query": "rama",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 1000,
+              "avg_time_ms": 0.123,
+              "iterations": 3,
+              "max_time_ms": 0.173,
+              "min_time_ms": 0.094,
+              "std_dev_ms": 0.043
+            },
+            "threshold": 70
+          },
+          "translation_high_threshold_fewer_results": {
+            "query": "sita",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 1000,
+              "avg_time_ms": 0.128,
+              "iterations": 3,
+              "max_time_ms": 0.189,
+              "min_time_ms": 0.093,
+              "std_dev_ms": 0.053
+            },
+            "threshold": 85
+          },
+          "translation_phrase_search_medium_results": {
+            "query": "devotion to rama",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 72,
+              "avg_time_ms": 0.124,
+              "iterations": 3,
+              "max_time_ms": 0.176,
+              "min_time_ms": 0.092,
+              "std_dev_ms": 0.046
+            },
+            "threshold": 70
+          },
+          "translation_sanskrit_concept_varied_results": {
+            "query": "dharma",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 394,
+              "avg_time_ms": 0.134,
+              "iterations": 3,
+              "max_time_ms": 0.194,
+              "min_time_ms": 0.095,
+              "std_dev_ms": 0.052
+            },
+            "threshold": 70
+          },
+          "translation_specific_object_very_low_results": {
+            "query": "weapon",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 191,
+              "avg_time_ms": 0.123,
+              "iterations": 3,
+              "max_time_ms": 0.181,
+              "min_time_ms": 0.088,
+              "std_dev_ms": 0.05
+            },
+            "threshold": 70
+          },
+          "translation_story_context_low_results": {
+            "query": "forest exile",
+            "stats": {
+              "avg_memory_mb": 0.0,
+              "avg_result_count": 174,
+              "avg_time_ms": 0.12,
+              "iterations": 3,
+              "max_time_ms": 0.168,
+              "min_time_ms": 0.095,
+              "std_dev_ms": 0.041
+            },
+            "threshold": 70
+          },
+          "translation_uncommon_word_low_results": {
+            "query": "celestial",
+            "stats": {
+              "avg_memory_mb": 0.01,
+              "avg_result_count": 84,
+              "avg_time_ms": 0.129,
+              "iterations": 3,
+              "max_time_ms": 0.193,
+              "min_time_ms": 0.093,
+              "std_dev_ms": 0.055
+            },
+            "threshold": 70
+          }
+        }
+      },
+      "git_branch": "feature/search-performance-improvements",
+      "git_commit": "4f37c50",
+      "system_info": {
+        "cpu_count": 8,
+        "memory_gb": 16.0,
+        "python_version": "3.13.5"
+      },
+      "timestamp": "2025-06-23T14:28:12.966276"
+    }
+  ]
+}
