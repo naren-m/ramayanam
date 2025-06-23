@@ -321,13 +321,36 @@ ramayanam/
 
 ### Running Tests
 
+#### Backend Testing (No Docker Required)
 ```bash
-# Run basic tests
-python -m pytest tests/
-
-# Test API endpoints
-python tests/test_e2e.py
+# Comprehensive backend testing with pytest
+./scripts/test-backend.sh           # All tests with coverage
+./scripts/test-backend.sh unit      # Unit tests only
+./scripts/test-backend.sh integration # Integration tests only
+./scripts/test-backend.sh parallel  # Parallel execution
 ```
+
+#### E2E Testing
+
+**Local E2E Testing (No Docker Required):**
+```bash
+# Start the application first
+python run.py
+
+# Run E2E tests against local server
+./scripts/test-e2e-local.sh         # Default options
+./scripts/test-e2e-local.sh --browser firefox --headed  # Firefox with UI
+```
+
+**Docker-based E2E Testing (Requires Docker):**
+```bash
+./scripts/test-e2e-docker.sh        # Build Docker image and test
+./scripts/test-e2e-compose.sh       # Docker Compose orchestrated testing
+```
+
+#### Test Reports
+- Backend coverage reports: `reports/coverage_html/index.html`
+- E2E test reports: `npx playwright show-report`
 
 ### Contributing
 

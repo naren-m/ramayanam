@@ -42,7 +42,7 @@ const ResultsDisplay: React.FC = () => {
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 max-w-md mx-auto">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 max-w-md mx-auto" data-testid="error-message">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
             Search Error
@@ -75,7 +75,7 @@ const ResultsDisplay: React.FC = () => {
   if (searchQuery && verses.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto" data-testid="no-results">
           <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
             No Results Found
@@ -101,7 +101,7 @@ const ResultsDisplay: React.FC = () => {
   const hasMore = pagination?.has_next || false;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="search-results">
       {/* Results Header */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div>
@@ -163,6 +163,7 @@ const ResultsDisplay: React.FC = () => {
             onClick={loadNextPage}
             className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loading}
+            data-testid="load-more-button"
           >
             Load More Results
           </button>

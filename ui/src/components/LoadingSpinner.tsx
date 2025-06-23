@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 const LoadingSpinner: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center py-16">
+    <div className="flex flex-col items-center justify-center py-16" data-testid="loading-spinner">
       <div className="relative">
         <div className="w-16 h-16 border-4 border-gold-200 dark:border-gold-700 rounded-full animate-spin border-t-gold-500 dark:border-t-gold-400"></div>
         <div className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-ping border-t-saffron-400 opacity-20"></div>

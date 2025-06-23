@@ -15,7 +15,10 @@ class Config:
     ]
     
     # Data paths
-    DATA_BASE_PATH = os.getenv('DATA_PATH', '/app/data')
+    # Default to local path for development, Docker path if DATA_PATH is set
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DEFAULT_DATA_PATH = os.path.join(PROJECT_ROOT, 'data')
+    DATA_BASE_PATH = os.getenv('DATA_PATH', DEFAULT_DATA_PATH)
     SLOKAS_PATH = os.path.join(DATA_BASE_PATH, 'slokas', 'Slokas')
     
     # Search settings
