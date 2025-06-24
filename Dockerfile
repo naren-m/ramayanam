@@ -9,7 +9,7 @@ WORKDIR /app/ui
 COPY ui/package*.json ./
 
 # Install Node.js dependencies
-RUN npm ci
+RUN npm install
 
 # Copy UI source code
 COPY ui/ .

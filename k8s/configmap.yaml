@@ -7,4 +7,18 @@ data:
   FLASK_ENV: "production"
   PORT: "5000"
   LOG_LEVEL: "INFO"
-  WORKERS: "2"
+  WORKERS: "4"
+  # Performance Configuration
+  MAX_SEARCH_RESULTS: "1000"
+  DEFAULT_FUZZY_THRESHOLD: "70"
+  DEFAULT_PAGE_SIZE: "10"
+  STREAM_BATCH_SIZE: "5"
+  # Cache Configuration
+  CACHE_TTL: "300"
+  CACHE_MAX_SIZE: "1000"
+  # Thread Pool Configuration
+  THREAD_POOL_MAX_WORKERS: "4"
+  # Python Optimizations
+  PYTHONUNBUFFERED: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONHASHSEED: "random"

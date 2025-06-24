@@ -49,6 +49,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     <div 
       className="verse-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 fade-in-up"
       style={{ animationDelay: `${index * 100}ms` }}
+      data-testid="verse-card"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -98,7 +99,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
 
       {/* Sanskrit Text */}
       <div className="mb-4">
-        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed" data-testid="verse-text">
           {verse.sloka}
         </div>
       </div>
@@ -108,6 +109,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
         <div 
           className="text-gray-700 dark:text-gray-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: verse.translation }}
+          data-testid="verse-translation"
         />
       </div>
 
@@ -133,7 +135,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gold-200 dark:border-gold-700/30">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gold-200 dark:border-gold-700/30" data-testid="verse-metadata">
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {copyStatus === 'copied' && (
             <span className="text-green-600 dark:text-green-400">Copied to clipboard!</span>

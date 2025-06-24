@@ -59,7 +59,7 @@ const SearchInterface: React.FC = () => {
   };
 
   return (
-    <div className="mb-8">
+    <div className="mb-8" data-testid="search-interface">
       {/* Search Tabs */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1">
@@ -75,6 +75,7 @@ const SearchInterface: React.FC = () => {
                 activeTab === 'english' ? 'ring-2 ring-gold-400' : ''
               }`}
               disabled={loading}
+              data-testid="english-search-input"
             />
             {englishQuery && (
               <button
@@ -103,6 +104,7 @@ const SearchInterface: React.FC = () => {
                 activeTab === 'sanskrit' ? 'ring-2 ring-gold-400' : ''
               }`}
               disabled={loading}
+              data-testid="sanskrit-search-input"
             />
             {sanskritQuery && (
               <button
@@ -135,6 +137,7 @@ const SearchInterface: React.FC = () => {
           value={filters.kanda || ''}
           onChange={(e) => setFilters({ ...filters, kanda: e.target.value ? Number(e.target.value) : null })}
           className="px-4 py-2 bg-white dark:bg-gray-800 border border-gold-200 dark:border-gold-700 rounded-lg text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gold-400"
+          data-testid="kanda-filter"
         >
           {KANDAS.map(kanda => (
             <option key={kanda.value || 'all'} value={kanda.value || ''}>

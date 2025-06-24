@@ -9,7 +9,7 @@ const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gold-200/20 dark:border-gold-700/20 sticky top-0 z-50">
+    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gold-200/20 dark:border-gold-700/20 sticky top-0 z-50" data-testid="header">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
@@ -59,6 +59,7 @@ const Header: React.FC = () => {
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-gold-100 dark:bg-gray-700 text-gold-700 dark:text-gold-400 hover:bg-gold-200 dark:hover:bg-gray-600 transition-colors"
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              data-testid="theme-toggle"
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>

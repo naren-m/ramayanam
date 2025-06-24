@@ -1,0 +1,425 @@
+ * Serving Flask app 'api.app'
+ * Debug mode: on
+2025-06-23 00:35:38,614 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-23 00:35:38,614 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-23 00:35:38,618 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 00:35:38,782 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 00:35:38,792 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 00:35:52,556 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:35:52] "GET / HTTP/1.1" 200 -
+2025-06-23 00:35:58,310 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:35:58] "GET / HTTP/1.1" 200 -
+2025-06-23 00:35:58,626 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:35:58] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:01,023 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:01,025 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:01,030 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:01,033 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:01,036 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:01,038 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:01,039 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:01,042 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:01,043 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:01,046 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:01,047 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:01,048 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:01] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:02,425 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:02,432 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:02,433 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:02,437 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:02,444 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:02,445 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:02,452 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:02,457 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:02,458 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:02,462 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:02,463 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:02,466 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:02] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:03,303 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:03,311 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:03,316 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:03,322 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:03,325 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:03,325 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:03,326 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:03,328 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:03,337 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:03,339 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:03,340 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:03,342 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:03,644 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:03,649 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:03,651 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:03] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:04,024 - api.services.optimized_fuzzy_search_service - INFO - Searching Sanskrit for query: राम
+2025-06-23 00:36:04,120 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: hanuman
+2025-06-23 00:36:04,185 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:04,265 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:04,273 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:04,554 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:04,770 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10&kanda=1 HTTP/1.1" 200 -
+2025-06-23 00:36:04,867 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:04] "GET /api/ramayanam/slokas/fuzzy-search-sanskrit?query=राम&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:05,066 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:05,066 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=2&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:05,225 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: rama
+2025-06-23 00:36:05,301 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:05,315 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=3&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:05,316 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Kanda 1 translation search: rama
+2025-06-23 00:36:05,325 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=2&page_size=5&kanda=1 HTTP/1.1" 200 -
+2025-06-23 00:36:05,378 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Sanskrit search: राम
+2025-06-23 00:36:05,379 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search-sanskrit?query=राम&page=2&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:05,436 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:05,446 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:05,453 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:05,453 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:05,509 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:05,515 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:05,517 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:05,536 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Kanda 1 translation search: rama
+2025-06-23 00:36:05,536 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=3&page_size=5&kanda=1 HTTP/1.1" 200 -
+2025-06-23 00:36:05,661 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:05,667 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:05,669 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:05,740 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:05,745 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:05,746 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:05,877 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:05,882 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:05,883 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:05] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:06,074 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:06,079 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:06,080 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:06,123 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: xyznoresults123
+2025-06-23 00:36:06,180 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /api/ramayanam/slokas/fuzzy-search?query=xyznoresults123&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:06,190 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:06,191 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:06,597 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:06,602 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:06,603 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:06,736 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:06,737 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:06,738 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /invalid-route HTTP/1.1" 200 -
+2025-06-23 00:36:06,761 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "[36mGET /assets/index-B8RjiN5a.css HTTP/1.1[0m" 304 -
+2025-06-23 00:36:06,763 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "[36mGET /assets/index-Bw6UMqcc.js HTTP/1.1[0m" 304 -
+2025-06-23 00:36:06,827 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:06,832 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:06,834 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:06,985 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:06,998 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:06] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:07,000 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:07] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:07,242 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:07,242 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:07] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=2&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:07,451 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:07,452 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:07] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=3&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:07,694 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:07,696 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:07] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:08,098 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:08,103 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:08,104 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:08,326 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:08,331 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:08,332 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:08,670 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:08,675 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:08,676 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:08] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:08,993 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: sita
+2025-06-23 00:36:09,171 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:09] "GET /api/ramayanam/slokas/fuzzy-search?query=sita&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:09,355 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:09,356 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:09] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:12,486 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:12] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:12,561 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:12] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:12,565 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:12] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:13,098 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:13,155 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:13,238 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:13,239 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:13,491 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:13,644 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:13,837 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:13,841 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:13] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:14,097 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:14] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:14,259 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:14] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:14,345 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:14] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:14,348 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:14] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:14,598 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:14] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:15,576 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:15] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:15,656 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:15] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:15,659 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:15] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:15,895 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:15] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:16,116 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:16,204 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:16,208 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:16,738 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:16,799 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:16,952 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:16,954 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:16] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:17,189 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:17] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:17,358 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:17] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:17,449 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:17] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:17,450 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:17] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:17,959 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:17] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:18,448 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:18] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:18,558 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:18] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:18,559 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:18] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:18,804 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:18] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:19,183 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:19] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:19,258 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:19] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:19,261 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:19] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:19,781 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:19] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:19,899 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:19] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:20,000 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:20,001 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:20,234 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:20,362 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:20,363 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:20,407 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:20,485 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:20,486 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:20,724 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:20,936 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:20,948 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:20,950 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:20] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:21,146 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Sanskrit search: राम
+2025-06-23 00:36:21,147 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /api/ramayanam/slokas/fuzzy-search-sanskrit?query=राम&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:21,278 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:21,308 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:21,334 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:21,334 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:21,398 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:21,470 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:21,518 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:21,525 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:21,723 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:21,741 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:21,743 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:21,788 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:21,864 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:21,882 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Kanda 1 translation search: rama
+2025-06-23 00:36:21,883 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:21] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10&kanda=1 HTTP/1.1" 200 -
+2025-06-23 00:36:22,228 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: xyznoresults123
+2025-06-23 00:36:22,291 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /api/ramayanam/slokas/fuzzy-search?query=xyznoresults123&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:22,406 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:22,417 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:22,418 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:22,537 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:22,591 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:22,591 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:22,639 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:22,640 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:22,962 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:22,981 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:22,981 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:22] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:23,151 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:23,165 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:23,166 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:23,210 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:23,224 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:23,226 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:23,270 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:23,310 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:23,365 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:23,709 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:23,719 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:23,720 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:23,845 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:23] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:24,111 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:24,112 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:24,575 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:24,576 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:24,628 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:24,629 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=2&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:24,836 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:24,838 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=3&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:24,904 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:24,927 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:24,927 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:24] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:25,063 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:25,158 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:25,169 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:25,170 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:25,309 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:25,624 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:25,691 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:25,693 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:25,756 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:25,767 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:25,768 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:25,892 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:25,914 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:25] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:26,229 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET /invalid-route HTTP/1.1" 200 -
+2025-06-23 00:36:26,243 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "[36mGET /assets/index-Bw6UMqcc.js HTTP/1.1[0m" 304 -
+2025-06-23 00:36:26,244 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "[36mGET /assets/index-B8RjiN5a.css HTTP/1.1[0m" 304 -
+2025-06-23 00:36:26,432 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:26,444 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:26,444 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:26,568 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET /vite.svg HTTP/1.1" 200 -
+2025-06-23 00:36:26,604 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: sita
+2025-06-23 00:36:26,605 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:26] "GET /api/ramayanam/slokas/fuzzy-search?query=sita&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:27,297 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:27,297 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:27] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:33,395 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:33,397 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:33,398 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:33,400 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:33,472 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:33,477 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:33,482 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:33,484 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:33,485 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:33,486 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:33,487 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:33,489 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:33] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:34,909 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:34,911 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:34,912 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:34,917 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:34,923 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:34,928 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:34,929 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:34,930 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:34,932 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:34,935 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:34,935 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:34,936 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:34] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,152 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:36,153 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:36,154 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:36,154 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:36,166 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:36,171 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:36,174 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,175 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,176 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:36,177 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,178 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,180 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:36,605 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:36,612 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:36,613 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:36,890 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:36,891 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:36,897 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Sanskrit search: राम
+2025-06-23 00:36:36,899 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:36] "GET /api/ramayanam/slokas/fuzzy-search-sanskrit?query=राम&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:37,211 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:37,217 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:37,219 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:37,279 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for Kanda 1 translation search: rama
+2025-06-23 00:36:37,280 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10&kanda=1 HTTP/1.1" 200 -
+2025-06-23 00:36:37,511 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:37,511 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:37,520 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:37,521 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:37,523 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:37,524 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:37,796 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:37,803 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:37,804 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:37,941 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:37,942 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:37] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:38,120 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:38,128 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:38,128 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:38,214 - api.services.optimized_fuzzy_search_service - INFO - Searching translations for query: xyznoresults123
+2025-06-23 00:36:38,273 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:38,273 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:38,274 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /api/ramayanam/slokas/fuzzy-search?query=xyznoresults123&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:38,520 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:38,526 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:38,528 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:38,720 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:38,727 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:38,728 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:38,803 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:38,810 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:38,811 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:38] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:39,402 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:39,404 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:39,466 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: hanuman
+2025-06-23 00:36:39,467 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /api/ramayanam/slokas/fuzzy-search?query=hanuman&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:39,539 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:39,552 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:39,558 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:39,707 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /invalid-route HTTP/1.1" 200 -
+2025-06-23 00:36:39,715 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "[36mGET /assets/index-Bw6UMqcc.js HTTP/1.1[0m" 304 -
+2025-06-23 00:36:39,715 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "[36mGET /assets/index-B8RjiN5a.css HTTP/1.1[0m" 304 -
+2025-06-23 00:36:39,870 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:39,878 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:39,879 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:39,913 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:39,914 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=2&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:39,962 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:39,970 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:39,970 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:39] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:40,119 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:40,120 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=3&page_size=5 HTTP/1.1" 200 -
+2025-06-23 00:36:40,255 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:40,262 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:40,263 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:40,864 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET / HTTP/1.1" 200 -
+2025-06-23 00:36:40,871 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /assets/index-Bw6UMqcc.js HTTP/1.1" 200 -
+2025-06-23 00:36:40,872 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /assets/index-B8RjiN5a.css HTTP/1.1" 200 -
+2025-06-23 00:36:40,908 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: sita
+2025-06-23 00:36:40,908 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:40] "GET /api/ramayanam/slokas/fuzzy-search?query=sita&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 00:36:41,545 - api.services.optimized_fuzzy_search_service - INFO - Cache hit for translation search: rama
+2025-06-23 00:36:41,547 - werkzeug - INFO - 127.0.0.1 - - [23/Jun/2025 00:36:41] "GET /api/ramayanam/slokas/fuzzy-search?query=rama&page=1&page_size=10 HTTP/1.1" 200 -
+2025-06-23 12:58:15,481 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/config.py', reloading
+2025-06-23 12:58:15,521 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:58:15,705 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:58:15,716 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:58:32,964 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 12:58:32,998 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:58:33,160 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:58:33,169 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:58:48,254 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 12:58:48,288 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:58:48,456 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:58:48,466 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:58:58,380 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 12:58:58,419 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:58:58,583 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:58:58,592 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:59:04,086 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 12:59:04,122 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:59:04,284 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:59:04,294 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:59:40,344 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 12:59:40,379 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:59:40,546 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:59:40,557 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 12:59:51,407 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/models/sloka_model.py', reloading
+2025-06-23 12:59:51,441 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 12:59:51,605 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 12:59:51,614 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:09:42,405 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:09:42,439 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:09:42,656 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:09:42,666 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:10:26,881 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:10:26,915 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:10:27,078 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:10:27,087 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:12:14,585 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/optimized_fuzzy_search_service.py', reloading
+2025-06-23 14:12:14,621 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:12:14,785 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:12:14,793 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:13:06,802 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/controllers/sloka_controller.py', reloading
+2025-06-23 14:13:06,837 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:13:07,003 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:13:07,012 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:13:59,786 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:13:59,820 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:13:59,985 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:13:59,994 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:15:06,010 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/tests/unit/test_services.py', reloading
+2025-06-23 14:15:06,044 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:15:06,207 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:15:06,216 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:15:25,605 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:15:25,645 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:15:25,807 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:15:25,816 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:52:29,735 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:52:29,769 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:52:29,929 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:52:29,938 - werkzeug - INFO -  * Debugger PIN: 119-128-943
+2025-06-23 14:52:37,574 - werkzeug - INFO -  * Detected change in '/Users/narenmudivarthy/Projects/ramayanam/api/services/fuzzy_search_service.py', reloading
+2025-06-23 14:52:37,608 - werkzeug - INFO -  * Restarting with stat
+2025-06-23 14:52:37,773 - werkzeug - WARNING -  * Debugger is active!
+2025-06-23 14:52:37,782 - werkzeug - INFO -  * Debugger PIN: 119-128-943

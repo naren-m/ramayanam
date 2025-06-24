@@ -240,7 +240,7 @@ def fuzzy_search_slokas_sanskrit():
 
 @sloka_blueprint.route("/slokas/fuzzy-search-stream", methods=["GET"])
 def fuzzy_search_slokas_stream():
-    """Streaming fuzzy search for progressive loading of results."""
+    """Enhanced streaming fuzzy search for progressive loading of results."""
     try:
         query = request.args.get("query", "").strip()
         if not query:
@@ -249,55 +249,137 @@ def fuzzy_search_slokas_stream():
         kanda = request.args.get("kanda", "0")
         threshold = int(request.args.get("threshold", Config.DEFAULT_FUZZY_THRESHOLD))
         batch_size = int(request.args.get("batch_size", Config.STREAM_BATCH_SIZE))
+        search_type = request.args.get("search_type", "translation")  # translation or sanskrit
         
         try:
             kanda_num = int(kanda) if kanda else 0
         except ValueError:
             return jsonify({"error": "Invalid kanda parameter"}), 400
             
+        if search_type not in ["translation", "sanskrit"]:
+            return jsonify({"error": "Invalid search_type. Must be 'translation' or 'sanskrit'"}), 400
+            
         def generate_results():
             try:
-                # Get search results iterator
-                if kanda_num == 0:
-                    all_results = fuzzy_search_service.search_translation_fuzzy(query)
-                else:
-                    all_results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda_num, query, threshold)
-                
                 import json
+                import time
                 
-                # Send total count first
-                total_count = len(all_results)
-                yield f'data: {json.dumps({"type": "total", "count": total_count})}\n\n'
+                # Send initial metadata
+                start_time = time.time()
+                yield f'data: {json.dumps({"type": "start", "query": query, "search_type": search_type, "timestamp": start_time})}\n\n'
                 
-                # Send results in batches
-                for i in range(0, len(all_results), batch_size):
-                    batch = all_results[i:i + batch_size]
-                    batch_data = {
-                        "type": "batch",
-                        "results": batch,
-                        "batch_number": (i // batch_size) + 1,
-                        "has_more": i + batch_size < len(all_results)
-                    }
-                    yield f'data: {json.dumps(batch_data)}\n\n'
+                # Use streaming search if kanda_num is 0 (all kandas)
+                if kanda_num == 0 and hasattr(fuzzy_search_service, 'search_stream'):
+                    batch_count = 0
+                    total_results = 0
                     
-                # Send completion signal
-                yield f'data: {json.dumps({"type": "complete"})}\n\n'
+                    # Use the new streaming search method
+                    for batch_results in fuzzy_search_service.search_stream(query, search_type, threshold, batch_size):
+                        if batch_results:
+                            batch_count += 1
+                            total_results += len(batch_results)
+                            
+                            batch_data = {
+                                "type": "batch",
+                                "results": batch_results,
+                                "batch_number": batch_count,
+                                "batch_size": len(batch_results),
+                                "total_so_far": total_results,
+                                "processing_time": time.time() - start_time
+                            }
+                            yield f'data: {json.dumps(batch_data)}\n\n'
+                    
+                    # Send completion with final stats
+                    completion_data = {
+                        "type": "complete",
+                        "total_results": total_results,
+                        "total_batches": batch_count,
+                        "total_time": time.time() - start_time,
+                        "cache_stats": fuzzy_search_service.get_cache_stats() if hasattr(fuzzy_search_service, 'get_cache_stats') else None
+                    }
+                    yield f'data: {json.dumps(completion_data)}\n\n'
+                    
+                else:
+                    # Fallback to regular search for specific kandas
+                    if search_type == "translation":
+                        if kanda_num == 0:
+                            all_results = fuzzy_search_service.search_translation_fuzzy(query)
+                        else:
+                            all_results = fuzzy_search_service.search_translation_in_kanda_fuzzy(kanda_num, query, threshold)
+                    else:  # sanskrit
+                        if kanda_num == 0:
+                            all_results = fuzzy_search_service.search_sloka_sanskrit_fuzzy(query, threshold)
+                        else:
+                            all_results = fuzzy_search_service.search_sloka_sanskrit_in_kanda_fuzzy(kanda_num, query, threshold)
+                    
+                    # Send total count
+                    total_count = len(all_results)
+                    yield f'data: {json.dumps({"type": "total", "count": total_count})}\n\n'
+                    
+                    # Send results in batches
+                    batch_count = 0
+                    for i in range(0, len(all_results), batch_size):
+                        batch = all_results[i:i + batch_size]
+                        batch_count += 1
+                        
+                        batch_data = {
+                            "type": "batch",
+                            "results": batch,
+                            "batch_number": batch_count,
+                            "batch_size": len(batch),
+                            "has_more": i + batch_size < len(all_results),
+                            "progress": min(100, int((i + batch_size) / total_count * 100))
+                        }
+                        yield f'data: {json.dumps(batch_data)}\n\n'
+                        
+                        # Small delay to prevent overwhelming the client
+                        time.sleep(0.01)
+                    
+                    # Send completion signal
+                    completion_data = {
+                        "type": "complete",
+                        "total_results": total_count,
+                        "total_batches": batch_count,
+                        "total_time": time.time() - start_time
+                    }
+                    yield f'data: {json.dumps(completion_data)}\n\n'
                 
             except Exception as e:
                 import json
                 logger.error(f"Error in streaming search: {e}")
-                yield f'data: {json.dumps({"type": "error", "message": "Search failed"})}\n\n'
+                error_data = {
+                    "type": "error", 
+                    "message": "Search failed",
+                    "error_details": str(e) if Config.DEBUG else None
+                }
+                yield f'data: {json.dumps(error_data)}\n\n'
 
         return Response(generate_results(), 
                        content_type="text/event-stream",
                        headers={
                            "Cache-Control": "no-cache",
-                           "Connection": "keep-alive"
+                           "Connection": "keep-alive",
+                           "Access-Control-Allow-Origin": "*",
+                           "Access-Control-Allow-Headers": "Cache-Control"
                        })
         
     except Exception as e:
         logger.error(f"Error in fuzzy_search_slokas_stream: {e}")
         return jsonify({"error": "Failed to initialize streaming search"}), 500
+
+
+@sloka_blueprint.route("/search/stats", methods=["GET"])
+def get_search_stats():
+    """Get search performance statistics."""
+    try:
+        if hasattr(fuzzy_search_service, 'get_cache_stats'):
+            stats = fuzzy_search_service.get_cache_stats()
+            return jsonify(stats)
+        else:
+            return jsonify({"message": "Statistics not available for this search service"})
+    except Exception as e:
+        logger.error(f"Error getting search stats: {e}")
+        return jsonify({"error": "Failed to retrieve statistics"}), 500
 
 
 @sloka_blueprint.errorhandler(RamayanamAPIException)

@@ -1,0 +1,17 @@
+{
+  "name": "ramayanam",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:local": "./scripts/test-e2e-local.sh",
+    "test:e2e:docker": "./scripts/test-e2e-docker.sh",
+    "test:e2e:compose": "./scripts/test-e2e-compose.sh",
+    "test:e2e:ci": "playwright test --reporter=github"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.53.1"
+  }
+}
