@@ -25,7 +25,7 @@ class TestFuzzySearchService(unittest.TestCase):
 
         Assertions:
         - The number of results returned matches the expected count.
-        - Each result contains the correct `sloka_number`, `translation`, and `ratio`.
+        - Each result contains the correct `sloka_id`, `translation`, and `ratio`.
         - The mocked function is called with the expected parameters.
 
         Parameters:
@@ -33,8 +33,8 @@ class TestFuzzySearchService(unittest.TestCase):
         """
         # Mocking the return value of search_translation_in_kanda_fuzzy
         mock_search_translation_in_kanda_fuzzy.side_effect = [
-            [{'sloka_number': 1, 'translation': 'translation1', 'ratio': 80}],
-            [{'sloka_number': 2, 'translation': 'translation2', 'ratio': 75}]
+            [{'sloka_id': 1, 'translation': 'translation1', 'ratio': 80}],
+            [{'sloka_id': 2, 'translation': 'translation2', 'ratio': 75}]
         ]
 
         query = "test query"
@@ -42,10 +42,10 @@ class TestFuzzySearchService(unittest.TestCase):
 
         # Assertions
         self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]['sloka_number'], 1)
+        self.assertEqual(results[0]['sloka_id'], 1)
         self.assertEqual(results[0]['translation'], 'translation1')
         self.assertEqual(results[0]['ratio'], 80)
-        self.assertEqual(results[1]['sloka_number'], 2)
+        self.assertEqual(results[1]['sloka_id'], 2)
         self.assertEqual(results[1]['translation'], 'translation2')
         self.assertEqual(results[1]['ratio'], 75)
 

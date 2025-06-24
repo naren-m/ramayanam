@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5000',
+    baseURL: 'http://192.168.68.138:5001',
     trace: 'on-first-retry',
   },
 
@@ -27,10 +27,11 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'python ../../run.py',
-    url: 'http://localhost:5000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // Remove webServer config since we're using Docker container
+  // webServer: {
+  //   command: 'python ../../run.py',
+  //   url: 'http://localhost:5000',
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000,
+  // },
 });

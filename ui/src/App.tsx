@@ -28,6 +28,7 @@ function App() {
                   <div className="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
                     <button
                       onClick={() => setActiveView('search')}
+                      data-testid="search-tab-button"
                       className={`px-6 py-2 rounded-md transition-colors ${
                         activeView === 'search'
                           ? 'bg-orange-500 text-white'
@@ -38,6 +39,7 @@ function App() {
                     </button>
                     <button
                       onClick={() => setActiveView('chat')}
+                      data-testid="chat-tab-button"
                       className={`px-6 py-2 rounded-md transition-colors ${
                         activeView === 'chat'
                           ? 'bg-orange-500 text-white'

@@ -63,9 +63,10 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     <div 
       className="verse-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 fade-in-up"
       style={{ animationDelay: `${index * 100}ms` }}
+      data-testid="verse-card"
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-4" data-testid="verse-metadata">
         <div className="flex items-center space-x-3">
           <div className={`${sourceInfo.color} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-1`}>
             <BookOpen className="w-3 h-3" />

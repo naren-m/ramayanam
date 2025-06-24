@@ -3,44 +3,38 @@ import { test, expect } from '@playwright/test';
 test.describe('UI Components', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/Ramayana Digital Corpus/);
+    await expect(page).toHaveTitle(/Universal Sacred Text Platform/);
   });
 
   test('should have responsive header component', async ({ page }) => {
-    const header = page.locator('[data-testid="header"]');
-    await expect(header).toBeVisible();
-    
     // Check title
-    await expect(page.locator('h1')).toContainText('Ramayana Digital Corpus');
+    await expect(page.locator('h1')).toContainText('Sacred Text Research');
     
-    // Check theme toggle button if present
-    const themeToggle = page.locator('[data-testid="theme-toggle"]');
-    if (await themeToggle.isVisible()) {
-      await expect(themeToggle).toBeVisible();
-    }
+    // Check theme toggle button
+    const themeToggle = page.locator('[data-testid="theme-toggle-button"]');
+    await expect(themeToggle).toBeVisible();
+    
+    // Check view toggle buttons
+    await expect(page.locator('[data-testid="search-tab-button"]')).toBeVisible();
+    await expect(page.locator('[data-testid="chat-tab-button"]')).toBeVisible();
   });
 
   test('should toggle dark/light theme', async ({ page }) => {
-    const themeToggle = page.locator('[data-testid="theme-toggle"]');
+    const themeToggle = page.locator('[data-testid="theme-toggle-button"]');
     
-    if (await themeToggle.isVisible()) {
-      // Get initial theme
-      const body = page.locator('body');
-      const initialClass = await body.getAttribute('class');
-      
-      // Toggle theme
-      await themeToggle.click();
-      
-      // Wait for theme change animation
-      await page.waitForTimeout(500);
-      
-      // Verify theme changed
-      const newClass = await body.getAttribute('class');
-      expect(newClass).not.toBe(initialClass);
-    } else {
-      // Skip if theme toggle not implemented yet
-      test.skip();
-    }
+    // Get initial theme
+    const html = page.locator('html');
+    const initialClass = await html.getAttribute('class');
+    
+    // Toggle theme
+    await themeToggle.click();
+    
+    // Wait for theme change animation
+    await page.waitForTimeout(500);
+    
+    // Verify theme changed
+    const newClass = await html.getAttribute('class');
+    expect(newClass).not.toBe(initialClass);
   });
 
   test('should display search interface correctly', async ({ page }) => {

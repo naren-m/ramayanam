@@ -20,7 +20,7 @@ class Config:
     # Data paths
     # Default to local path for development, Docker path if DATA_PATH is set
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DEFAULT_DATA_PATH = os.path.join(PROJECT_ROOT, 'data')
+    DEFAULT_DATA_PATH = os.path.join(PROJECT_ROOT, '..', 'data')  # Go up one level from api/
     DATA_BASE_PATH = os.getenv('DATA_PATH', DEFAULT_DATA_PATH)
     SLOKAS_PATH = os.path.join(DATA_BASE_PATH, 'slokas', 'Slokas')
     

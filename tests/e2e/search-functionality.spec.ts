@@ -3,13 +3,15 @@ import { test, expect } from '@playwright/test';
 test.describe('Search Functionality', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/Ramayana Digital Corpus/);
+    await expect(page).toHaveTitle(/Universal Sacred Text Platform/);
   });
 
   test('should load the homepage successfully', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Ramayana Digital Corpus');
-    await expect(page.locator('input[type="text"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await expect(page.locator('h1')).toContainText('Sacred Text Research');
+    await expect(page.locator('[data-testid="english-search-input"]')).toBeVisible();
+    await expect(page.locator('[data-testid="sanskrit-search-input"]')).toBeVisible();
+    await expect(page.locator('[data-testid="search-tab-button"]')).toBeVisible();
+    await expect(page.locator('[data-testid="chat-tab-button"]')).toBeVisible();
   });
 
   test('should perform English fuzzy search', async ({ page }) => {

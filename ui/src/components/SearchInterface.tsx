@@ -99,7 +99,7 @@ const SearchInterface: React.FC = () => {
   };
 
   return (
-    <div className="mb-8 search-interface">
+    <div className="mb-8 search-interface" data-testid="search-interface">
       {/* Search Mode Selection */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -191,6 +191,7 @@ const SearchInterface: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
             <input
               type="text"
+              data-testid="english-search-input"
               value={englishQuery}
               onChange={(e) => handleEnglishSearch(e.target.value)}
               onKeyPress={(e) => handleKeyPress(e, 'english')}
@@ -227,6 +228,7 @@ const SearchInterface: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
             <input
               type="text"
+              data-testid="sanskrit-search-input"
               value={sanskritQuery}
               onChange={(e) => handleSanskritSearch(e.target.value)}
               onKeyPress={(e) => handleKeyPress(e, 'sanskrit')}
@@ -270,6 +272,7 @@ const SearchInterface: React.FC = () => {
         {/* Quick Kandam Filter - Only show for Ramayana */}
         {selectedTexts.includes('ramayana') && (
           <select
+            data-testid="kanda-filter"
             value={filters.kanda || ''}
             onChange={(e) => setFilters({ ...filters, kanda: e.target.value ? Number(e.target.value) : null })}
             className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"

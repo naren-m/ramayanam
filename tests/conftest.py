@@ -102,7 +102,7 @@ def sample_search_results():
             "sarga": 1,
             "sloka": 1,
             "ratio": 95,
-            "sloka_number": "1.1.1"
+            "sloka_id": "1.1.1"
         },
         {
             "sloka_id": "1.1.2",
@@ -113,7 +113,7 @@ def sample_search_results():
             "sarga": 1,
             "sloka": 2,
             "ratio": 87,
-            "sloka_number": "1.1.2"
+            "sloka_id": "1.1.2"
         }
     ]
 

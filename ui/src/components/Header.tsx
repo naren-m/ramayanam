@@ -39,6 +39,7 @@ const Header: React.FC = () => {
             </button>
             <button
               onClick={toggleTheme}
+              data-testid="theme-toggle-button"
               className="p-2 rounded-lg bg-orange-100 dark:bg-gray-700 text-orange-700 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-gray-600 transition-colors"
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
