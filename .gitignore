@@ -20,6 +20,8 @@ ui/dist/
 
 # E2E Testing
 node_modules/
+test-results/
+playwright-report/
 
 # Logs
 *.log
