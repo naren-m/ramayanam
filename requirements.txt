@@ -4,7 +4,7 @@ Flask-CORS==4.0.0
 Werkzeug==3.0.3
 
 # HTTP client
-requests==2.31.0
+requests==2.32.4
 
 # Fuzzy string matching
 fuzzywuzzy==0.18.0
