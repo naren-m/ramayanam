@@ -1,15 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ramayanam-app
+  name: ramayanam-app-amd64
   namespace: ramayanam
   labels:
     app: ramayanam
+    arch: amd64
     version: v1.0.0
-  annotations:
-    deployment.kubernetes.io/revision: "1"
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,10 +17,12 @@ spec:
   selector:
     matchLabels:
       app: ramayanam
+      arch: amd64
   template:
     metadata:
       labels:
         app: ramayanam
+        arch: amd64
         version: v1.0.0
     spec:
       containers:

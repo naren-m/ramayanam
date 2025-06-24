@@ -1,15 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ramayanam-app
+  name: ramayanam-app-arm64
   namespace: ramayanam
   labels:
     app: ramayanam
+    arch: arm64
     version: v1.0.0
-  annotations:
-    deployment.kubernetes.io/revision: "1"
 spec:
-  replicas: 3
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,15 +17,17 @@ spec:
   selector:
     matchLabels:
       app: ramayanam
+      arch: arm64
   template:
     metadata:
       labels:
         app: ramayanam
+        arch: arm64
         version: v1.0.0
     spec:
       containers:
       - name: ramayanam
-        image: narenm/ramayanam:latest
+        image: narenm/ramayanam:arm64
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
@@ -102,6 +103,6 @@ spec:
         emptyDir:
           sizeLimit: 2Gi
       nodeSelector:
-        kubernetes.io/arch: amd64
+        kubernetes.io/arch: arm64
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

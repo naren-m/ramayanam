@@ -6,3 +6,22 @@ build/
 
 .tox/
 .coverage
+
+# Development
+venv/
+.env
+.vscode/
+.idea/
+
+# UI Build
+dist/
+ui/node_modules/
+ui/dist/
+
+# E2E Testing
+node_modules/
+
+# Logs
+*.log
+logs/
+
