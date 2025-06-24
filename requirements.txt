@@ -1,6 +1,6 @@
 # Core Flask dependencies
 Flask==2.2.5
-Flask-CORS==4.0.0
+Flask-CORS==6.0.0
 Werkzeug==3.0.3
 
 # HTTP client
