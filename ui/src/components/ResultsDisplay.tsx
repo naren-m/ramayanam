@@ -1,23 +1,11 @@
 import React from 'react';
-import { AlertCircle, BookOpen, Download, ToggleLeft, ToggleRight, Globe } from 'lucide-react';
+import { AlertCircle, BookOpen, Globe } from 'lucide-react';
 import { useSearch } from '../contexts/SearchContext';
 import VerseCard from './VerseCard';
 import LoadingSpinner from './LoadingSpinner';
 
 const ResultsDisplay: React.FC = () => {
-  const { 
-    verses, 
-    loading, 
-    streamingProgress,
-    error, 
-    pagination, 
-    searchQuery, 
-    searchType,
-    useStreaming,
-    loadNextPage,
-    toggleStreamingMode,
-    filters
-  } = useSearch();
+  const { verses, loading, error, totalResults, searchQuery, searchType, filters } = useSearch();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -25,7 +13,7 @@ const ResultsDisplay: React.FC = () => {
 
   if (error) {
     return (
-      <div className="text-center py-12" data-testid="error-message">
+      <div className="text-center py-12">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
@@ -75,7 +63,7 @@ const ResultsDisplay: React.FC = () => {
 
   if (searchQuery && verses.length === 0) {
     return (
-      <div className="text-center py-12" data-testid="no-results">
+      <div className="text-center py-12">
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
           <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -106,15 +94,15 @@ const ResultsDisplay: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="results-display">
+    <div className="space-y-6">
       {/* Results Header */}
-      <div className="flex items-center justify-between" data-testid="search-results">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
             Search Results
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Found {pagination?.total_results || verses.length} verses matching "{searchQuery}" in {getSearchModeDisplay()}
+            Found {totalResults} verses matching "{searchQuery}" in {getSearchModeDisplay()}
           </p>
           {filters.texts && filters.texts.length > 1 && (
             <div className="flex items-center space-x-2 mt-2">

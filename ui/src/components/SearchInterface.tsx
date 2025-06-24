@@ -1,7 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, X, ChevronDown, BookOpen, Globe } from 'lucide-react';
 import { useSearch } from '../contexts/SearchContext';
-import { debounce } from '../utils/api';
 
 const KANDAS = [
   { value: null, label: 'All Kandams' },
@@ -39,20 +38,12 @@ const SearchInterface: React.FC = () => {
     setFilters({ ...filters, texts: selectedTexts });
   }, [selectedTexts, setFilters]);
 
-  const debouncedSearch = useCallback(
-    debounce((query: string, type: 'english' | 'sanskrit') => {
-      searchVerses(query, type);
-    }, 500),
-    [searchVerses]
-  );
-
   const handleEnglishSearch = (value: string) => {
     setEnglishQuery(value);
     setSanskritQuery('');
     setActiveTab('english');
-    if (value.trim()) {
-      debouncedSearch(value, 'english');
-    } else {
+    // Only clear search if input is empty, but don't trigger search as user types
+    if (!value.trim()) {
       clearSearch();
     }
   };
@@ -61,9 +52,8 @@ const SearchInterface: React.FC = () => {
     setSanskritQuery(value);
     setEnglishQuery('');
     setActiveTab('sanskrit');
-    if (value.trim()) {
-      debouncedSearch(value, 'sanskrit');
-    } else {
+    // Only clear search if input is empty, but don't trigger search as user types
+    if (!value.trim()) {
       clearSearch();
     }
   };
