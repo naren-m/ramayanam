@@ -9,12 +9,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
-    const stored = localStorage.getItem('universal-sacred-text-theme');
+    const stored = localStorage.getItem('ramayana-theme');
     return stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
-    localStorage.setItem('universal-sacred-text-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('ramayana-theme', isDark ? 'dark' : 'light');
     if (isDark) {
       document.documentElement.classList.add('dark');
     } else {

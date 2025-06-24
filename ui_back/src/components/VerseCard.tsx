@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Copy, ExternalLink, Share2, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Heart, Copy, ExternalLink, Share2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Verse } from '../types';
 import { useSearch } from '../contexts/SearchContext';
 import { copyToClipboard, formatVerseForSharing } from '../utils/api';
@@ -35,7 +35,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     const text = formatVerseForSharing(verse);
     if (navigator.share) {
       await navigator.share({
-        title: `${verse.source || 'Sacred Text'} Verse ${verse.sloka_number}`,
+        title: `Ramayana Verse ${verse.sloka_number}`,
         text: text,
       });
     } else {
@@ -43,34 +43,17 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     }
   };
 
-  const getSourceInfo = () => {
-    if (verse.source === 'bhagavad-gita') {
-      return { name: 'Bhagavad Gita', color: 'bg-blue-500' };
-    } else if (verse.source === 'ramayana') {
-      return { name: 'Ramayana', color: 'bg-orange-500' };
-    } else if (verse.source === 'mahabharata') {
-      return { name: 'Mahabharata', color: 'bg-purple-500' };
-    }
-    return { name: 'Ramayana', color: 'bg-orange-500' };
-  };
-
-  const sourceInfo = getSourceInfo();
-  const externalUrl = verse.source === 'ramayana' 
-    ? `https://valmiki.iitk.ac.in/sloka?field_kanda_tid=${verse.sloka_number.split('.')[0]}&field_sarga_value=${verse.sloka_number.split('.')[1]}&field_sloka_value=${verse.sloka_number.split('.')[2]}`
-    : '#';
+  const externalUrl = `https://valmiki.iitk.ac.in/sloka?field_kanda_tid=${verse.sloka_number.split('.')[0]}&field_sarga_value=${verse.sloka_number.split('.')[1]}&field_sloka_value=${verse.sloka_number.split('.')[2]}`;
 
   return (
     <div 
       className="verse-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 fade-in-up"
       style={{ animationDelay: `${index * 100}ms` }}
+      data-testid="verse-card"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className={`${sourceInfo.color} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-1`}>
-            <BookOpen className="w-3 h-3" />
-            <span>{sourceInfo.name}</span>
-          </div>
           <div className="bg-gradient-to-br from-saffron-400 to-gold-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
             {verse.sloka_number}
           </div>
@@ -116,7 +99,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
 
       {/* Sanskrit Text */}
       <div className="mb-4">
-        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed" data-testid="verse-text">
           {verse.sloka}
         </div>
       </div>
@@ -126,6 +109,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
         <div 
           className="text-gray-700 dark:text-gray-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: verse.translation }}
+          data-testid="verse-translation"
         />
       </div>
 
@@ -151,7 +135,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gold-200 dark:border-gold-700/30">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gold-200 dark:border-gold-700/30" data-testid="verse-metadata">
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {copyStatus === 'copied' && (
             <span className="text-green-600 dark:text-green-400">Copied to clipboard!</span>
@@ -161,17 +145,15 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
           )}
         </div>
         
-        {verse.source === 'ramayana' && (
-          <a
-            href={externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-1 text-xs text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 transition-colors"
-          >
-            <span>View Source</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        )}
+        <a
+          href={externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center space-x-1 text-xs text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 transition-colors"
+        >
+          <span>View Source</span>
+          <ExternalLink className="w-3 h-3" />
+        </a>
       </div>
     </div>
   );

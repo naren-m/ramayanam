@@ -4,14 +4,12 @@ export interface Verse {
   sloka: string;
   meaning: string;
   translation: string;
-  source?: string; // 'ramayana' | 'bhagavad-gita' | 'mahabharata'
 }
 
 export interface SearchFilters {
   kanda: number | null;
   minRatio: number;
   threshold?: number;
-  texts?: string[]; // Selected texts for cross-search
 }
 
 export interface PaginationInfo {
@@ -34,8 +32,6 @@ export interface SearchHistory {
   type: 'english' | 'sanskrit';
   timestamp: number;
   resultCount: number;
-  searchMode?: 'single' | 'cross';
-  texts?: string[];
 }
 
 export interface FavoriteVerse {

@@ -28,6 +28,7 @@ class SearchAPI {
     }
   }
 
+
   async search(
     query: string, 
     type: 'english' | 'sanskrit', 
@@ -39,8 +40,6 @@ class SearchAPI {
       throw new APIError('Search query cannot be empty', 400);
     }
 
-    // For cross-text search, we'll need to extend this logic
-    // Currently supporting Ramayana as primary text
     const endpoint = type === 'english' ? 'fuzzy-search' : 'fuzzy-search-sanskrit';
     const params = new URLSearchParams({
       query: query.trim(),
@@ -50,33 +49,15 @@ class SearchAPI {
       ...(filters.threshold && { threshold: filters.threshold.toString() })
     });
     
-    // Add selected texts filter for cross-search
-    if (filters.texts && filters.texts.length > 0) {
-      params.append('texts', filters.texts.join(','));
-    }
-    
     const url = `${API_BASE_URL}/${endpoint}?${params}`;
     const response = await this.makeRequest(url);
     
-    // Enhanced validation and error handling
-    if (!response || typeof response !== 'object') {
+    if (!response.results || !Array.isArray(response.results)) {
       throw new APIError('Invalid response format from server', 500);
     }
     
-    if (!response.results || !Array.isArray(response.results)) {
-      console.error('API Response:', response);
-      throw new APIError('Invalid response format: results field is missing or not an array', 500);
-    }
-    
-    if (!response.pagination || typeof response.pagination !== 'object') {
-      console.error('API Response pagination:', response.pagination);
-      throw new APIError('Invalid response format: pagination field is missing', 500);
-    }
-    
-    // Filter by minimum ratio if specified - with safety check
-    const filteredResults = response.results.filter((verse: Verse) => {
-      return verse && typeof verse.ratio === 'number' && verse.ratio >= filters.minRatio;
-    });
+    // Filter by minimum ratio if specified
+    const filteredResults = response.results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
     
     return {
       results: filteredResults,
@@ -103,11 +84,6 @@ class SearchAPI {
       ...(filters.kanda && { kanda: filters.kanda.toString() }),
       ...(filters.threshold && { threshold: filters.threshold.toString() })
     });
-    
-    // Add selected texts filter for cross-search
-    if (filters.texts && filters.texts.length > 0) {
-      params.append('texts', filters.texts.join(','));
-    }
     
     const url = `${API_BASE_URL}/fuzzy-search-stream?${params}`;
     
@@ -177,34 +153,6 @@ class SearchAPI {
     const url = `/api/ramayanam/kandas/${kandaNumber}/sargas/${sargaNumber}/slokas/${slokaNumber}`;
     return await this.makeRequest(url);
   }
-
-  // New methods for cross-text search functionality
-  async getAvailableTexts(): Promise<string[]> {
-    try {
-      const url = '/api/texts/available';
-      const result = await this.makeRequest(url);
-      return result.texts || ['ramayana']; // Default to ramayana if API not available
-    } catch (error) {
-      console.warn('Could not fetch available texts, using default');
-      return ['ramayana'];
-    }
-  }
-
-  async searchAcrossTexts(
-    query: string,
-    type: 'english' | 'sanskrit',
-    selectedTexts: string[],
-    filters: SearchFilters,
-    page: number = 1,
-    pageSize: number = 10
-  ): Promise<PaginatedResponse> {
-    if (!query.trim()) {
-      throw new APIError('Search query cannot be empty', 400);
-    }
-
-    const updatedFilters = { ...filters, texts: selectedTexts };
-    return this.search(query, type, updatedFilters, page, pageSize);
-  }
 }
 
 class APIError extends Error {
@@ -245,6 +193,5 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 export const formatVerseForSharing = (verse: Verse): string => {
-  const sourceText = verse.source ? ` - ${verse.source}` : '';
-  return `${verse.sloka_number}: ${verse.sloka}\n\n${verse.translation}${sourceText}\n\nSource: Universal Sacred Text Platform`;
+  return `${verse.sloka_number}: ${verse.sloka}\n\n${verse.translation}\n\nSource: Ramayana Digital Corpus`;
 };

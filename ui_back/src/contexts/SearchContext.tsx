@@ -64,12 +64,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       // Always use paginated search for better performance
       const response = await searchAPI.search(query, type, filters, 1, 10);
-      
-      // Enhanced validation
-      if (!response || !response.results || !Array.isArray(response.results)) {
-        throw new Error('Invalid API response format');
-      }
-      
       setVerses(response.results);
       setPagination(response.pagination);
       
@@ -86,9 +80,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         query,
         type,
         timestamp: Date.now(),
-        resultCount: response.results.length,
-        searchMode: filters.texts && filters.texts.length > 1 ? 'cross' : 'single',
-        texts: filters.texts
+        resultCount: verses.length
       };
 
       const updatedHistory = [historyEntry, ...searchHistory.slice(0, 9)];
@@ -111,7 +103,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setLoading(false);
     }
-  }, [filters, searchHistory]);
+  }, [filters, searchHistory, verses.length]);
 
   const loadNextPage = useCallback(async () => {
     if (!pagination?.has_next || !searchQuery || useStreaming) return;
@@ -150,7 +142,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       for (let page = startPage; page < startPage + numPages; page++) {
         const response = await searchAPI.search(query, type, searchFilters, page, 5);
-        if (response && response.results && Array.isArray(response.results) && response.results.length > 0) {
+        if (response.results.length > 0) {
           setVerses(prev => [...prev, ...response.results]);
           setPagination(response.pagination);
           
@@ -174,13 +166,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       timestamp: Date.now()
     };
 
-    const updatedFavorites = [favorite, ...favorites.filter((f: FavoriteVerse) => f.id !== verse.sloka_number)];
+    const updatedFavorites = [favorite, ...favorites.filter(f => f.id !== verse.sloka_number)];
     setFavorites(updatedFavorites);
     localStorage.setItem('ramayana-favorites', JSON.stringify(updatedFavorites));
   }, [favorites]);
 
   const removeFromFavorites = useCallback((verseId: string) => {
-    const updatedFavorites = favorites.filter((f: FavoriteVerse) => f.id !== verseId);
+    const updatedFavorites = favorites.filter(f => f.id !== verseId);
     setFavorites(updatedFavorites);
     localStorage.setItem('ramayana-favorites', JSON.stringify(updatedFavorites));
   }, [favorites]);
