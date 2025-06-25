@@ -443,7 +443,7 @@ class RamayanaEntityExtractor:
             labels['sa'] = sanskrit_name
         
         return KGEntity(
-            kg_id=f"http://example.org/entity/{entity_id}",
+            kg_id=f"http://ramayanam.hanuma.com/entity/{entity_id}",
             entity_type=pattern.entity_type,
             labels=labels,
             properties={

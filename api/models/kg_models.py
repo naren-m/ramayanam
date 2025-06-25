@@ -22,7 +22,7 @@ class EntityType(Enum):
 @dataclass
 class KGEntity:
     """Knowledge Graph Entity representation"""
-    kg_id: str  # URI identifier like http://example.org/entity/rama
+    kg_id: str  # URI identifier like http://ramayanam.hanuma.com/entity/rama
     entity_type: EntityType
     labels: Dict[str, str]  # Language -> label mapping {"en": "Rama", "sa": "राम"}
     properties: Dict[str, Any] = field(default_factory=dict)

@@ -45,17 +45,5 @@ CREATE INDEX IF NOT EXISTS idx_text_mentions_unit ON text_entity_mentions(text_u
 CREATE INDEX IF NOT EXISTS idx_text_mentions_entity ON text_entity_mentions(entity_id);
 CREATE INDEX IF NOT EXISTS idx_text_mentions_confidence ON text_entity_mentions(confidence);
 
--- Sample data insertion (will be replaced by automated extraction)
-INSERT OR IGNORE INTO kg_entities (kg_id, entity_type, labels, properties) VALUES
-('http://ramayanam.hanuma.com/entity/rama', 'Person', '{"en": "Rama", "sa": "राम"}', '{"epithets": ["राघव", "दाशरथि"], "confidence": 0.95}'),
-('http://ramayanam.hanuma.com/entity/sita', 'Person', '{"en": "Sita", "sa": "सीता"}', '{"epithets": ["मैथिली", "वैदेही"], "confidence": 0.95}'),
-('http://ramayanam.hanuma.com/entity/hanuman', 'Person', '{"en": "Hanuman", "sa": "हनुमान्"}', '{"epithets": ["पवनात्मज", "मारुति"], "confidence": 0.95}'),
-('http://ramayanam.hanuma.com/entity/ayodhya', 'Place', '{"en": "Ayodhya", "sa": "अयोध्या"}', '{"type": "city", "confidence": 0.95}'),
-('http://ramayanam.hanuma.com/entity/dharma', 'Concept', '{"en": "Dharma", "sa": "धर्म"}', '{"category": "philosophy", "confidence": 0.90}');
-
--- Sample relationships
-INSERT OR IGNORE INTO kg_relationships (subject_id, predicate, object_id, metadata) VALUES
-('http://ramayanam.hanuma.com/entity/rama', 'hasSpouse', 'http://ramayanam.hanuma.com/entity/sita', '{"confidence": 0.99}'),
-('http://ramayanam.hanuma.com/entity/hanuman', 'devoteeOf', 'http://ramayanam.hanuma.com/entity/rama', '{"confidence": 0.99}'),
-('http://ramayanam.hanuma.com/entity/rama', 'rules', 'http://ramayanam.hanuma.com/entity/ayodhya', '{"confidence": 0.95}'),
-('http://ramayanam.hanuma.com/entity/rama', 'embodies', 'http://ramayanam.hanuma.com/entity/dharma', '{"confidence": 0.90}');
+-- Sample data insertion removed - entities will be populated by automated extraction
+-- Use the translation_kg_builder.py script or /api/kg/extract endpoint to populate real data

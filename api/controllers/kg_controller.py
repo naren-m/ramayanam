@@ -55,9 +55,9 @@ def get_entities():
 def get_entity(entity_id: str):
     """Get specific entity with relationships and mentions"""
     try:
-        # Handle URL encoding - entity_id might be http://example.org/entity/rama
+        # Handle URL encoding - entity_id might be http://ramayanam.hanuma.com/entity/rama
         if not entity_id.startswith('http'):
-            entity_id = f"http://example.org/entity/{entity_id}"
+            entity_id = f"http://ramayanam.hanuma.com/entity/{entity_id}"
         
         entity = kg_service.get_entity_by_id(entity_id)
         if not entity:
@@ -169,7 +169,7 @@ def get_entity_relationships_endpoint(entity_id: str):
     """Get relationships for a specific entity"""
     try:
         if not entity_id.startswith('http'):
-            entity_id = f"http://example.org/entity/{entity_id}"
+            entity_id = f"http://ramayanam.hanuma.com/entity/{entity_id}"
         
         relationships = kg_service.get_entity_relationships(entity_id)
         
