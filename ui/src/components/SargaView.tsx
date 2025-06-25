@@ -18,8 +18,6 @@ const SargaView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentSloka, setCurrentSloka] = useState<number>(0);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [showAllVerses, setShowAllVerses] = useState<boolean>(false);
-  const [gridPage, setGridPage] = useState<number>(0);
 
   useEffect(() => {
     const loadSargaData = async () => {
@@ -382,107 +380,34 @@ const SargaView: React.FC = () => {
           </div>
         </div>
 
-        {/* Verse Grid (Scalable Overview) */}
+        {/* Quick Verse Selector */}
         <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-              All Verses in This Sarga ({sargaData.sarga.total_slokas})
+          <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
+              Jump to Verse
             </h3>
-            {sargaData.sarga.total_slokas > 50 && (
-              <button
-                onClick={() => setShowAllVerses(!showAllVerses)}
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
-              >
-                {showAllVerses ? 'Show Less' : 'Show All'}
-              </button>
-            )}
-          </div>
-          
-          {/* Verse Navigation for Large Sargas */}
-          {sargaData.sarga.total_slokas > 100 && (
-            <div className="mb-4 flex items-center justify-center space-x-4">
-              <label className="text-sm text-gray-600 dark:text-gray-400">
-                Jump to verse:
+            <div className="flex items-center space-x-4">
+              <label htmlFor="verse-selector" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                Go to verse:
               </label>
-              <input
-                type="number"
-                min="1"
-                max={sargaData.sarga.total_slokas}
-                value={currentSloka + 1}
-                onChange={(e) => {
-                  const verse = parseInt(e.target.value) - 1;
-                  if (verse >= 0 && verse < sargaData.slokas.length) {
-                    setCurrentSloka(verse);
-                  }
-                }}
-                className="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                of {sargaData.sarga.total_slokas}
-              </span>
+              <select
+                id="verse-selector"
+                value={currentSloka}
+                onChange={(e) => setCurrentSloka(parseInt(e.target.value))}
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label="Select verse to jump to"
+              >
+                {sargaData.slokas.map((verse, index) => (
+                  <option key={verse.sloka_number} value={index}>
+                    Verse {index + 1} - {verse.sloka_number}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
-          
-          {/* Responsive Grid with Pagination for Large Sargas */}
-          {(() => {
-            const versesPerPage = 80;
-            const totalPages = Math.ceil(sargaData.slokas.length / versesPerPage);
-            const shouldPaginate = sargaData.slokas.length > versesPerPage && !showAllVerses;
-            
-            let displayVerses = sargaData.slokas;
-            if (shouldPaginate) {
-              const start = gridPage * versesPerPage;
-              const end = start + versesPerPage;
-              displayVerses = sargaData.slokas.slice(start, end);
-            }
-            
-            return (
-              <>
-                {shouldPaginate && (
-                  <div className="flex items-center justify-center space-x-4 mb-4">
-                    <button
-                      onClick={() => setGridPage(Math.max(0, gridPage - 1))}
-                      disabled={gridPage === 0}
-                      className="px-3 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Page {gridPage + 1} of {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setGridPage(Math.min(totalPages - 1, gridPage + 1))}
-                      disabled={gridPage === totalPages - 1}
-                      className="px-3 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
-                
-                <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2">
-                  {displayVerses.map((verse, displayIndex) => {
-                    const actualIndex = shouldPaginate ? gridPage * versesPerPage + displayIndex : displayIndex;
-                    return (
-                      <button
-                        key={verse.sloka_number}
-                        onClick={() => setCurrentSloka(actualIndex)}
-                        className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                          actualIndex === currentSloka
-                            ? 'bg-blue-500 text-white ring-2 ring-blue-300'
-                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30'
-                        }`}
-                        title={`Verse ${actualIndex + 1}`}
-                        aria-label={`Go to verse ${actualIndex + 1}`}
-                      >
-                        {actualIndex + 1}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            );
-          })()}
+            <div className="mt-3 text-sm text-gray-500 dark:text-gray-400 text-center">
+              {sargaData.sarga.total_slokas} verses in this sarga
+            </div>
+          </div>
         </div>
       </div>
     </div>
