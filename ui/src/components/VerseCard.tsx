@@ -75,6 +75,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     <div 
       className="verse-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 fade-in-up"
       style={{ animationDelay: `${index * 100}ms` }}
+      data-testid="verse-card"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -83,7 +84,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
             <BookOpen className="w-3 h-3" />
             <span>{sourceInfo.name}</span>
           </div>
-          <div className="bg-gradient-to-br from-saffron-400 to-gold-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <div className="bg-gradient-to-br from-saffron-400 to-gold-500 text-white px-3 py-1 rounded-full text-sm font-semibold" data-testid="verse-metadata">
             {verse.sloka_number}
           </div>
           <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full text-xs font-medium">
@@ -136,7 +137,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
 
       {/* Sanskrit Text */}
       <div className="mb-4">
-        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed" data-testid="verse-text">
           {verse.sloka}
         </div>
       </div>
@@ -145,6 +146,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
       <div className="mb-4">
         <div 
           className="text-gray-700 dark:text-gray-300 leading-relaxed"
+          data-testid="verse-translation"
           dangerouslySetInnerHTML={{ __html: verse.translation }}
         />
       </div>

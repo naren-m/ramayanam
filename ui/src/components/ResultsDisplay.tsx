@@ -13,7 +13,7 @@ const ResultsDisplay: React.FC = () => {
 
   if (error) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" data-testid="error-message">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 max-w-md mx-auto">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
@@ -63,7 +63,7 @@ const ResultsDisplay: React.FC = () => {
 
   if (searchQuery && verses.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" data-testid="no-results">
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
           <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -94,7 +94,7 @@ const ResultsDisplay: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="search-results">
       {/* Results Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -120,7 +120,7 @@ const ResultsDisplay: React.FC = () => {
       </div>
 
       {/* Results Grid */}
-      <div className="grid gap-6">
+      <div className="grid gap-6" data-testid="results-display">
         {verses.map((verse, index) => (
           <VerseCard
             key={`${verse.source || 'unknown'}-${verse.sloka_number}-${index}`}
