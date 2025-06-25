@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Heart, Copy, ExternalLink, Share2, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, Copy, ExternalLink, Share2, ChevronDown, ChevronUp, BookOpen, Eye } from 'lucide-react';
 import { Verse } from '../types';
 import { useSearch } from '../contexts/SearchContext';
 import { copyToClipboard, formatVerseForSharing } from '../utils/api';
@@ -10,6 +11,7 @@ interface VerseCardProps {
 }
 
 const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
+  const navigate = useNavigate();
   const { favorites, addToFavorites, removeFromFavorites } = useSearch();
   const [expanded, setExpanded] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
@@ -43,6 +45,16 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     }
   };
 
+  const handleReadSarga = () => {
+    const parts = verse.sloka_number.split('.');
+    if (parts.length >= 3) {
+      const kanda = parts[0];
+      const sarga = parts[1];
+      const source = verse.source || 'ramayana';
+      navigate(`/sarga/${source}/${kanda}/${sarga}`);
+    }
+  };
+
   const getSourceInfo = () => {
     if (verse.source === 'bhagavad-gita') {
       return { name: 'Bhagavad Gita', color: 'bg-blue-500' };
@@ -63,10 +75,9 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     <div 
       className="verse-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 fade-in-up"
       style={{ animationDelay: `${index * 100}ms` }}
-      data-testid="verse-card"
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4" data-testid="verse-metadata">
+      <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className={`${sourceInfo.color} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-1`}>
             <BookOpen className="w-3 h-3" />
@@ -81,6 +92,14 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
         </div>
         
         <div className="flex items-center space-x-2">
+          <button
+            onClick={handleReadSarga}
+            className="p-2 rounded-lg text-blue-500 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+            title="Read full sarga"
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+          
           <button
             onClick={handleToggleFavorite}
             className={`p-2 rounded-lg transition-colors ${
@@ -162,17 +181,26 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
           )}
         </div>
         
-        {verse.source === 'ramayana' && (
-          <a
-            href={externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-1 text-xs text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 transition-colors"
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handleReadSarga}
+            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium"
           >
-            <span>View Source</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        )}
+            Read Full Sarga
+          </button>
+          
+          {verse.source === 'ramayana' && (
+            <a
+              href={externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-1 text-xs text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 transition-colors"
+            >
+              <span>View Source</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

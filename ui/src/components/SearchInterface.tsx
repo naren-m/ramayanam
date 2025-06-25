@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, X, ChevronDown, BookOpen, Globe } from 'lucide-react';
 import { useSearch } from '../contexts/SearchContext';
 
+/**
+ * SearchInterface Component
+ * 
+ * This component handles the user interface for searching Ramayana verses.
+ * Search is only triggered when:
+ * 1. User presses the Enter key in the search input
+ * 2. User clicks the search button next to the input field
+ * 
+ * The search is NOT automatically triggered as the user types.
+ * Only empty inputs will clear the search results.
+ */
+
 const KANDAS = [
   { value: null, label: 'All Kandams' },
   { value: 1, label: 'Bala Kandam' },
@@ -42,24 +54,27 @@ const SearchInterface: React.FC = () => {
     setEnglishQuery(value);
     setSanskritQuery('');
     setActiveTab('english');
-    // Only clear search if input is empty, but don't trigger search as user types
+    // Only clear search if input is empty, never trigger search as user types
     if (!value.trim()) {
       clearSearch();
     }
+    // Removed any automatic search - search happens only on Enter key press
   };
 
   const handleSanskritSearch = (value: string) => {
     setSanskritQuery(value);
     setEnglishQuery('');
     setActiveTab('sanskrit');
-    // Only clear search if input is empty, but don't trigger search as user types
+    // Only clear search if input is empty, never trigger search as user types
     if (!value.trim()) {
       clearSearch();
     }
+    // Removed any automatic search - search happens only on Enter key press
   };
 
   const handleKeyPress = (e: React.KeyboardEvent, type: 'english' | 'sanskrit') => {
     if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission if within a form
       const query = type === 'english' ? englishQuery : sanskritQuery;
       if (query.trim()) {
         searchVerses(query, type);
@@ -202,11 +217,23 @@ const SearchInterface: React.FC = () => {
                   setEnglishQuery('');
                   clearSearch();
                 }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
+            <button
+              onClick={() => {
+                if (englishQuery.trim()) {
+                  searchVerses(englishQuery, 'english');
+                }
+              }}
+              disabled={loading || !englishQuery.trim()}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
@@ -239,11 +266,23 @@ const SearchInterface: React.FC = () => {
                   setSanskritQuery('');
                   clearSearch();
                 }}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
+            <button
+              onClick={() => {
+                if (sanskritQuery.trim()) {
+                  searchVerses(sanskritQuery, 'sanskrit');
+                }
+              }}
+              disabled={loading || !sanskritQuery.trim()}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>

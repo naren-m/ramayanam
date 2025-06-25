@@ -13,6 +13,8 @@ interface SearchContextType {
   searchQuery: string;
   searchType: 'english' | 'sanskrit';
   filters: SearchFilters;
+  useStreaming?: boolean;
+  pagination?: { page_size: number };
   
   searchVerses: (query: string, type: 'english' | 'sanskrit') => Promise<void>;
   setFilters: (filters: SearchFilters) => void;
@@ -44,7 +46,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     kanda: null,
     minRatio: 0
   });
+  // Adding pagination and streaming settings for compatibility with ui_back
+  const pagination = { page_size: 20 };
+  const useStreaming = false;
 
+  // This function is only called when Enter is pressed in the search input
   const searchVerses = useCallback(async (query: string, type: 'english' | 'sanskrit') => {
     if (!query.trim()) {
       setVerses([]);
@@ -123,6 +129,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       searchQuery,
       searchType,
       filters,
+      useStreaming,
+      pagination,
       searchVerses,
       setFilters,
       addToFavorites,
