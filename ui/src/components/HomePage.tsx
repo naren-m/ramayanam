@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import Header from './Header';
+import SearchInterface from './SearchInterface';
+import ResultsDisplay from './ResultsDisplay';
+import ErrorBoundary from './ErrorBoundary';
+import { ChatInterface } from './chat/ChatInterface';
+
+const HomePage: React.FC = () => {
+  const [activeView, setActiveView] = useState<'search' | 'chat'>('search');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 dark:from-gray-900 dark:to-blue-900 transition-colors duration-300">
+      <div className="absolute inset-0 opacity-5 dark:opacity-10">
+        <div className="lotus-pattern"></div>
+      </div>
+      <div className="relative z-10">
+        <Header />
+        
+        {/* View Toggle */}
+        <div className="container mx-auto px-4 pt-4">
+          <div className="flex justify-center mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
+              <button
+                onClick={() => setActiveView('search')}
+                data-testid="search-tab-button"
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeView === 'search'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                Search Verses
+              </button>
+              <button
+                onClick={() => setActiveView('chat')}
+                data-testid="chat-tab-button"
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeView === 'chat'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                Chat & Discuss
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <main className="container mx-auto px-4 pb-8">
+          {activeView === 'search' ? (
+            <>
+              <ErrorBoundary>
+                <SearchInterface />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <ResultsDisplay />
+              </ErrorBoundary>
+            </>
+          ) : (
+            <ErrorBoundary>
+              <div className="max-w-4xl mx-auto h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                <ChatInterface activeText="ramayana" />
+              </div>
+            </ErrorBoundary>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default HomePage;

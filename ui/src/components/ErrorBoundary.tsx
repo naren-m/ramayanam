@@ -21,6 +21,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('Error stack:', error.stack);
+    console.error('Component stack:', errorInfo.componentStack);
   }
 
   render() {
@@ -38,6 +40,18 @@ class ErrorBoundary extends Component<Props, State> {
               <p className="text-red-600 dark:text-red-300 mb-4">
                 An unexpected error occurred. Please refresh the page to try again.
               </p>
+              {this.state.error && process.env.NODE_ENV === 'development' && (
+                <details className="text-left">
+                  <summary className="cursor-pointer text-sm text-red-700 dark:text-red-300 mb-2">
+                    Error Details (Development)
+                  </summary>
+                  <pre className="text-xs text-red-800 dark:text-red-200 bg-red-100 dark:bg-red-900/30 p-2 rounded overflow-auto">
+                    {this.state.error.toString()}
+                    {'\n\n'}
+                    {this.state.error.stack}
+                  </pre>
+                </details>
+              )}
               <button
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

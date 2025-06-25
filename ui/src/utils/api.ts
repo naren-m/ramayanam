@@ -62,13 +62,40 @@ class SearchAPI {
     ];
   }
 
-  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters): Promise<Verse[]> {
+  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters, page: number = 1, pageSize: number = 10): Promise<{ verses: Verse[], pagination?: any }> {
     const endpoint = type === 'english' ? 'fuzzy-search' : 'fuzzy-search-sanskrit';
     const kandaParam = filters.kanda ? `&kanda=${filters.kanda}` : '';
     const textsParam = filters.texts && filters.texts.length > 0 ? `&texts=${filters.texts.join(',')}` : '';
-    const url = `${API_BASE_URL}/${endpoint}?query=${encodeURIComponent(query)}${kandaParam}${textsParam}`;
+    const paginationParams = `&page=${page}&page_size=${pageSize}`;
+    const url = `${API_BASE_URL}/${endpoint}?query=${encodeURIComponent(query)}${kandaParam}${textsParam}${paginationParams}`;
     
-    const results = await this.makeRequest(url);
+    const response = await this.makeRequest(url);
+    
+    // Handle paginated response format
+    let results: Verse[];
+    let pagination: any = undefined;
+    
+    if (response && typeof response === 'object' && 'results' in response) {
+      // API returns paginated format: {results: [...], pagination: {...}}
+      results = response.results || [];
+      pagination = response.pagination;
+    } else if (Array.isArray(response)) {
+      // API returns direct array (fallback/mock data)
+      results = response;
+      // Create mock pagination for fallback
+      pagination = {
+        page: 1,
+        page_size: results.length,
+        total_results: results.length,
+        total_pages: 1,
+        has_next: false,
+        has_prev: false
+      };
+    } else {
+      // Unexpected format, return empty array
+      console.error('Unexpected API response format:', response);
+      return { verses: [], pagination: undefined };
+    }
     
     // Filter by minimum ratio if specified
     let filteredResults = results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
@@ -79,7 +106,7 @@ class SearchAPI {
       filteredResults = this.getMockCrossTextResults(query, type);
     }
     
-    return filteredResults;
+    return { verses: filteredResults, pagination };
   }
 
   private getMockCrossTextResults(query: string, type: 'english' | 'sanskrit'): Verse[] {
@@ -156,4 +183,95 @@ export const formatVerseForSharing = (verse: Verse): string => {
   const sourceName = verse.source === 'bhagavad-gita' ? 'Bhagavad Gita' : 
                      verse.source === 'ramayana' ? 'Ramayana' : 'Sacred Text';
   return `${verse.sloka_number}: ${verse.sloka}\n\n${verse.translation}\n\nSource: ${sourceName} Digital Corpus`;
+};
+
+export interface SargaData {
+  kanda: {
+    number: number;
+    name: string;
+  };
+  sarga: {
+    number: number;
+    total_slokas: number;
+  };
+  slokas: Verse[];
+}
+
+// Type guard for API response validation
+interface SargaApiResponse {
+  kanda: { number: number; name: string };
+  sarga: { number: number; total_slokas: number };
+  slokas: Array<{
+    sloka_id: string;
+    sloka_text: string;
+    meaning: string;
+    translation: string;
+  }>;
+}
+
+function isSargaApiResponse(data: any): data is SargaApiResponse {
+  return data &&
+    typeof data === 'object' &&
+    data.kanda &&
+    typeof data.kanda.number === 'number' &&
+    typeof data.kanda.name === 'string' &&
+    data.sarga &&
+    typeof data.sarga.number === 'number' &&
+    typeof data.sarga.total_slokas === 'number' &&
+    Array.isArray(data.slokas) &&
+    data.slokas.every((sloka: any) => 
+      sloka &&
+      typeof sloka.sloka_id === 'string' &&
+      typeof sloka.sloka_text === 'string' &&
+      typeof sloka.meaning === 'string' &&
+      typeof sloka.translation === 'string'
+    );
+}
+
+export const fetchSargaData = async (source: string, kanda: string, sarga: string): Promise<SargaData> => {
+  try {
+    console.log(`Fetching sarga data for source: ${source}, kanda: ${kanda}, sarga: ${sarga}`);
+    const response = await fetch(`/api/ramayanam/kandas/${kanda}/sargas/${sarga}`);
+    
+    if (!response.ok) {
+      console.error(`API request failed with status: ${response.status}`);
+      if (response.status === 404) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Sarga ${sarga} not found in Kanda ${kanda}`);
+      }
+      throw new Error(`Failed to fetch sarga data: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log('Raw API response:', data);
+    
+    // Validate API response structure
+    if (!isSargaApiResponse(data)) {
+      console.error('Invalid API response structure:', data);
+      throw new Error('Invalid sarga data format received from server');
+    }
+    
+    // Transform the API response to match our expected format
+    const transformedData: SargaData = {
+      kanda: data.kanda,
+      sarga: data.sarga,
+      slokas: data.slokas.map((sloka, index) => {
+        console.log(`Transforming sloka ${index}:`, sloka);
+        return {
+          sloka_number: sloka.sloka_id,
+          sloka: sloka.sloka_text,
+          meaning: sloka.meaning,
+          translation: sloka.translation,
+          ratio: 100, // Default ratio for sarga reading
+          source: source
+        };
+      })
+    };
+    
+    console.log('Transformed data:', transformedData);
+    return transformedData;
+  } catch (error) {
+    console.error('Failed to fetch sarga data:', error);
+    throw error;
+  }
 };

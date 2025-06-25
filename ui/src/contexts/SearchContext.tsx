@@ -2,9 +2,19 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Verse, SearchFilters, SearchHistory, FavoriteVerse } from '../types';
 import { searchAPI } from '../utils/api';
 
+interface PaginationMetadata {
+  page: number;
+  page_size: number;
+  total_results: number;
+  total_pages: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
 interface SearchContextType {
   verses: Verse[];
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
   searchHistory: SearchHistory[];
   favorites: FavoriteVerse[];
@@ -15,8 +25,10 @@ interface SearchContextType {
   filters: SearchFilters;
   useStreaming?: boolean;
   pagination?: { page_size: number };
+  paginationMeta?: PaginationMetadata;
   
   searchVerses: (query: string, type: 'english' | 'sanskrit') => Promise<void>;
+  loadMoreResults: () => Promise<void>;
   setFilters: (filters: SearchFilters) => void;
   addToFavorites: (verse: Verse) => void;
   removeFromFavorites: (verseId: string) => void;
@@ -29,7 +41,9 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paginationMeta, setPaginationMeta] = useState<PaginationMetadata | undefined>();
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>(() => {
     const stored = localStorage.getItem('ramayana-search-history');
     return stored ? JSON.parse(stored) : [];
@@ -55,6 +69,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!query.trim()) {
       setVerses([]);
       setTotalResults(0);
+      setPaginationMeta(undefined);
       return;
     }
 
@@ -65,9 +80,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrentPage(1);
 
     try {
-      const results = await searchAPI.search(query, type, filters);
+      const { verses: results, pagination } = await searchAPI.search(query, type, filters, 1, 10);
       setVerses(results);
-      setTotalResults(results.length);
+      setTotalResults(pagination?.total_results || results.length);
+      setPaginationMeta(pagination);
 
       // Add to search history
       const historyEntry: SearchHistory = {
@@ -75,7 +91,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         query,
         type,
         timestamp: Date.now(),
-        resultCount: results.length
+        resultCount: pagination?.total_results || results.length
       };
 
       const updatedHistory = [historyEntry, ...searchHistory.slice(0, 9)];
@@ -86,10 +102,40 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError(err instanceof Error ? err.message : 'Search failed');
       setVerses([]);
       setTotalResults(0);
+      setPaginationMeta(undefined);
     } finally {
       setLoading(false);
     }
   }, [filters, searchHistory]);
+
+  const loadMoreResults = useCallback(async () => {
+    if (!searchQuery || !paginationMeta?.has_next || loadingMore) {
+      return;
+    }
+
+    setLoadingMore(true);
+    setError(null);
+
+    try {
+      const nextPage = paginationMeta.page + 1;
+      const { verses: newResults, pagination } = await searchAPI.search(
+        searchQuery, 
+        searchType, 
+        filters, 
+        nextPage, 
+        10
+      );
+      
+      setVerses(prevVerses => [...prevVerses, ...newResults]);
+      setPaginationMeta(pagination);
+      setCurrentPage(nextPage);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load more results');
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [searchQuery, searchType, filters, paginationMeta, loadingMore]);
 
   const addToFavorites = useCallback((verse: Verse) => {
     const favorite: FavoriteVerse = {
@@ -115,12 +161,14 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setSearchQuery('');
     setTotalResults(0);
     setCurrentPage(1);
+    setPaginationMeta(undefined);
   }, []);
 
   return (
     <SearchContext.Provider value={{
       verses,
       loading,
+      loadingMore,
       error,
       searchHistory,
       favorites,
@@ -131,7 +179,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       filters,
       useStreaming,
       pagination,
+      paginationMeta,
       searchVerses,
+      loadMoreResults,
       setFilters,
       addToFavorites,
       removeFromFavorites,
