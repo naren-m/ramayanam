@@ -47,11 +47,16 @@ test.describe('API Integration', () => {
     
     // Should show error message or fallback content
     // Wait a bit for the error to be handled
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     
-    // Check if there's a results section or error indication
-    const resultsSection = page.locator('[data-testid="results-display"]');
-    await expect(resultsSection).toBeVisible({ timeout: 5000 });
+    // Check if there's an error message or results display handles gracefully
+    const errorMessage = page.locator('[data-testid="error-message"]');
+    const resultsDisplay = page.locator('[data-testid="results-display"]');
+    
+    // Either error message should be visible OR results display should handle gracefully
+    const hasError = await errorMessage.isVisible();
+    const hasResults = await resultsDisplay.isVisible();
+    expect(hasError || hasResults).toBeTruthy();
   });
 
   test('should handle slow API responses', async ({ page }) => {

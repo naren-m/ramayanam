@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 DOCKER_IMAGE_NAME="ramayanam"
 DOCKER_CONTAINER_NAME="ramayanam-e2e-test"
-APP_PORT=5000
+APP_PORT=5001
 TEST_TIMEOUT=300  # 5 minutes timeout for app startup
 
 # Function to print colored output

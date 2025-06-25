@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  playwright-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://host.docker.internal:5001
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    working_dir: /workspace
+    command: npx playwright test tests/e2e --reporter=line
+    network_mode: "host"  # This allows the container to access localhost services
