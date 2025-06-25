@@ -184,19 +184,61 @@ export interface SargaData {
   slokas: Verse[];
 }
 
+// Type guard for API response validation
+interface SargaApiResponse {
+  kanda: { number: number; name: string };
+  sarga: { number: number; total_slokas: number };
+  slokas: Array<{
+    sloka_id: string;
+    sloka_text: string;
+    meaning: string;
+    translation: string;
+  }>;
+}
+
+function isSargaApiResponse(data: any): data is SargaApiResponse {
+  return data &&
+    typeof data === 'object' &&
+    data.kanda &&
+    typeof data.kanda.number === 'number' &&
+    typeof data.kanda.name === 'string' &&
+    data.sarga &&
+    typeof data.sarga.number === 'number' &&
+    typeof data.sarga.total_slokas === 'number' &&
+    Array.isArray(data.slokas) &&
+    data.slokas.every((sloka: any) => 
+      sloka &&
+      typeof sloka.sloka_id === 'string' &&
+      typeof sloka.sloka_text === 'string' &&
+      typeof sloka.meaning === 'string' &&
+      typeof sloka.translation === 'string'
+    );
+}
+
 export const fetchSargaData = async (source: string, kanda: string, sarga: string): Promise<SargaData> => {
   try {
     const response = await fetch(`/api/ramayanam/kandas/${kanda}/sargas/${sarga}`);
     if (!response.ok) {
+      if (response.status === 404) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Sarga ${sarga} not found in Kanda ${kanda}`);
+      }
       throw new Error(`Failed to fetch sarga data: ${response.statusText}`);
     }
+    
     const data = await response.json();
+    
+    // Validate API response structure
+    if (!isSargaApiResponse(data)) {
+      console.error('Invalid API response structure:', data);
+      throw new Error('Invalid sarga data format received from server');
+    }
     
     // Transform the API response to match our expected format
     const transformedData: SargaData = {
       kanda: data.kanda,
       sarga: data.sarga,
-      slokas: data.slokas.map((sloka: any) => ({
+      slokas: data.slokas.map((sloka) => ({
         sloka_number: sloka.sloka_id,
         sloka: sloka.sloka_text,
         meaning: sloka.meaning,

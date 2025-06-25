@@ -18,6 +18,8 @@ const SargaView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentSloka, setCurrentSloka] = useState<number>(0);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [showAllVerses, setShowAllVerses] = useState<boolean>(false);
+  const [gridPage, setGridPage] = useState<number>(0);
 
   useEffect(() => {
     const loadSargaData = async () => {
@@ -30,8 +32,9 @@ const SargaView: React.FC = () => {
         const data = await fetchSargaData(source!, kanda!, sarga!);
         setSargaData(data);
         
-        // Load favorites from localStorage
-        const savedFavorites = localStorage.getItem('ramayana-favorites');
+        // Load favorites from localStorage (namespaced by source)
+        const favoritesKey = `${source}-favorites`;
+        const savedFavorites = localStorage.getItem(favoritesKey);
         if (savedFavorites) {
           setFavorites(JSON.parse(savedFavorites));
         }
@@ -45,13 +48,59 @@ const SargaView: React.FC = () => {
     loadSargaData();
   }, [source, kanda, sarga]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Only handle keys when not typing in an input
+      if (event.target instanceof HTMLInputElement) return;
+      
+      switch (event.key) {
+        case 'ArrowLeft':
+        case 'h':
+          event.preventDefault();
+          if (currentSloka > 0) {
+            navigateSloka('prev');
+          }
+          break;
+        case 'ArrowRight':
+        case 'l':
+          event.preventDefault();
+          if (sargaData && currentSloka < sargaData.slokas.length - 1) {
+            navigateSloka('next');
+          }
+          break;
+        case 'Home':
+          event.preventDefault();
+          setCurrentSloka(0);
+          break;
+        case 'End':
+          event.preventDefault();
+          if (sargaData) {
+            setCurrentSloka(sargaData.slokas.length - 1);
+          }
+          break;
+        case 'f':
+          event.preventDefault();
+          if (sargaData) {
+            handleToggleFavorite(sargaData.slokas[currentSloka].sloka_number);
+          }
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [currentSloka, sargaData]);
+
   const handleToggleFavorite = (slokaId: string) => {
     const newFavorites = favorites.includes(slokaId)
       ? favorites.filter(id => id !== slokaId)
       : [...favorites, slokaId];
     
     setFavorites(newFavorites);
-    localStorage.setItem('ramayana-favorites', JSON.stringify(newFavorites));
+    // Use namespaced localStorage key by source
+    const favoritesKey = `${source}-favorites`;
+    localStorage.setItem(favoritesKey, JSON.stringify(newFavorites));
   };
 
   const handleCopySloka = async (verse: Verse) => {
@@ -90,15 +139,34 @@ const SargaView: React.FC = () => {
     }
   };
 
-  const navigateSarga = (direction: 'prev' | 'next') => {
+  const navigateSarga = async (direction: 'prev' | 'next') => {
     if (!sarga || !kanda) return;
     
     const sargaNum = parseInt(sarga);
     const newSarga = direction === 'prev' ? sargaNum - 1 : sargaNum + 1;
     
-    if (newSarga > 0) {
-      navigate(`/sarga/${source}/${kanda}/${newSarga}`);
+    // Check boundaries
+    if (newSarga < 1) return;
+    
+    // For next sarga, verify it exists before navigating
+    if (direction === 'next') {
+      try {
+        const response = await fetch(`/api/ramayanam/kandas/${kanda}/sargas/${newSarga}`);
+        if (!response.ok) {
+          // If 404, we've reached the end of the kanda
+          if (response.status === 404) {
+            console.log(`End of Kanda ${kanda} reached. Sarga ${newSarga} does not exist.`);
+            return;
+          }
+          // For other errors, still attempt navigation (let the next page handle it)
+        }
+      } catch (error) {
+        console.error('Error checking next sarga existence:', error);
+        // Continue with navigation anyway
+      }
     }
+    
+    navigate(`/sarga/${source}/${kanda}/${newSarga}`);
   };
 
   if (loading) {
@@ -275,20 +343,24 @@ const SargaView: React.FC = () => {
               <button
                 onClick={() => navigateSloka('prev')}
                 disabled={currentSloka === 0}
-                className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label={`Go to previous verse ${currentSloka > 0 ? `(verse ${currentSloka})` : '(at first verse)'}`}
+                title={currentSloka > 0 ? `Go to verse ${currentSloka}` : 'Already at first verse'}
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Previous Verse</span>
               </button>
               
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {currentSloka + 1} / {sargaData.sarga.total_slokas}
+              <div className="text-sm text-gray-500 dark:text-gray-400" role="status" aria-live="polite">
+                Verse {currentSloka + 1} of {sargaData.sarga.total_slokas}
               </div>
               
               <button
                 onClick={() => navigateSloka('next')}
                 disabled={currentSloka === sargaData.slokas.length - 1}
-                className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label={`Go to next verse ${currentSloka < sargaData.slokas.length - 1 ? `(verse ${currentSloka + 2})` : '(at last verse)'}`}
+                title={currentSloka < sargaData.slokas.length - 1 ? `Go to verse ${currentSloka + 2}` : 'Already at last verse'}
               >
                 <span>Next Verse</span>
                 <ChevronRight className="w-4 h-4" />
@@ -310,27 +382,107 @@ const SargaView: React.FC = () => {
           </div>
         </div>
 
-        {/* Verse Grid (Optional Overview) */}
+        {/* Verse Grid (Scalable Overview) */}
         <div className="mt-12">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center">
-            All Verses in This Sarga
-          </h3>
-          <div className="grid grid-cols-8 md:grid-cols-12 lg:grid-cols-16 gap-2">
-            {sargaData.slokas.map((verse, index) => (
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              All Verses in This Sarga ({sargaData.sarga.total_slokas})
+            </h3>
+            {sargaData.sarga.total_slokas > 50 && (
               <button
-                key={verse.sloka_number}
-                onClick={() => setCurrentSloka(index)}
-                className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                  index === currentSloka
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30'
-                }`}
-                title={`Verse ${index + 1}`}
+                onClick={() => setShowAllVerses(!showAllVerses)}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
               >
-                {index + 1}
+                {showAllVerses ? 'Show Less' : 'Show All'}
               </button>
-            ))}
+            )}
           </div>
+          
+          {/* Verse Navigation for Large Sargas */}
+          {sargaData.sarga.total_slokas > 100 && (
+            <div className="mb-4 flex items-center justify-center space-x-4">
+              <label className="text-sm text-gray-600 dark:text-gray-400">
+                Jump to verse:
+              </label>
+              <input
+                type="number"
+                min="1"
+                max={sargaData.sarga.total_slokas}
+                value={currentSloka + 1}
+                onChange={(e) => {
+                  const verse = parseInt(e.target.value) - 1;
+                  if (verse >= 0 && verse < sargaData.slokas.length) {
+                    setCurrentSloka(verse);
+                  }
+                }}
+                className="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                of {sargaData.sarga.total_slokas}
+              </span>
+            </div>
+          )}
+          
+          {/* Responsive Grid with Pagination for Large Sargas */}
+          {(() => {
+            const versesPerPage = 80;
+            const totalPages = Math.ceil(sargaData.slokas.length / versesPerPage);
+            const shouldPaginate = sargaData.slokas.length > versesPerPage && !showAllVerses;
+            
+            let displayVerses = sargaData.slokas;
+            if (shouldPaginate) {
+              const start = gridPage * versesPerPage;
+              const end = start + versesPerPage;
+              displayVerses = sargaData.slokas.slice(start, end);
+            }
+            
+            return (
+              <>
+                {shouldPaginate && (
+                  <div className="flex items-center justify-center space-x-4 mb-4">
+                    <button
+                      onClick={() => setGridPage(Math.max(0, gridPage - 1))}
+                      disabled={gridPage === 0}
+                      className="px-3 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      Page {gridPage + 1} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setGridPage(Math.min(totalPages - 1, gridPage + 1))}
+                      disabled={gridPage === totalPages - 1}
+                      className="px-3 py-1 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2">
+                  {displayVerses.map((verse, displayIndex) => {
+                    const actualIndex = shouldPaginate ? gridPage * versesPerPage + displayIndex : displayIndex;
+                    return (
+                      <button
+                        key={verse.sloka_number}
+                        onClick={() => setCurrentSloka(actualIndex)}
+                        className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
+                          actualIndex === currentSloka
+                            ? 'bg-blue-500 text-white ring-2 ring-blue-300'
+                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                        }`}
+                        title={`Verse ${actualIndex + 1}`}
+                        aria-label={`Go to verse ${actualIndex + 1}`}
+                      >
+                        {actualIndex + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>
