@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-orange-200/20 dark:border-orange-700/20 sticky top-0 z-50">
+    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-orange-200/20 dark:border-orange-700/20 sticky top-0 z-50" data-testid="header">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}

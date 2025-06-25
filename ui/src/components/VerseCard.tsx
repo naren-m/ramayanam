@@ -136,7 +136,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
 
       {/* Sanskrit Text */}
       <div className="mb-4">
-        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+        <div className="sanskrit-text text-lg font-medium text-gray-800 dark:text-gray-200 leading-relaxed" data-testid="verse-text">
           {verse.sloka}
         </div>
       </div>
@@ -146,6 +146,7 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
         <div 
           className="text-gray-700 dark:text-gray-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: verse.translation }}
+          data-testid="verse-translation"
         />
       </div>
 

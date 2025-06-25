@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - FLASK_ENV=production
       - DATA_PATH=/app/data
@@ -28,6 +28,7 @@ services:
         condition: service_healthy
     environment:
       - BASE_URL=http://app:5000
+      - PLAYWRIGHT_BASE_URL=http://app:5000
     volumes:
       - .:/workspace
       - /workspace/node_modules
