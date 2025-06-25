@@ -554,3 +554,9 @@ This comprehensive architecture plan transforms the current Ramayana search appl
 The generic architecture supports multiple text types while maintaining the depth and accuracy required for scholarly work. By integrating modern AI capabilities with traditional texts, we create a bridge between ancient wisdom and contemporary technology, making these timeless teachings accessible to global audiences.
 
 Success depends on careful attention to cultural sensitivity, technical excellence, and community engagement. With proper execution, this platform can become the definitive digital resource for studying Hindu scriptures and philosophy.
+
+
+## Other works similar to this
+
+https://github.com/AshuVj/Valmiki_Ramayan_Dataset/tree/main
+https://sanskritdocuments.org/

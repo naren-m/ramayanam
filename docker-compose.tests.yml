@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # Main application service for testing
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=testing
+      - DATABASE_URL=sqlite:///ramayanam.db
+      - TESTING=true
+    volumes:
+      - ./data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - test-network
+
+  # Comprehensive test runner - all categories
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - PYTEST_CURRENT_TEST=1
+      - PLAYWRIGHT_BASE_URL=http://app:5000
+      - TESTING=true
+    volumes:
+      - ./tests:/app/tests
+      - ./reports:/app/reports
+      - test-reports:/app/reports
+    networks:
+      - test-network
+    command: ["/app/run-tests.sh"]
+
+  # Unit tests only - fastest execution (lightweight Python-only build)
+  unit-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      target: unit-test-runner
+    environment:
+      - PYTEST_CURRENT_TEST=1
+      - TESTING=true
+    volumes:
+      - ./tests:/app/tests
+      - ./reports:/app/reports
+      - test-reports:/app/reports
+    networks:
+      - test-network
+    profiles:
+      - unit
+
+  # End-to-end API tests - requires running app (lightweight Python-only build)
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      target: e2e-test-runner
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - PYTEST_CURRENT_TEST=1
+      - TESTING=true
+      - API_BASE_URL=http://app:5000
+    volumes:
+      - ./tests:/app/tests
+      - ./reports:/app/reports
+      - test-reports:/app/reports
+    networks:
+      - test-network
+    profiles:
+      - e2e
+
+  # UI tests - requires running app (Node.js + Playwright build)
+  ui-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      target: ui-test-runner
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://app:5000
+      - PLAYWRIGHT_BROWSERS_PATH=/usr/local/lib/playwright
+      - NODE_ENV=test
+    volumes:
+      - ./tests:/app/tests
+      - ./reports:/app/reports
+      - test-reports:/app/reports
+    networks:
+      - test-network
+    profiles:
+      - ui
+
+  # Performance tests
+  performance-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - PYTEST_CURRENT_TEST=1
+      - TESTING=true
+      - PERFORMANCE_TEST=true
+    volumes:
+      - ./tests:/app/tests
+      - ./reports:/app/reports
+      - test-reports:/app/reports
+    networks:
+      - test-network
+    command: ["pytest", "tests/performance/", "-v", "--tb=short", "--benchmark-only", "--benchmark-json=reports/performance.json"]
+    profiles:
+      - performance
+
+  # Test report server - serves test results
+  report-server:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - test-reports:/usr/share/nginx/html:ro
+      - ./nginx-test-reports.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - test-network
+    profiles:
+      - reports
+
+volumes:
+  test-reports:
+    driver: local
+
+networks:
+  test-network:
+    driver: bridge
