@@ -6,10 +6,11 @@ import { fetchSargaData, SargaData } from '../utils/api';
 import LoadingSpinner from './LoadingSpinner';
 
 const SargaView: React.FC = () => {
-  const { source, kanda, sarga } = useParams<{
+  const { source, kanda, sarga, verse } = useParams<{
     source: string;
     kanda: string;
     sarga: string;
+    verse?: string;
   }>();
   const navigate = useNavigate();
   
@@ -30,6 +31,17 @@ const SargaView: React.FC = () => {
         const data = await fetchSargaData(source!, kanda!, sarga!);
         setSargaData(data);
         
+        // If a specific verse is provided in URL, find and set it
+        if (verse && data.slokas) {
+          const verseIndex = data.slokas.findIndex(sloka => {
+            const parts = sloka.sloka_number.split('.');
+            return parts.length >= 3 && parts[2] === verse;
+          });
+          if (verseIndex !== -1) {
+            setCurrentSloka(verseIndex);
+          }
+        }
+        
         // Load favorites from localStorage (namespaced by source)
         const favoritesKey = `${source}-favorites`;
         const savedFavorites = localStorage.getItem(favoritesKey);
@@ -44,7 +56,7 @@ const SargaView: React.FC = () => {
     };
 
     loadSargaData();
-  }, [source, kanda, sarga]);
+  }, [source, kanda, sarga, verse]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -130,10 +142,19 @@ const SargaView: React.FC = () => {
   const navigateSloka = (direction: 'prev' | 'next') => {
     if (!sargaData) return;
     
+    let newIndex = currentSloka;
     if (direction === 'prev' && currentSloka > 0) {
-      setCurrentSloka(currentSloka - 1);
+      newIndex = currentSloka - 1;
     } else if (direction === 'next' && currentSloka < sargaData.slokas.length - 1) {
-      setCurrentSloka(currentSloka + 1);
+      newIndex = currentSloka + 1;
+    }
+    
+    if (newIndex !== currentSloka) {
+      setCurrentSloka(newIndex);
+      // Update URL to reflect current verse
+      const currentVerse = sargaData.slokas[newIndex];
+      const verseNum = currentVerse.sloka_number.split('.')[2];
+      navigate(`/sarga/${source}/${kanda}/${sarga}/${verseNum}`, { replace: true });
     }
   };
 
@@ -393,7 +414,14 @@ const SargaView: React.FC = () => {
               <select
                 id="verse-selector"
                 value={currentSloka}
-                onChange={(e) => setCurrentSloka(parseInt(e.target.value))}
+                onChange={(e) => {
+                  const newIndex = parseInt(e.target.value);
+                  setCurrentSloka(newIndex);
+                  // Update URL to reflect selected verse
+                  const selectedVerse = sargaData.slokas[newIndex];
+                  const verseNum = selectedVerse.sloka_number.split('.')[2];
+                  navigate(`/sarga/${source}/${kanda}/${sarga}/${verseNum}`, { replace: true });
+                }}
                 className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 aria-label="Select verse to jump to"
               >

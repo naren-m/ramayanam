@@ -16,6 +16,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/sarga/:source/:kanda/:sarga" element={<SargaView />} />
+              <Route path="/sarga/:source/:kanda/:sarga/:verse" element={<SargaView />} />
             </Routes>
           </Router>
         </SearchProvider>

@@ -50,8 +50,9 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
     if (parts.length >= 3) {
       const kanda = parts[0];
       const sarga = parts[1];
+      const verseNum = parts[2];
       const source = verse.source || 'ramayana';
-      navigate(`/sarga/${source}/${kanda}/${sarga}`);
+      navigate(`/sarga/${source}/${kanda}/${sarga}/${verseNum}`);
     }
   };
 
