@@ -4,9 +4,10 @@ import SearchInterface from './SearchInterface';
 import ResultsDisplay from './ResultsDisplay';
 import ErrorBoundary from './ErrorBoundary';
 import { ChatInterface } from './chat/ChatInterface';
+import KnowledgeGraphSearch from './KnowledgeGraphSearch';
 
 const HomePage: React.FC = () => {
-  const [activeView, setActiveView] = useState<'search' | 'chat'>('search');
+  const [activeView, setActiveView] = useState<'search' | 'chat' | 'knowledge'>('search');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 dark:from-gray-900 dark:to-blue-900 transition-colors duration-300">
@@ -30,6 +31,17 @@ const HomePage: React.FC = () => {
                 }`}
               >
                 Search Verses
+              </button>
+              <button
+                onClick={() => setActiveView('knowledge')}
+                data-testid="knowledge-tab-button"
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeView === 'knowledge'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                Knowledge Graph
               </button>
               <button
                 onClick={() => setActiveView('chat')}
@@ -56,6 +68,12 @@ const HomePage: React.FC = () => {
                 <ResultsDisplay />
               </ErrorBoundary>
             </>
+          ) : activeView === 'knowledge' ? (
+            <ErrorBoundary>
+              <div className="max-w-6xl mx-auto">
+                <KnowledgeGraphSearch />
+              </div>
+            </ErrorBoundary>
           ) : (
             <ErrorBoundary>
               <div className="max-w-4xl mx-auto h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">

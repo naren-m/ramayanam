@@ -61,9 +61,7 @@ const KnowledgeGraphSearch: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'search' | 'browse'>('search');
 
-  const API_BASE = process.env.NODE_ENV === 'production' 
-    ? 'http://localhost:8080' 
-    : 'http://localhost:8080';
+  const API_BASE = '';
 
   useEffect(() => {
     fetchStatistics();
