@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - "5001:5000"
+      - "8080:5000"
     environment:
       - FLASK_ENV=development
       - PORT=5000
