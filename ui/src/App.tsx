@@ -4,12 +4,13 @@ import SearchInterface from './components/SearchInterface';
 import ResultsDisplay from './components/ResultsDisplay';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ChatInterface } from './components/chat/ChatInterface';
+import KnowledgeGraphSearch from './components/KnowledgeGraphSearch';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SearchProvider } from './contexts/SearchContext';
 import './App.css';
 
 function App() {
-  const [activeView, setActiveView] = useState<'search' | 'chat'>('search');
+  const [activeView, setActiveView] = useState<'search' | 'chat' | 'knowledge'>('search');
 
   return (
     <ErrorBoundary>
@@ -38,6 +39,17 @@ function App() {
                       Search Verses
                     </button>
                     <button
+                      onClick={() => setActiveView('knowledge')}
+                      data-testid="knowledge-tab-button"
+                      className={`px-6 py-2 rounded-md transition-colors ${
+                        activeView === 'knowledge'
+                          ? 'bg-orange-500 text-white'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      Knowledge Graph
+                    </button>
+                    <button
                       onClick={() => setActiveView('chat')}
                       data-testid="chat-tab-button"
                       className={`px-6 py-2 rounded-md transition-colors ${
@@ -62,6 +74,12 @@ function App() {
                       <ResultsDisplay />
                     </ErrorBoundary>
                   </>
+                ) : activeView === 'knowledge' ? (
+                  <ErrorBoundary>
+                    <div className="max-w-6xl mx-auto">
+                      <KnowledgeGraphSearch />
+                    </div>
+                  </ErrorBoundary>
                 ) : (
                   <ErrorBoundary>
                     <div className="max-w-4xl mx-auto h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
