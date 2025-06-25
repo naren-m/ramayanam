@@ -30,6 +30,10 @@ app.register_blueprint(sloka_blueprint, url_prefix='/api/ramayanam')
 from api.controllers.chat_controller import chat_blueprint
 app.register_blueprint(chat_blueprint, url_prefix='/api/chat')
 
+# Register knowledge graph blueprint
+from api.controllers.kg_controller import kg_blueprint
+app.register_blueprint(kg_blueprint, url_prefix='/api/kg')
+
 # Serve React app
 @app.route('/')
 @app.route('/<path:path>')

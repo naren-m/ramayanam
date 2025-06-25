@@ -1,0 +1,134 @@
+{
+  "@context": {
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "schema": "http://schema.org/",
+    "rama": "http://ramayanam.hanuma.com/ontology/",
+    "entity": "http://ramayanam.hanuma.com/entity/"
+  },
+  "@graph": [
+    {
+      "@id": "rama:Person",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Person",
+      "rdfs:comment": "A character in the Ramayana epic - gods, humans, demons, animals"
+    },
+    {
+      "@id": "rama:Place",
+      "@type": "rdfs:Class", 
+      "rdfs:label": "Place",
+      "rdfs:comment": "A location in the Ramayana - cities, forests, mountains, rivers"
+    },
+    {
+      "@id": "rama:Event",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Event", 
+      "rdfs:comment": "A significant happening or occurrence in the narrative"
+    },
+    {
+      "@id": "rama:Object",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Object",
+      "rdfs:comment": "A notable item or artifact in the story"
+    },
+    {
+      "@id": "rama:Concept",
+      "@type": "rdfs:Class",
+      "rdfs:label": "Concept",
+      "rdfs:comment": "An abstract idea, principle, or philosophical concept"
+    },
+    {
+      "@id": "rama:hasSpouse",
+      "@type": "rdf:Property",
+      "rdfs:label": "has spouse",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Person"},
+      "owl:inverseOf": {"@id": "rama:hasSpouse"}
+    },
+    {
+      "@id": "rama:hasParent", 
+      "@type": "rdf:Property",
+      "rdfs:label": "has parent",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Person"},
+      "owl:inverseOf": {"@id": "rama:hasChild"}
+    },
+    {
+      "@id": "rama:hasChild",
+      "@type": "rdf:Property", 
+      "rdfs:label": "has child",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Person"},
+      "owl:inverseOf": {"@id": "rama:hasParent"}
+    },
+    {
+      "@id": "rama:hasSibling",
+      "@type": "rdf:Property",
+      "rdfs:label": "has sibling", 
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Person"},
+      "owl:inverseOf": {"@id": "rama:hasSibling"}
+    },
+    {
+      "@id": "rama:devoteeOf",
+      "@type": "rdf:Property",
+      "rdfs:label": "devotee of",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Person"}
+    },
+    {
+      "@id": "rama:rules", 
+      "@type": "rdf:Property",
+      "rdfs:label": "rules",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Place"},
+      "owl:inverseOf": {"@id": "rama:ruledBy"}
+    },
+    {
+      "@id": "rama:ruledBy",
+      "@type": "rdf:Property",
+      "rdfs:label": "ruled by", 
+      "rdfs:domain": {"@id": "rama:Place"},
+      "rdfs:range": {"@id": "rama:Person"},
+      "owl:inverseOf": {"@id": "rama:rules"}
+    },
+    {
+      "@id": "rama:livesIn",
+      "@type": "rdf:Property",
+      "rdfs:label": "lives in",
+      "rdfs:domain": {"@id": "rama:Person"}, 
+      "rdfs:range": {"@id": "rama:Place"}
+    },
+    {
+      "@id": "rama:travelsTo",
+      "@type": "rdf:Property",
+      "rdfs:label": "travels to",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Place"}
+    },
+    {
+      "@id": "rama:mentionedIn",
+      "@type": "rdf:Property",
+      "rdfs:label": "mentioned in",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "xsd:string"},
+      "rdfs:comment": "Links entity to text unit ID where it's mentioned"
+    },
+    {
+      "@id": "rama:embodies",
+      "@type": "rdf:Property", 
+      "rdfs:label": "embodies",
+      "rdfs:domain": {"@id": "rama:Person"},
+      "rdfs:range": {"@id": "rama:Concept"}
+    },
+    {
+      "@id": "rama:exemplifies",
+      "@type": "rdf:Property",
+      "rdfs:label": "exemplifies",  
+      "rdfs:domain": {"@id": "rama:Event"},
+      "rdfs:range": {"@id": "rama:Concept"}
+    }
+  ]
+}
