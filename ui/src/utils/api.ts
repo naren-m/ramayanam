@@ -68,7 +68,21 @@ class SearchAPI {
     const textsParam = filters.texts && filters.texts.length > 0 ? `&texts=${filters.texts.join(',')}` : '';
     const url = `${API_BASE_URL}/${endpoint}?query=${encodeURIComponent(query)}${kandaParam}${textsParam}`;
     
-    const results = await this.makeRequest(url);
+    const response = await this.makeRequest(url);
+    
+    // Handle paginated response format
+    let results: Verse[];
+    if (response && typeof response === 'object' && 'results' in response) {
+      // API returns paginated format: {results: [...], pagination: {...}}
+      results = response.results || [];
+    } else if (Array.isArray(response)) {
+      // API returns direct array (fallback/mock data)
+      results = response;
+    } else {
+      // Unexpected format, return empty array
+      console.error('Unexpected API response format:', response);
+      return [];
+    }
     
     // Filter by minimum ratio if specified
     let filteredResults = results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
@@ -156,4 +170,45 @@ export const formatVerseForSharing = (verse: Verse): string => {
   const sourceName = verse.source === 'bhagavad-gita' ? 'Bhagavad Gita' : 
                      verse.source === 'ramayana' ? 'Ramayana' : 'Sacred Text';
   return `${verse.sloka_number}: ${verse.sloka}\n\n${verse.translation}\n\nSource: ${sourceName} Digital Corpus`;
+};
+
+export interface SargaData {
+  kanda: {
+    number: number;
+    name: string;
+  };
+  sarga: {
+    number: number;
+    total_slokas: number;
+  };
+  slokas: Verse[];
+}
+
+export const fetchSargaData = async (source: string, kanda: string, sarga: string): Promise<SargaData> => {
+  try {
+    const response = await fetch(`/api/ramayanam/kandas/${kanda}/sargas/${sarga}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sarga data: ${response.statusText}`);
+    }
+    const data = await response.json();
+    
+    // Transform the API response to match our expected format
+    const transformedData: SargaData = {
+      kanda: data.kanda,
+      sarga: data.sarga,
+      slokas: data.slokas.map((sloka: any) => ({
+        sloka_number: sloka.sloka_id,
+        sloka: sloka.sloka_text,
+        meaning: sloka.meaning,
+        translation: sloka.translation,
+        ratio: 100, // Default ratio for sarga reading
+        source: source
+      }))
+    };
+    
+    return transformedData;
+  } catch (error) {
+    console.error('Failed to fetch sarga data:', error);
+    throw error;
+  }
 };

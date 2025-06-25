@@ -49,6 +49,58 @@ def get_kanda_name(kanda_number):
         return jsonify({"error": "Internal server error"}), 500
 
 
+@sloka_blueprint.route("/kandas/<int:kanda_number>/sargas/<int:sarga_number>", methods=["GET"])
+def get_sarga_slokas(kanda_number, sarga_number):
+    """Get all slokas in a specific sarga."""
+    try:
+        logger.debug("Getting sarga for kanda: %d, sarga: %d", kanda_number, sarga_number)
+        
+        # Get kanda
+        kanda = ramayanam_data.kandas.get(kanda_number)
+        if not kanda:
+            raise KandaNotFoundError(kanda_number)
+
+        # Get sarga
+        sarga = kanda.sargas.get(sarga_number)
+        if not sarga:
+            raise SargaNotFoundError(sarga_number, kanda_number)
+
+        # Get all slokas in the sarga
+        slokas = []
+        for sloka_number, sloka_obj in sarga.slokas.items():
+            response_sloka = Sloka(
+                sloka_id=sloka_obj.id,
+                sloka_text=sloka_obj.text,
+                meaning=sloka_obj.meaning,
+                translation=sloka_obj.translation,
+            )
+            slokas.append(response_sloka.serialize())
+
+        # Get kanda and sarga metadata
+        kanda_info = ramayanam_data.kandaDetails.get(kanda_number, {})
+        
+        response = {
+            "kanda": {
+                "number": kanda_number,
+                "name": kanda_info.get("name", f"Kanda {kanda_number}")
+            },
+            "sarga": {
+                "number": sarga_number,
+                "total_slokas": len(slokas)
+            },
+            "slokas": slokas
+        }
+
+        return jsonify(response)
+
+    except RamayanamAPIException as e:
+        logger.warning(f"API error in get_sarga_slokas: {e.message}")
+        return jsonify({"error": e.message}), e.status_code
+    except Exception as e:
+        logger.error(f"Unexpected error in get_sarga_slokas: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
 @sloka_blueprint.route(
     "/kandas/<int:kanda_number>/sargas/<int:sarga_number>/slokas/<int:sloka_number>",
     methods=["GET"],
@@ -355,7 +407,7 @@ def fuzzy_search_slokas_stream():
                 yield f'data: {json.dumps(error_data)}\n\n'
 
         return Response(generate_results(), 
-                       content_type="text/event-stream",
+                       content_type="text/event-stream; charset=utf-8",
                        headers={
                            "Cache-Control": "no-cache",
                            "Connection": "keep-alive",
