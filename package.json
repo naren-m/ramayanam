@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:local": "./scripts/test-e2e-local.sh",
-    "test:e2e:docker": "./scripts/test-e2e-docker.sh",
-    "test:e2e:compose": "./scripts/test-e2e-compose.sh",
-    "test:e2e:ci": "playwright test --reporter=github"
+    "test": "./run-all-tests.sh all",
+    "test:unit": "./run-all-tests.sh unit",
+    "test:e2e": "./run-all-tests.sh e2e", 
+    "test:ui": "./run-all-tests.sh ui",
+    "test:performance": "./run-all-tests.sh performance",
+    "test:build": "./run-all-tests.sh all --build",
+    "test:reports": "./run-all-tests.sh all --reports",
+    "test:ui:local": "playwright test tests/e2e/ --config=playwright.config.ts",
+    "test:ui:headed": "playwright test tests/e2e/ --config=playwright.config.ts --headed",
+    "test:ui:debug": "playwright test tests/e2e/ --config=playwright.config.ts --debug"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.1"

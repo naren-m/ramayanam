@@ -54,27 +54,20 @@ const SearchInterface: React.FC = () => {
     setEnglishQuery(value);
     setSanskritQuery('');
     setActiveTab('english');
-    // Only clear search if input is empty, never trigger search as user types
-    if (!value.trim()) {
-      clearSearch();
-    }
-    // Removed any automatic search - search happens only on Enter key press
+    // Do not automatically clear search - only when user explicitly clears or searches
   };
 
   const handleSanskritSearch = (value: string) => {
     setSanskritQuery(value);
     setEnglishQuery('');
     setActiveTab('sanskrit');
-    // Only clear search if input is empty, never trigger search as user types
-    if (!value.trim()) {
-      clearSearch();
-    }
-    // Removed any automatic search - search happens only on Enter key press
+    // Do not automatically clear search - only when user explicitly clears or searches
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent, type: 'english' | 'sanskrit') => {
+  const handleKeyDown = (e: React.KeyboardEvent, type: 'english' | 'sanskrit') => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // Prevent form submission if within a form
+      e.preventDefault(); // Prevent any form submission
+      e.stopPropagation(); // Stop event bubbling
       const query = type === 'english' ? englishQuery : sanskritQuery;
       if (query.trim()) {
         searchVerses(query, type);
@@ -199,7 +192,7 @@ const SearchInterface: React.FC = () => {
               data-testid="english-search-input"
               value={englishQuery}
               onChange={(e) => handleEnglishSearch(e.target.value)}
-              onKeyPress={(e) => handleKeyPress(e, 'english')}
+              onKeyDown={(e) => handleKeyDown(e, 'english')}
               placeholder={searchMode === 'cross' 
                 ? "Search concepts across texts like 'dharma', 'duty', 'devotion'..."
                 : "Search for concepts like 'dharma', 'rama', 'duty'..."
@@ -248,7 +241,7 @@ const SearchInterface: React.FC = () => {
               data-testid="sanskrit-search-input"
               value={sanskritQuery}
               onChange={(e) => handleSanskritSearch(e.target.value)}
-              onKeyPress={(e) => handleKeyPress(e, 'sanskrit')}
+              onKeyDown={(e) => handleKeyDown(e, 'sanskrit')}
               placeholder={searchMode === 'cross'
                 ? "धर्म, भक्ति, या अन्य शब्द खोजें..."
                 : "राम, धर्म, या अन्य शब्द खोजें..."

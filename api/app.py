@@ -34,7 +34,13 @@ app.register_blueprint(chat_blueprint, url_prefix='/api/chat')
 from api.controllers.kg_controller import kg_blueprint
 app.register_blueprint(kg_blueprint, url_prefix='/api/kg')
 
-# Serve React app
+# Health check endpoint for testing - MUST be before catch-all route
+@app.route('/health')
+def health_check():
+    """Health check endpoint for container orchestration and testing."""
+    return {'status': 'healthy', 'service': 'ramayanam-api'}, 200
+
+# Serve React app - MUST be last (catch-all route)
 @app.route('/')
 @app.route('/<path:path>')
 def serve_react_app(path=''):

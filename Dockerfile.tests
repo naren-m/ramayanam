@@ -1,0 +1,280 @@
+# Multi-stage Dockerfile for comprehensive testing
+# Supports: Unit Tests (pytest), End-to-End Tests (pytest API), UI Tests (Playwright)
+
+# ============================================
+# Base Python stage for all Python-based tests
+# ============================================
+FROM python:3.11-slim AS python-base
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY requirements.txt requirements-test.txt ./
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-test.txt
+
+# Install additional API testing tools
+RUN pip install --no-cache-dir \
+    httpx \
+    requests-mock \
+    pytest-benchmark \
+    pytest-asyncio
+
+# ============================================
+# Lightweight Unit Test stage (Python only)
+# ============================================
+FROM python-base AS unit-test-runner
+COPY pytest.tests.ini ./pytest.ini
+COPY tests/conftest.py ./
+COPY . .
+
+RUN mkdir -p /app/reports
+
+# Unit test script (fast, isolated)
+COPY <<EOF /app/run-unit-tests.sh
+#!/bin/bash
+echo "🧪 Running Unit Tests Only"
+pytest tests/unit/ -v --tb=short --cov=api --cov-report=html:reports/unit-coverage --cov-report=term
+EOF
+
+RUN chmod +x /app/run-unit-tests.sh
+CMD ["/app/run-unit-tests.sh"]
+
+# ============================================
+# E2E Test stage (Python + API calls)
+# ============================================
+FROM python-base AS e2e-test-runner
+COPY pytest.tests.ini ./pytest.ini
+COPY tests/conftest.py ./
+COPY . .
+
+RUN mkdir -p /app/reports
+
+# E2E test script (waits for app)
+COPY <<EOF /app/run-e2e-tests.sh
+#!/bin/bash
+echo "🚀 Running End-to-End API Tests Only"
+echo "⏳ Waiting for application to be ready..."
+timeout 60 bash -c 'until curl -f http://app:5000/health 2>/dev/null; do sleep 2; done' || {
+    echo "❌ Application failed to start"
+    exit 1
+}
+echo "✅ Application is ready"
+pytest tests/integration/ -v --tb=short --cov=api --cov-report=html:reports/e2e-coverage --cov-report=term
+EOF
+
+RUN chmod +x /app/run-e2e-tests.sh
+CMD ["/app/run-e2e-tests.sh"]
+
+# ============================================
+# UI Test stage (Node.js + Playwright)
+# ============================================
+FROM python:3.11-slim AS ui-test-runner
+
+# Install Node.js and Playwright dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    netcat-traditional \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Playwright system dependencies
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libxss1 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Node.js dependencies and install
+COPY package.json package-lock.json ./
+RUN npm install
+RUN npx playwright install chromium firefox webkit
+RUN npx playwright install-deps
+
+# Copy test configurations
+COPY playwright.config.ts ./
+COPY . .
+
+RUN mkdir -p /app/reports
+
+# UI test script (waits for app)
+COPY <<EOF /app/run-ui-tests.sh
+#!/bin/bash
+echo "🖥️ Running UI Tests Only"
+echo "⏳ Waiting for application to be ready..."
+timeout 60 bash -c 'until curl -f http://app:5000/health 2>/dev/null; do sleep 2; done' || {
+    echo "❌ Application failed to start"
+    exit 1
+}
+echo "✅ Application is ready"
+export PLAYWRIGHT_BASE_URL=http://app:5000
+npx playwright test tests/e2e/ --reporter=html --output-dir=reports/ui-results
+EOF
+
+RUN chmod +x /app/run-ui-tests.sh
+CMD ["/app/run-ui-tests.sh"]
+
+# ============================================
+# Comprehensive Test Runner (all categories)
+# ============================================
+FROM python:3.11-slim AS test-runner
+
+# Install Node.js for UI tests
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    gcc \
+    netcat-traditional \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Playwright system dependencies
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libxss1 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Python dependencies and install
+COPY requirements.txt requirements-test.txt ./
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-test.txt
+
+# Copy Node.js dependencies and install (only for comprehensive testing)
+COPY package.json package-lock.json ./
+RUN npm install
+RUN npx playwright install chromium firefox webkit
+RUN npx playwright install-deps
+
+# Copy test configurations
+COPY pytest.tests.ini ./pytest.ini
+COPY playwright.config.ts ./
+COPY tests/conftest.py ./
+
+# Copy application code
+COPY . .
+
+# Create test script that runs all test categories
+COPY <<EOF /app/run-tests.sh
+#!/bin/bash
+set -e
+
+echo "🧪 Starting Comprehensive Test Suite"
+echo "======================================"
+
+# Wait for application to be ready
+echo "⏳ Waiting for application to be ready..."
+timeout 60 bash -c 'until curl -f http://app:5000/health 2>/dev/null; do sleep 2; done' || {
+    echo "❌ Application failed to start"
+    exit 1
+}
+
+echo "✅ Application is ready"
+
+# Function to run a test category
+run_test_category() {
+    local category=\$1
+    local command=\$2
+    echo ""
+    echo "🚀 Running \$category Tests"
+    echo "$(printf '=%.0s' {1..50})"
+    if eval "\$command"; then
+        echo "✅ \$category Tests: PASSED"
+        return 0
+    else
+        echo "❌ \$category Tests: FAILED"
+        return 1
+    fi
+}
+
+# Initialize results
+UNIT_RESULT=0
+E2E_RESULT=0
+UI_RESULT=0
+
+# 1. Unit Tests (pytest API level)
+run_test_category "Unit" "pytest tests/unit/ -v --tb=short --cov=api --cov-report=html:reports/unit-coverage" || UNIT_RESULT=1
+
+# 2. End-to-End Tests (pytest API integration)
+run_test_category "End-to-End" "pytest tests/integration/ -v --tb=short --cov=api --cov-append --cov-report=html:reports/e2e-coverage" || E2E_RESULT=1
+
+# 3. UI Tests (Playwright)
+export PLAYWRIGHT_BASE_URL=http://app:5000
+run_test_category "UI" "npx playwright test tests/e2e/ --reporter=html --output-dir=reports/ui-results" || UI_RESULT=1
+
+# Generate consolidated report
+echo ""
+echo "📊 Test Results Summary"
+echo "======================="
+echo "Unit Tests:         \$([ \$UNIT_RESULT -eq 0 ] && echo '✅ PASSED' || echo '❌ FAILED')"
+echo "End-to-End Tests:   \$([ \$E2E_RESULT -eq 0 ] && echo '✅ PASSED' || echo '❌ FAILED')"  
+echo "UI Tests:           \$([ \$UI_RESULT -eq 0 ] && echo '✅ PASSED' || echo '❌ FAILED')"
+
+# Exit with failure if any category failed
+TOTAL_FAILURES=\$((UNIT_RESULT + E2E_RESULT + UI_RESULT))
+if [ \$TOTAL_FAILURES -eq 0 ]; then
+    echo ""
+    echo "🎉 All Test Categories Passed!"
+    exit 0
+else
+    echo ""
+    echo "💥 \$TOTAL_FAILURES Test Categories Failed"
+    exit 1
+fi
+EOF
+
+RUN chmod +x /app/run-tests.sh
+
+# Create individual test runners
+COPY <<EOF /app/run-unit-tests.sh
+#!/bin/bash
+echo "🧪 Running Unit Tests Only"
+pytest tests/unit/ -v --tb=short --cov=api --cov-report=html:reports/unit-coverage --cov-report=term
+EOF
+
+COPY <<EOF /app/run-e2e-tests.sh
+#!/bin/bash
+echo "🚀 Running End-to-End API Tests Only"
+timeout 60 bash -c 'until curl -f http://app:5000/health 2>/dev/null; do sleep 2; done'
+pytest tests/integration/ -v --tb=short --cov=api --cov-report=html:reports/e2e-coverage --cov-report=term
+EOF
+
+COPY <<EOF /app/run-ui-tests.sh
+#!/bin/bash
+echo "🖥️ Running UI Tests Only"
+timeout 60 bash -c 'until curl -f http://app:5000/health 2>/dev/null; do sleep 2; done'
+export PLAYWRIGHT_BASE_URL=http://app:5000
+npx playwright test tests/e2e/ --reporter=html --output-dir=reports/ui-results
+EOF
+
+RUN chmod +x /app/run-unit-tests.sh /app/run-e2e-tests.sh /app/run-ui-tests.sh
+
+# Create directory for test reports
+RUN mkdir -p /app/reports
+
+# Default command runs all tests
+CMD ["/app/run-tests.sh"]
