@@ -41,6 +41,77 @@ class TestKandaEndpoints:
 
 
 @pytest.mark.api
+class TestSargaEndpoints:
+    """Test cases for Sarga-related endpoints."""
+    
+    def test_get_sarga_slokas_success(self, client, mock_ramayanam_data):
+        """Test successful retrieval of all slokas in a sarga."""
+        response = client.get('/api/ramayanam/kandas/1/sargas/1')
+        
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        
+        # Verify response structure
+        assert 'kanda' in data
+        assert 'sarga' in data
+        assert 'slokas' in data
+        
+        # Verify kanda info
+        assert data['kanda']['number'] == 1
+        assert data['kanda']['name'] == 'BalaKanda'
+        
+        # Verify sarga info
+        assert data['sarga']['number'] == 1
+        assert data['sarga']['total_slokas'] == 2
+        
+        # Verify slokas array
+        assert isinstance(data['slokas'], list)
+        assert len(data['slokas']) == 2
+        
+        # Verify sloka structure
+        sloka = data['slokas'][0]
+        required_fields = ['sloka_id', 'sloka_text', 'meaning', 'translation']
+        for field in required_fields:
+            assert field in sloka
+    
+    def test_get_sarga_slokas_kanda_not_found(self, client, mock_ramayanam_data):
+        """Test sarga retrieval with non-existent kanda."""
+        mock_ramayanam_data.kandas = {}
+        
+        response = client.get('/api/ramayanam/kandas/999/sargas/1')
+        
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
+        assert 'kanda' in data['error'].lower()
+    
+    def test_get_sarga_slokas_sarga_not_found(self, client, mock_ramayanam_data):
+        """Test sarga retrieval with non-existent sarga."""
+        mock_kanda = MagicMock()
+        mock_kanda.sargas = {}
+        mock_ramayanam_data.kandas = {1: mock_kanda}
+        
+        response = client.get('/api/ramayanam/kandas/1/sargas/999')
+        
+        assert response.status_code == 404
+        data = json.loads(response.data)
+        assert 'error' in data
+        assert 'sarga' in data['error'].lower()
+    
+    def test_get_sarga_slokas_invalid_kanda(self, client):
+        """Test sarga retrieval with invalid kanda number."""
+        response = client.get('/api/ramayanam/kandas/abc/sargas/1')
+        
+        assert response.status_code == 404  # Flask converts invalid int to 404
+    
+    def test_get_sarga_slokas_invalid_sarga(self, client):
+        """Test sarga retrieval with invalid sarga number."""
+        response = client.get('/api/ramayanam/kandas/1/sargas/abc')
+        
+        assert response.status_code == 404  # Flask converts invalid int to 404
+
+
+@pytest.mark.api
 class TestSlokaEndpoints:
     """Test cases for Sloka-related endpoints."""
     
