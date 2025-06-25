@@ -62,26 +62,39 @@ class SearchAPI {
     ];
   }
 
-  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters): Promise<Verse[]> {
+  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters, page: number = 1, pageSize: number = 10): Promise<{ verses: Verse[], pagination?: any }> {
     const endpoint = type === 'english' ? 'fuzzy-search' : 'fuzzy-search-sanskrit';
     const kandaParam = filters.kanda ? `&kanda=${filters.kanda}` : '';
     const textsParam = filters.texts && filters.texts.length > 0 ? `&texts=${filters.texts.join(',')}` : '';
-    const url = `${API_BASE_URL}/${endpoint}?query=${encodeURIComponent(query)}${kandaParam}${textsParam}`;
+    const paginationParams = `&page=${page}&page_size=${pageSize}`;
+    const url = `${API_BASE_URL}/${endpoint}?query=${encodeURIComponent(query)}${kandaParam}${textsParam}${paginationParams}`;
     
     const response = await this.makeRequest(url);
     
     // Handle paginated response format
     let results: Verse[];
+    let pagination: any = undefined;
+    
     if (response && typeof response === 'object' && 'results' in response) {
       // API returns paginated format: {results: [...], pagination: {...}}
       results = response.results || [];
+      pagination = response.pagination;
     } else if (Array.isArray(response)) {
       // API returns direct array (fallback/mock data)
       results = response;
+      // Create mock pagination for fallback
+      pagination = {
+        page: 1,
+        page_size: results.length,
+        total_results: results.length,
+        total_pages: 1,
+        has_next: false,
+        has_prev: false
+      };
     } else {
       // Unexpected format, return empty array
       console.error('Unexpected API response format:', response);
-      return [];
+      return { verses: [], pagination: undefined };
     }
     
     // Filter by minimum ratio if specified
@@ -93,7 +106,7 @@ class SearchAPI {
       filteredResults = this.getMockCrossTextResults(query, type);
     }
     
-    return filteredResults;
+    return { verses: filteredResults, pagination };
   }
 
   private getMockCrossTextResults(query: string, type: 'english' | 'sanskrit'): Verse[] {

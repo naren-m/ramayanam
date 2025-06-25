@@ -24,4 +24,42 @@ test.describe('Search Functionality', () => {
     const searchResults = page.locator('[data-testid="search-results"]');
     await expect(searchResults).not.toBeVisible();
   });
+
+  test('should show and handle load more button when more results are available', async ({ page }) => {
+    // Perform a search that would return multiple pages
+    const searchInput = page.locator('[data-testid="english-search-input"]');
+    await searchInput.fill('rama');
+    await searchInput.press('Enter');
+    
+    // Wait for search results to load
+    await page.waitForTimeout(2000);
+    
+    // Check if load more button is visible (only if there are more results)
+    const loadMoreButton = page.locator('[data-testid="load-more-button"]');
+    
+    // Count initial results
+    const initialResults = page.locator('[data-testid="verse-card"]');
+    const initialCount = await initialResults.count();
+    
+    // If load more button is visible, test its functionality
+    if (await loadMoreButton.isVisible()) {
+      // Click load more button
+      await loadMoreButton.click();
+      
+      // Wait for new results to load
+      await page.waitForTimeout(2000);
+      
+      // Check that more results were loaded
+      const newResults = page.locator('[data-testid="verse-card"]');
+      const newCount = await newResults.count();
+      
+      expect(newCount).toBeGreaterThan(initialCount);
+      
+      // Check that button shows loading state when clicked
+      if (await loadMoreButton.isVisible()) {
+        await loadMoreButton.click();
+        await expect(loadMoreButton).toContainText('Loading...');
+      }
+    }
+  });
 });
