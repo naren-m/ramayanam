@@ -217,8 +217,11 @@ function isSargaApiResponse(data: any): data is SargaApiResponse {
 
 export const fetchSargaData = async (source: string, kanda: string, sarga: string): Promise<SargaData> => {
   try {
+    console.log(`Fetching sarga data for source: ${source}, kanda: ${kanda}, sarga: ${sarga}`);
     const response = await fetch(`/api/ramayanam/kandas/${kanda}/sargas/${sarga}`);
+    
     if (!response.ok) {
+      console.error(`API request failed with status: ${response.status}`);
       if (response.status === 404) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Sarga ${sarga} not found in Kanda ${kanda}`);
@@ -227,6 +230,7 @@ export const fetchSargaData = async (source: string, kanda: string, sarga: strin
     }
     
     const data = await response.json();
+    console.log('Raw API response:', data);
     
     // Validate API response structure
     if (!isSargaApiResponse(data)) {
@@ -238,16 +242,20 @@ export const fetchSargaData = async (source: string, kanda: string, sarga: strin
     const transformedData: SargaData = {
       kanda: data.kanda,
       sarga: data.sarga,
-      slokas: data.slokas.map((sloka) => ({
-        sloka_number: sloka.sloka_id,
-        sloka: sloka.sloka_text,
-        meaning: sloka.meaning,
-        translation: sloka.translation,
-        ratio: 100, // Default ratio for sarga reading
-        source: source
-      }))
+      slokas: data.slokas.map((sloka, index) => {
+        console.log(`Transforming sloka ${index}:`, sloka);
+        return {
+          sloka_number: sloka.sloka_id,
+          sloka: sloka.sloka_text,
+          meaning: sloka.meaning,
+          translation: sloka.translation,
+          ratio: 100, // Default ratio for sarga reading
+          source: source
+        };
+      })
     };
     
+    console.log('Transformed data:', transformedData);
     return transformedData;
   } catch (error) {
     console.error('Failed to fetch sarga data:', error);

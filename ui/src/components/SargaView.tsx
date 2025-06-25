@@ -22,33 +22,55 @@ const SargaView: React.FC = () => {
 
   useEffect(() => {
     const loadSargaData = async () => {
-      if (!source || !kanda || !sarga) return;
+      console.log('SargaView: Loading sarga data with params:', { source, kanda, sarga, verse });
+      
+      if (!source || !kanda || !sarga) {
+        console.error('SargaView: Missing required parameters:', { source, kanda, sarga });
+        setError('Invalid sarga URL parameters');
+        setLoading(false);
+        return;
+      }
       
       setLoading(true);
       setError(null);
       
       try {
+        console.log('SargaView: Calling fetchSargaData...');
         const data = await fetchSargaData(source!, kanda!, sarga!);
+        console.log('SargaView: Received sarga data:', data);
+        
+        if (!data || !data.slokas || !Array.isArray(data.slokas)) {
+          throw new Error('Invalid sarga data structure received');
+        }
+        
         setSargaData(data);
         
         // If a specific verse is provided in URL, find and set it
         if (verse && data.slokas) {
+          console.log('SargaView: Looking for specific verse:', verse);
           const verseIndex = data.slokas.findIndex(sloka => {
+            if (!sloka.sloka_number) return false;
             const parts = sloka.sloka_number.split('.');
             return parts.length >= 3 && parts[2] === verse;
           });
+          console.log('SargaView: Found verse index:', verseIndex);
           if (verseIndex !== -1) {
             setCurrentSloka(verseIndex);
           }
         }
         
         // Load favorites from localStorage (namespaced by source)
-        const favoritesKey = `${source}-favorites`;
-        const savedFavorites = localStorage.getItem(favoritesKey);
-        if (savedFavorites) {
-          setFavorites(JSON.parse(savedFavorites));
+        try {
+          const favoritesKey = `${source}-favorites`;
+          const savedFavorites = localStorage.getItem(favoritesKey);
+          if (savedFavorites) {
+            setFavorites(JSON.parse(savedFavorites));
+          }
+        } catch (favError) {
+          console.warn('SargaView: Failed to load favorites from localStorage:', favError);
         }
       } catch (err) {
+        console.error('SargaView: Error loading sarga data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load sarga');
       } finally {
         setLoading(false);
@@ -224,6 +246,37 @@ const SargaView: React.FC = () => {
   }
 
   const currentVerse = sargaData.slokas[currentSloka];
+
+  // Additional safety check
+  if (!currentVerse) {
+    console.error('SargaView: Current verse is undefined', { 
+      currentSloka, 
+      totalSlokas: sargaData.slokas.length,
+      sargaData 
+    });
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 dark:from-gray-900 dark:to-blue-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+                Verse Not Found
+              </h3>
+              <p className="text-red-600 dark:text-red-300 mb-4">
+                Unable to load the requested verse.
+              </p>
+              <button
+                onClick={() => navigate('/')}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Return to Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-orange-50 dark:from-gray-900 dark:to-blue-900">
