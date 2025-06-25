@@ -29,7 +29,7 @@ print_warning() {
 }
 
 # Default values
-PORT=5000
+PORT=5001
 BROWSER="chromium"
 HEADED=false
 UI_MODE=false

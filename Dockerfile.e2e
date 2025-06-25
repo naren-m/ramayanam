@@ -23,9 +23,9 @@ RUN npm install
 # Install Playwright browsers
 RUN npx playwright install
 
-# Copy test files
+# Copy test files and configuration
 COPY playwright.config.ts ./
-COPY tests/e2e/ ./e2e/
+COPY tests/ ./tests/
 
 # Default command
-CMD ["npx", "playwright", "test"]
+CMD ["npx", "playwright", "test", "tests/e2e"]

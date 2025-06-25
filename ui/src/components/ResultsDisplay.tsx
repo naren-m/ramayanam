@@ -133,7 +133,7 @@ const ResultsDisplay: React.FC = () => {
       {/* Load More */}
       {verses.length >= 10 && (
         <div className="text-center pt-8">
-          <button className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors">
+          <button className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors" data-testid="load-more-button">
             Load More Results
           </button>
         </div>

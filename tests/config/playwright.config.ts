@@ -8,8 +8,10 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://192.168.68.138:5001',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5001',
     trace: 'on-first-retry',
+    timeout: 30000, // 30 seconds timeout for actions
+    navigationTimeout: 30000, // 30 seconds for page navigation
   },
 
   projects: [
