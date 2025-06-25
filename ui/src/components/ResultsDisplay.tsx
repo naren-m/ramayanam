@@ -5,7 +5,7 @@ import VerseCard from './VerseCard';
 import LoadingSpinner from './LoadingSpinner';
 
 const ResultsDisplay: React.FC = () => {
-  const { verses, loading, error, totalResults, searchQuery, searchType, filters } = useSearch();
+  const { verses, loading, loadingMore, error, totalResults, searchQuery, searchType, filters, paginationMeta, loadMoreResults } = useSearch();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -131,10 +131,15 @@ const ResultsDisplay: React.FC = () => {
       </div>
 
       {/* Load More */}
-      {verses.length >= 10 && (
+      {paginationMeta?.has_next && (
         <div className="text-center pt-8">
-          <button className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors" data-testid="load-more-button">
-            Load More Results
+          <button 
+            onClick={loadMoreResults}
+            disabled={loadingMore}
+            className="px-6 py-3 bg-gradient-to-r from-saffron-500 to-gold-500 text-white font-medium rounded-lg hover:from-saffron-600 hover:to-gold-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+            data-testid="load-more-button"
+          >
+            {loadingMore ? 'Loading...' : 'Load More Results'}
           </button>
         </div>
       )}

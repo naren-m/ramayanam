@@ -21,6 +21,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('Error stack:', error.stack);
+    console.error('Component stack:', errorInfo.componentStack);
   }
 
   render() {
@@ -43,6 +45,18 @@ class ErrorBoundary extends Component<Props, State> {
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 An error occurred while rendering this component. Please refresh the page and try again.
               </p>
+              {this.state.error && process.env.NODE_ENV === 'development' && (
+                <details className="mt-4 text-left">
+                  <summary className="cursor-pointer text-sm text-red-700 dark:text-red-300 mb-2">
+                    Error Details (Development)
+                  </summary>
+                  <pre className="text-xs text-red-800 dark:text-red-200 bg-red-100 dark:bg-red-900/30 p-2 rounded overflow-auto">
+                    {this.state.error.toString()}
+                    {'\n\n'}
+                    {this.state.error.stack}
+                  </pre>
+                </details>
+              )}
               <div className="mt-6">
                 <button
                   onClick={() => window.location.reload()}

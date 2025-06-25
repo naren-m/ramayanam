@@ -49,6 +49,11 @@ def serve_react_app(path=''):
     In production, serves built files from dist/.
     In development, falls back to old frontend if dist/ doesn't exist.
     """
+    # Don't serve frontend for API routes that don't exist - let Flask return 404
+    if path and path.startswith('api/'):
+        from flask import abort
+        abort(404)
+    
     # Check if we have the built React app
     dist_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dist')
     if os.path.exists(dist_path):
@@ -56,6 +61,10 @@ def serve_react_app(path=''):
             return send_from_directory(dist_path, path)
         return send_file(os.path.join(dist_path, 'index.html'))
     else:
+        # In test environment, don't try to serve frontend files that don't exist
+        if app.config.get('TESTING') or not os.path.exists('../slokas-frontend/index.html'):
+            from flask import abort
+            abort(404)
         # Fallback to old frontend for development
         logging.warning("dist/ not found, serving old frontend")
         return send_file('../slokas-frontend/index.html')
