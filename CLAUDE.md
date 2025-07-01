@@ -76,6 +76,24 @@ python run.py                       # Start app first
 npx playwright show-report          # HTML report with screenshots
 ```
 
+### Docker Multi-Platform Build Commands
+
+```bash
+# Multi-platform Docker builds (linux/amd64,linux/arm64)
+./scripts/build-multi-arch-docker.sh                    # Build multi-arch (buildx cache only)
+./scripts/build-multi-arch-docker.sh --load             # Build and load to local Docker (amd64 only)
+./scripts/build-multi-arch-docker.sh -t v1.0.0         # Build with custom tag
+./scripts/build-multi-arch-docker.sh -t v1.0.0 --push  # Build and push to registry
+./scripts/build-multi-arch-docker.sh --help            # Show all options
+
+# Alternative: Distributed multi-arch build (requires infrastructure)
+./scripts/build-multi-arch.sh                          # Build on separate ARM64 VM + AMD64 cluster
+
+# Single platform builds
+./scripts/build-amd64.sh                               # AMD64 only
+./scripts/build-docker.sh                              # Default single platform
+```
+
 ### Testing Status
 
 **✅ E2E Testing (Playwright):**
