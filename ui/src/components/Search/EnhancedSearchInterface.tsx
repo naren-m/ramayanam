@@ -55,25 +55,35 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
       e.stopPropagation();
       const query = type === 'english' ? englishQuery : sanskritQuery;
       if (query.trim()) {
+        console.log(`EnhancedSearch: Enter key pressed for ${type} search with query: "${query}"`);
         searchVerses(query, type);
       }
     }
   };
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const query = englishQuery || sanskritQuery;
-    const type = englishQuery ? 'english' : 'sanskrit';
+  // Handle search execution - unified function
+  const executeSearch = (type: 'english' | 'sanskrit') => {
+    const query = type === 'english' ? englishQuery : sanskritQuery;
     if (query.trim()) {
+      console.log(`EnhancedSearch: Executing ${type} search with query: "${query}"`);
       searchVerses(query, type);
     }
   };
 
   const handleSearchClick = (type: 'english' | 'sanskrit') => {
-    const query = type === 'english' ? englishQuery : sanskritQuery;
-    if (query.trim()) {
-      searchVerses(query, type);
+    executeSearch(type);
+  };
+
+  // Form submission handler
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(`EnhancedSearch: Form submitted with activeTab: ${activeTab}`);
+    if (activeTab === 'english' && englishQuery.trim()) {
+      console.log(`EnhancedSearch: Executing English search via form submit: "${englishQuery}"`);
+      executeSearch('english');
+    } else if (activeTab === 'sanskrit' && sanskritQuery.trim()) {
+      console.log(`EnhancedSearch: Executing Sanskrit search via form submit: "${sanskritQuery}"`);
+      executeSearch('sanskrit');
     }
   };
 
@@ -132,88 +142,88 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
         </div>
 
         {/* Search Inputs */}
-        <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-4 mb-6">
-          {/* English Search */}
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Search English Translations
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
-              <input
-                type="text"
-                data-testid="enhanced-search-input"
-                value={englishQuery}
-                onChange={(e) => handleEnglishSearch(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, 'english')}
-                placeholder="Search for concepts like 'dharma', 'duty', 'devotion'..."
-                className={`w-full pl-12 pr-12 py-4 rounded-xl text-lg font-medium placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-800 border-2 focus:outline-none transition-colors ${
-                  activeTab === 'english' 
-                    ? 'border-orange-400 ring-2 ring-orange-400/20' 
-                    : 'border-gray-200 dark:border-gray-600 focus:border-orange-400'
-                }`}
-                disabled={loading}
-              />
-              {englishQuery && (
+        <form onSubmit={handleFormSubmit}>
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            {/* English Search */}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Search English Translations
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
+                <input
+                  type="text"
+                  data-testid="enhanced-search-input"
+                  value={englishQuery}
+                  onChange={(e) => handleEnglishSearch(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, 'english')}
+                  placeholder="Search for concepts like 'dharma', 'duty', 'devotion'..."
+                  className={`w-full pl-12 pr-12 py-4 rounded-xl text-lg font-medium placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-800 border-2 focus:outline-none transition-colors ${
+                    activeTab === 'english' 
+                      ? 'border-orange-400 ring-2 ring-orange-400/20' 
+                      : 'border-gray-200 dark:border-gray-600 focus:border-orange-400'
+                  }`}
+                  disabled={loading}
+                />
+                {englishQuery && (
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
                 <button
-                  type="button"
-                  onClick={handleClear}
-                  className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  type="submit"
+                  disabled={loading || !englishQuery.trim()}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
+                  aria-label="Search English"
                 >
-                  <X className="w-5 h-5" />
+                  <Search className="w-5 h-5" />
                 </button>
-              )}
-              <button
-                type="submit"
-                onClick={() => handleSearchClick('english')}
-                disabled={loading || !englishQuery.trim()}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
-                aria-label="Search English"
-              >
-                <Search className="w-5 h-5" />
-              </button>
+              </div>
             </div>
-          </div>
 
-          {/* Sanskrit Search */}
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Search Sanskrit Text
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
-              <input
-                type="text"
-                data-testid="enhanced-sanskrit-search-input"
-                value={sanskritQuery}
-                onChange={(e) => handleSanskritSearch(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, 'sanskrit')}
-                placeholder="राम, धर्म, या अन्य शब्द खोजें..."
-                className={`sanskrit-text w-full pl-12 pr-12 py-4 rounded-xl text-lg font-medium placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-800 border-2 focus:outline-none transition-colors ${
-                  activeTab === 'sanskrit' 
-                    ? 'border-orange-400 ring-2 ring-orange-400/20' 
-                    : 'border-gray-200 dark:border-gray-600 focus:border-orange-400'
-                }`}
-                disabled={loading}
-              />
-              {sanskritQuery && (
+            {/* Sanskrit Search */}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Search Sanskrit Text
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-500 w-5 h-5" />
+                <input
+                  type="text"
+                  data-testid="enhanced-sanskrit-search-input"
+                  value={sanskritQuery}
+                  onChange={(e) => handleSanskritSearch(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, 'sanskrit')}
+                  placeholder="राम, धर्म, या अन्य शब्द खोजें..."
+                  className={`sanskrit-text w-full pl-12 pr-12 py-4 rounded-xl text-lg font-medium placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-800 border-2 focus:outline-none transition-colors ${
+                    activeTab === 'sanskrit' 
+                      ? 'border-orange-400 ring-2 ring-orange-400/20' 
+                      : 'border-gray-200 dark:border-gray-600 focus:border-orange-400'
+                  }`}
+                  disabled={loading}
+                />
+                {sanskritQuery && (
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
                 <button
-                  type="button"
-                  onClick={handleClear}
-                  className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  type="submit"
+                  disabled={loading || !sanskritQuery.trim()}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
+                  aria-label="Search Sanskrit"
                 >
-                  <X className="w-5 h-5" />
+                  <Search className="w-5 h-5" />
                 </button>
-              )}
-              <button
-                type="submit"
-                onClick={() => handleSearchClick('sanskrit')}
-                disabled={loading || !sanskritQuery.trim()}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
-                aria-label="Search Sanskrit"
-              >
-                <Search className="w-5 h-5" />
-              </button>
+              </div>
             </div>
           </div>
         </form>
