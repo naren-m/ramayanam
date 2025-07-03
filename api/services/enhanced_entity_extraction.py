@@ -1,658 +1,584 @@
 """
-Enhanced Entity Extraction with Proper NLP Strategy for Sanskrit Texts
-
-This module implements a comprehensive approach for extracting entities from Sanskrit texts
-using multiple strategies suitable for ancient Indian texts and proper names.
+Enhanced Entity Extraction for Phase 1 Scale-Up
+Optimized for processing the full Ramayana corpus with improved patterns and performance
 """
 
 import re
+import sqlite3
 import logging
-import requests
 import json
 from typing import Dict, List, Tuple, Set, Optional, Any
 from dataclasses import dataclass
 from collections import defaultdict, Counter
 from pathlib import Path
-
-# For NLP processing
-try:
-    import spacy
-    from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
-    SPACY_AVAILABLE = True
-except ImportError:
-    SPACY_AVAILABLE = False
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 from api.models.kg_models import KGEntity, KGRelationship, EntityType, SemanticAnnotation
 
 
 @dataclass
-class EntityCandidate:
-    """Candidate entity from various extraction methods"""
-    text: str
-    start: int
-    end: int
-    entity_type: str
-    confidence: float
-    extraction_method: str
-    context: str
-    transliterated_form: Optional[str] = None
-    english_translation: Optional[str] = None
-
-
-class SanskritEntityExtractor:
-    """
-    Multi-strategy entity extractor specifically designed for Sanskrit texts
-    Combines pattern-based, NLP-based, and knowledge-based approaches
-    """
+class EnhancedEntityPattern:
+    """Enhanced pattern for entity identification with confidence scoring"""
+    entity_id: str
+    entity_type: EntityType
+    primary_names: List[str]  # Most common names
+    alternative_names: List[str]  # Alternative spellings/forms
+    sanskrit_patterns: List[str]  # Sanskrit regex patterns
+    english_patterns: List[str]  # English regex patterns
+    epithets: List[str]  # Known epithets
+    context_words: List[str]  # Words that boost confidence when found nearby
+    confidence_base: float = 0.8
+    min_confidence: float = 0.6
     
-    def __init__(self, use_external_apis: bool = False):
+    def __post_init__(self):
+        if not self.epithets:
+            self.epithets = []
+        if not self.context_words:
+            self.context_words = []
+
+
+class ScalableEntityExtractor:
+    """Enhanced entity extractor optimized for large-scale processing"""
+    
+    def __init__(self, db_path: str = "data/db/ramayanam.db"):
+        self.db_path = db_path
         self.logger = logging.getLogger(__name__)
-        self.use_external_apis = use_external_apis
-        
-        # Initialize NLP models if available
-        self.nlp_model = None
-        self.ner_pipeline = None
-        self._initialize_nlp_models()
-        
-        # Sanskrit-specific patterns and knowledge
-        self.sanskrit_patterns = self._load_sanskrit_patterns()
-        self.transliteration_map = self._load_transliteration_map()
-        self.known_epithets = self._load_known_epithets()
-        
-        # Statistics
+        self.entity_patterns = self._load_enhanced_patterns()
+        self.processed_cache = set()  # Cache to avoid reprocessing
         self.extraction_stats = {
             'total_processed': 0,
-            'entities_found': defaultdict(int),
-            'methods_used': defaultdict(int),
-            'confidence_distribution': defaultdict(int)
+            'entities_found': 0,
+            'new_entities': 0,
+            'processing_time': 0
         }
+        self._lock = threading.Lock()
     
-    def _initialize_nlp_models(self):
-        """Initialize NLP models for entity extraction"""
-        if not SPACY_AVAILABLE:
-            self.logger.warning("spaCy not available. Using pattern-based extraction only.")
+    def get_connection(self):
+        """Get database connection with row factory"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+    
+    def _load_enhanced_patterns(self) -> List[EnhancedEntityPattern]:
+        """Load comprehensive entity patterns for the Ramayana"""
+        patterns = [
+            # Major Characters - Enhanced patterns
+            EnhancedEntityPattern(
+                entity_id="rama",
+                entity_type=EntityType.PERSON,
+                primary_names=["राम", "राम:", "रामम्", "रामस्य", "रामो", "रामे"],
+                alternative_names=["राघव", "दशरथि", "कोसलेन्द्र", "रघुनन्दन"],
+                sanskrit_patterns=[
+                    r"राम[ःम्ं।]?",
+                    r"राघव[ःम्ं।]?", 
+                    r"दशरथि[ःम्ं।]?",
+                    r"रघु(?:नन्दन|पति|वीर)[ःम्ं।]?",
+                    r"कोसल(?:राज|पति|नाथ)[ःम्ं।]?"
+                ],
+                english_patterns=[
+                    r"\brama\b", r"\braghava\b", r"\bdasharathi\b"
+                ],
+                epithets=["राघव", "दशरथि", "कोसलेन्द्र", "रघुनन्दन", "रघुपति"],
+                context_words=["राजा", "प्रिन्स", "धनुष", "सीता", "अयोध्या"],
+                confidence_base=0.95
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="sita",
+                entity_type=EntityType.PERSON,
+                primary_names=["सीता", "सीते", "सीताम्", "सीतया"],
+                alternative_names=["जानकी", "वैदेही", "मिथिलेशी"],
+                sanskrit_patterns=[
+                    r"सीत[ाे ाम्या ासम्।ः]?",
+                    r"जानकी[म्ं।]?",
+                    r"वैदेही[म्ं।]?",
+                    r"मिथिलेश[ीः][म्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bsita\b", r"\bjanaki\b", r"\bvaidehi\b"
+                ],
+                epithets=["जानकी", "वैदेही", "मिथिलेशी"],
+                context_words=["पत्नी", "राम", "रानी", "वन", "अग्नि"],
+                confidence_base=0.95
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="lakshmana", 
+                entity_type=EntityType.PERSON,
+                primary_names=["लक्ष्मण", "लक्ष्मणस्य", "लक्ष्मणम्"],
+                alternative_names=["सौमित्रि", "शेषावतार"],
+                sanskrit_patterns=[
+                    r"लक्ष्मण[ःम्ं।स्य]?",
+                    r"सौमित्रि[ःम्ं।]?",
+                    r"शेषावतार[ःम्ं।]?"
+                ],
+                english_patterns=[
+                    r"\blakshmana\b", r"\blakshman\b", r"\bsaumitri\b"
+                ],
+                epithets=["सौमित्रि", "शेषावतार"],
+                context_words=["भाई", "राम", "धनुष", "वन"],
+                confidence_base=0.9
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="ravana",
+                entity_type=EntityType.PERSON,
+                primary_names=["रावण", "रावणस्य", "रावणम्"],
+                alternative_names=["दशानन", "लंकेश", "राक्षसराज"],
+                sanskrit_patterns=[
+                    r"रावण[ःम्ं।स्य]?",
+                    r"दशानन[ःम्ं।]?",
+                    r"लंकेश[ःम्ं।]?",
+                    r"राक्षस(?:राज|पति)[ःम्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bravana\b", r"\bdashanan\b", r"\blankesh\b"
+                ],
+                epithets=["दशानन", "लंकेश", "राक्षसराज"],
+                context_words=["राक्षस", "लंका", "शत्रु", "युद्ध"],
+                confidence_base=0.9
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="hanuman",
+                entity_type=EntityType.PERSON, 
+                primary_names=["हनुमान्", "हनुमत्", "हनुमान"],
+                alternative_names=["मारुति", "पवनपुत्र", "वायुपुत्र", "अंजनेय"],
+                sanskrit_patterns=[
+                    r"हनुम[ाान्त्][न्तः।ं]?",
+                    r"मारुति[ःम्ं।]?",
+                    r"पवन(?:पुत्र|सुत)[ःम्ं।]?",
+                    r"वायु(?:पुत्र|सुत)[ःम्ं।]?",
+                    r"अंजनेय[ःम्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bhanuman\b", r"\bmaruti\b", r"\banjaneya\b"
+                ],
+                epithets=["मारुति", "पवनपुत्र", "वायुपुत्र", "अंजनेय"],
+                context_words=["वानर", "राम", "सेवक", "उड़ना"],
+                confidence_base=0.9
+            ),
+            
+            # Places - Enhanced patterns
+            EnhancedEntityPattern(
+                entity_id="ayodhya",
+                entity_type=EntityType.PLACE,
+                primary_names=["अयोध्या", "अयोध्याम्", "अयोध्यायाम्"],
+                alternative_names=["कोसल", "साकेत"],
+                sanskrit_patterns=[
+                    r"अयोध्या[म्यांः।]?",
+                    r"कोसल[ेम्ं।]?",
+                    r"साकेत[म्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bayodhya\b", r"\bkosala\b", r"\bsaketa\b"
+                ],
+                epithets=["कोसल", "साकेत"],
+                context_words=["नगर", "राज्य", "राजधानी", "राम"],
+                confidence_base=0.85
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="lanka",
+                entity_type=EntityType.PLACE,
+                primary_names=["लंका", "लंकाम्", "लंकायाम्"],
+                alternative_names=["रावणपुरी", "राक्षसपुरी"],
+                sanskrit_patterns=[
+                    r"लंका[म्यांः।]?",
+                    r"रावणपुरी[म्ं।]?",
+                    r"राक्षसपुरी[म्ं।]?"
+                ],
+                english_patterns=[
+                    r"\blanka\b", r"\bravanapur\b"
+                ],
+                epithets=["रावणपुरी", "राक्षसपुरी"],
+                context_words=["द्वीप", "सागर", "रावण", "राक्षस"],
+                confidence_base=0.85
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="dandaka",
+                entity_type=EntityType.PLACE,
+                primary_names=["दण्डक", "दण्डकारण्य"],
+                alternative_names=["वन", "अरण्य"],
+                sanskrit_patterns=[
+                    r"दण्डक[ःम्ं।]?",
+                    r"दण्डकारण्य[म्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bdandaka\b", r"\bdandakaranya\b"
+                ],
+                epithets=["दण्डकारण्य"],
+                context_words=["वन", "अरण्य", "निर्वासन", "तपस्या"],
+                confidence_base=0.8
+            ),
+            
+            # Concepts - Enhanced patterns  
+            EnhancedEntityPattern(
+                entity_id="dharma",
+                entity_type=EntityType.CONCEPT,
+                primary_names=["धर्म", "धर्मस्य", "धर्मम्"],
+                alternative_names=["न्याय", "सत्य", "कर्तव्य"],
+                sanskrit_patterns=[
+                    r"धर्म[ःम्ेस्य।]?",
+                    r"न्याय[ःम्ं।]?",
+                    r"सत्य[ःम्ं।]?",
+                    r"कर्तव्य[ःम्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bdharma\b", r"\brighteousness\b", r"\bduty\b"
+                ],
+                epithets=["न्याय", "सत्य", "कर्तव्य"],
+                context_words=["राज्य", "न्याय", "शासन", "आचार"],
+                confidence_base=0.75
+            ),
+            
+            EnhancedEntityPattern(
+                entity_id="karma",
+                entity_type=EntityType.CONCEPT,
+                primary_names=["कर्म", "कर्मणः", "कर्मणा"],
+                alternative_names=["कृत्य", "क्रिया"],
+                sanskrit_patterns=[
+                    r"कर्म[णःनाम्।]?",
+                    r"कृत्य[ःम्ं।]?",
+                    r"क्रिया[म्ं।]?"
+                ],
+                english_patterns=[
+                    r"\bkarma\b", r"\baction\b", r"\bdeed\b"
+                ],
+                epithets=["कृत्य", "क्रिया"],
+                context_words=["फल", "परिणाम", "कर्ता"],
+                confidence_base=0.7
+            )
+        ]
+        
+        self.logger.info(f"Loaded {len(patterns)} enhanced entity patterns")
+        return patterns
+    
+    def extract_entities_from_sloka(self, sloka_row) -> List[Dict[str, Any]]:
+        """Extract entities from a single sloka with enhanced matching"""
+        text_unit_id = f"{sloka_row['kanda_id']}.{sloka_row['sarga_id']}.{sloka_row['sloka_id']}"
+        
+        # Skip if already processed (for incremental processing)
+        if text_unit_id in self.processed_cache:
+            return []
+        
+        extractions = []
+        
+        # Process different text fields
+        texts_to_process = [
+            (sloka_row['sloka'], 'sanskrit'),
+            (sloka_row['translation'], 'translation'), 
+            (sloka_row['meaning'], 'meaning')
+        ]
+        
+        for text, source_type in texts_to_process:
+            if not text:
+                continue
+                
+            text = str(text).lower()
+            
+            for pattern in self.entity_patterns:
+                entity_mentions = self._find_entity_mentions(text, pattern, source_type)
+                
+                for mention in entity_mentions:
+                    extraction = {
+                        'entity_id': pattern.entity_id,
+                        'entity_type': pattern.entity_type.value,
+                        'text_unit_id': text_unit_id,
+                        'span_start': mention['start'],
+                        'span_end': mention['end'],
+                        'confidence': mention['confidence'],
+                        'source_type': source_type,
+                        'matched_text': mention['matched_text'],
+                        'pattern_type': mention['pattern_type']
+                    }
+                    extractions.append(extraction)
+        
+        return extractions
+    
+    def _find_entity_mentions(self, text: str, pattern: EnhancedEntityPattern, source_type: str) -> List[Dict[str, Any]]:
+        """Find all mentions of an entity in text using enhanced patterns"""
+        mentions = []
+        
+        # Choose appropriate patterns based on source type
+        if source_type == 'sanskrit':
+            patterns_to_use = pattern.sanskrit_patterns
+        else:
+            patterns_to_use = pattern.english_patterns
+        
+        for regex_pattern in patterns_to_use:
+            for match in re.finditer(regex_pattern, text, re.IGNORECASE):
+                confidence = self._calculate_confidence(
+                    text, match, pattern, source_type
+                )
+                
+                if confidence >= pattern.min_confidence:
+                    mentions.append({
+                        'start': match.start(),
+                        'end': match.end(), 
+                        'confidence': confidence,
+                        'matched_text': match.group(),
+                        'pattern_type': regex_pattern
+                    })
+        
+        return mentions
+    
+    def _calculate_confidence(self, text: str, match, pattern: EnhancedEntityPattern, source_type: str) -> float:
+        """Calculate confidence score for an entity match"""
+        base_confidence = pattern.confidence_base
+        
+        # Boost confidence based on source type
+        source_multipliers = {
+            'sanskrit': 1.0,
+            'translation': 0.9,
+            'meaning': 0.8
+        }
+        confidence = base_confidence * source_multipliers.get(source_type, 0.7)
+        
+        # Context boost - check for related words nearby
+        context_window = text[max(0, match.start()-50):match.end()+50]
+        context_boost = 0
+        for context_word in pattern.context_words:
+            if context_word.lower() in context_window.lower():
+                context_boost += 0.05
+        
+        # Epithet boost
+        for epithet in pattern.epithets:
+            if epithet.lower() in context_window.lower():
+                context_boost += 0.1
+        
+        # Apply boosts but cap at 1.0
+        final_confidence = min(1.0, confidence + context_boost)
+        
+        return final_confidence
+    
+    def process_corpus_batch(self, batch_size: int = 1000, max_workers: int = 4) -> Dict[str, Any]:
+        """Process the entire corpus in batches with parallel processing"""
+        start_time = time.time()
+        
+        self.logger.info(f"Starting large-scale entity extraction with {max_workers} workers")
+        
+        with self.get_connection() as conn:
+            # Get total count for progress tracking
+            total_slokas = conn.execute("SELECT COUNT(*) as count FROM slokas").fetchone()['count']
+            
+            # Load already processed slokas to skip them
+            processed_units = conn.execute("""
+                SELECT DISTINCT text_unit_id FROM text_entity_mentions
+            """).fetchall()
+            
+            self.processed_cache = {row['text_unit_id'] for row in processed_units}
+            
+            self.logger.info(f"Found {len(self.processed_cache)} already processed slokas")
+            
+            # Process in batches
+            results = {
+                'entities': {},
+                'mentions': [],
+                'statistics': {
+                    'total_slokas': total_slokas,
+                    'processed_slokas': 0,
+                    'entities_found': 0,
+                    'new_entities': 0,
+                    'processing_time': 0
+                }
+            }
+            
+            offset = 0
+            while offset < total_slokas:
+                batch_start = time.time()
+                
+                # Get batch of slokas
+                slokas = conn.execute("""
+                    SELECT kanda_id, sarga_id, sloka_id, sloka, translation, meaning
+                    FROM slokas 
+                    ORDER BY kanda_id, sarga_id, sloka_id
+                    LIMIT ? OFFSET ?
+                """, (batch_size, offset)).fetchall()
+                
+                if not slokas:
+                    break
+                
+                # Process batch with parallel workers
+                batch_results = self._process_batch_parallel(slokas, max_workers)
+                
+                # Store results in database
+                self._store_batch_results(batch_results)
+                
+                # Update statistics
+                batch_time = time.time() - batch_start
+                results['statistics']['processed_slokas'] += len(slokas)
+                results['statistics']['entities_found'] += len(batch_results)
+                
+                # Progress logging
+                progress = (offset + len(slokas)) / total_slokas * 100
+                self.logger.info(f"Progress: {progress:.1f}% ({offset + len(slokas)}/{total_slokas}) - "
+                               f"Batch time: {batch_time:.2f}s - Found: {len(batch_results)} entities")
+                
+                offset += batch_size
+        
+        total_time = time.time() - start_time
+        results['statistics']['processing_time'] = total_time
+        
+        self.logger.info(f"Completed corpus processing in {total_time:.2f}s")
+        return results
+    
+    def _process_batch_parallel(self, slokas: List, max_workers: int) -> List[Dict[str, Any]]:
+        """Process a batch of slokas in parallel"""
+        all_extractions = []
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all slokas for processing
+            future_to_sloka = {
+                executor.submit(self.extract_entities_from_sloka, sloka): sloka 
+                for sloka in slokas
+            }
+            
+            # Collect results as they complete
+            for future in as_completed(future_to_sloka):
+                try:
+                    extractions = future.result()
+                    all_extractions.extend(extractions)
+                except Exception as e:
+                    sloka = future_to_sloka[future]
+                    self.logger.error(f"Error processing sloka {sloka.get('sloka_id', 'unknown')}: {e}")
+        
+        return all_extractions
+    
+    def _store_batch_results(self, extractions: List[Dict[str, Any]]):
+        """Store extraction results in database efficiently"""
+        if not extractions:
             return
         
-        try:
-            # Load English NLP model for translation processing
-            self.nlp_model = spacy.load("en_core_web_sm")
-            self.logger.info("Loaded spaCy English model")
-        except OSError:
-            self.logger.warning("spaCy English model not found. Install with: python -m spacy download en_core_web_sm")
-        
-        try:
-            # Load transformer-based NER model
-            self.ner_pipeline = pipeline(
-                "ner", 
-                model="dbmdz/bert-large-cased-finetuned-conll03-english",
-                aggregation_strategy="simple"
-            )
-            self.logger.info("Loaded transformer NER model")
-        except Exception as e:
-            self.logger.warning(f"Could not load transformer model: {e}")
-    
-    def _load_sanskrit_patterns(self) -> Dict[str, List[str]]:
-        """Load Sanskrit patterns for major entity types"""
-        return {
-            'person_patterns': [
-                # General person indicators
-                r'[A-Za-z]*राम[A-Za-z]*',  # Any word containing 'राम'
-                r'[A-Za-z]*सीता[A-Za-z]*',  # Any word containing 'सीता'
-                r'[A-Za-z]*हनुमा[न्त्][A-Za-z]*',  # Hanuman variants
-                r'[A-Za-z]*लक्ष्मण[A-Za-z]*',  # Lakshmana variants
-                r'[A-Za-z]*भरत[A-Za-z]*',   # Bharata variants
-                r'[A-Za-z]*शत्रुघ्न[A-Za-z]*',  # Shatrughna variants
-                r'[A-Za-z]*रावण[A-Za-z]*',  # Ravana variants
-                r'[A-Za-z]*विभीषण[A-Za-z]*',  # Vibhishana variants
-                r'[A-Za-z]*सुग्रीव[A-Za-z]*',  # Sugriva variants
-                r'[A-Za-z]*अङ्गद[A-Za-z]*',  # Angada variants
-                r'[A-Za-z]*जामवन्त्[A-Za-z]*',  # Jambavan variants
-                r'[A-Za-z]*दशरथ[A-Za-z]*',  # Dasharatha variants
-                r'[A-Za-z]*जनक[A-Za-z]*',   # Janaka variants
-                r'[A-Za-z]*कैकेयी[A-Za-z]*',  # Kaikeyi variants
-                r'[A-Za-z]*कौशल्या[A-Za-z]*',  # Kausalya variants
-                r'[A-Za-z]*सुमित्रा[A-Za-z]*',  # Sumitra variants
+        with self.get_connection() as conn:
+            # Group extractions by entity for efficient storage
+            entities_data = defaultdict(list)
+            mentions_data = []
+            
+            for extraction in extractions:
+                entity_id = extraction['entity_id']
+                entities_data[entity_id].append(extraction)
                 
-                # Pattern for compound names ending in common suffixes
-                r'\b\w*[ःम्य]\b',  # Sanskrit case endings
-                r'\b\w*पुत्र[ःम्स्य]?\b',  # Son of X
-                r'\b\w*आत्मज[ःम्स्य]?\b',  # Soul-born of X
-                r'\b\w*नन्दन[ःम्स्य]?\b',  # Joy of X
-            ],
+                # Prepare mention data
+                mentions_data.append((
+                    extraction['text_unit_id'],
+                    entity_id, 
+                    extraction['span_start'],
+                    extraction['span_end'],
+                    extraction['confidence'],
+                    extraction['source_type']
+                ))
             
-            'place_patterns': [
-                r'[A-Za-z]*अयोध्या[A-Za-z]*',  # Ayodhya variants
-                r'[A-Za-z]*लङ्का[A-Za-z]*',   # Lanka variants
-                r'[A-Za-z]*मिथिला[A-Za-z]*',  # Mithila variants
-                r'[A-Za-z]*किष्किन्धा[A-Za-z]*',  # Kishkindha variants
-                r'[A-Za-z]*दण्डक[A-Za-z]*',   # Dandaka variants
-                r'[A-Za-z]*चित्रकूट[A-Za-z]*',  # Chitrakoot variants
-                r'[A-Za-z]*पञ्चवटी[A-Za-z]*',  # Panchavati variants
-                
-                # Pattern for place suffixes
-                r'\b\w*पुर[ःम्ी]?\b',  # City
-                r'\b\w*नगर[ःम्ी]?\b',  # City
-                r'\b\w*आश्रम[ःम्े]?\b',  # Hermitage
-                r'\b\w*वन[ःम्े]?\b',   # Forest
-                r'\b\w*गिरि[ःम्]?\b',  # Mountain
-                r'\b\w*सागर[ःम्]?\b',  # Ocean
-            ],
+            # Store/update entities
+            for entity_id, entity_extractions in entities_data.items():
+                self._store_or_update_entity(conn, entity_id, entity_extractions)
             
-            'concept_patterns': [
-                r'धर्म[ःम्स्य]?',  # Dharma
-                r'अर्थ[ःम्स्य]?',  # Artha
-                r'काम[ःम्स्य]?',   # Kama
-                r'मोक्ष[ःम्स्य]?', # Moksha
-                r'यज्ञ[ःम्स्य]?',  # Yajna
-                r'तप[ःम्स्य]?',    # Tapas
-                r'भक्ति[ःम्स्य]?', # Bhakti
-                r'करुणा[ःम्स्य]?', # Compassion
-                r'दया[ःम्स्य]?',   # Mercy
-                r'अहिंसा[ःम्स्य]?', # Non-violence
-            ]
-        }
-    
-    def _load_transliteration_map(self) -> Dict[str, str]:
-        """Load Devanagari to Roman transliteration mappings"""
-        return {
-            'राम': 'Rama',
-            'सीता': 'Sita',
-            'हनुमान्': 'Hanuman',
-            'लक्ष्मण': 'Lakshmana',
-            'भरत': 'Bharata',
-            'शत्रुघ्न': 'Shatrughna',
-            'रावण': 'Ravana',
-            'विभीषण': 'Vibhishana',
-            'सुग्रीव': 'Sugriva',
-            'अयोध्या': 'Ayodhya',
-            'लङ्का': 'Lanka',
-            'मिथिला': 'Mithila',
-            'धर्म': 'Dharma',
-            'अर्थ': 'Artha',
-            'काम': 'Kama',
-            'मोक्ष': 'Moksha'
-        }
-    
-    def _load_known_epithets(self) -> Dict[str, List[str]]:
-        """Load known epithets for major characters"""
-        return {
-            'rama': ['राघव', 'दाशरथि', 'काकुत्स्थ', 'कोसलेन्द्र', 'रघुनन्दन'],
-            'sita': ['मैथिली', 'वैदेही', 'जानकी', 'भूमिजा'],
-            'hanuman': ['पवनात्मज', 'वायुपुत्र', 'मारुति', 'अञ्जनेय', 'महावीर'],
-            'ravana': ['दशग्रीव', 'लङ्केश', 'दशमुख', 'रावणेश्वर'],
-            'lakshmana': ['सौमित्रि', 'लक्ष्मण'],
-            'bharata': ['भरत', 'कैकेयीनन्दन'],
-            'sugriva': ['सुग्रीव', 'वानरराज', 'किष्किन्धेश']
-        }
-    
-    def extract_entities_from_corpus(self, corpus_path: str = "data/slokas/Slokas") -> Dict[str, Any]:
-        """
-        Extract entities using multiple strategies:
-        1. Pattern-based Sanskrit extraction
-        2. NLP-based English extraction  
-        3. Knowledge-based epithet recognition
-        4. External API verification (optional)
-        """
-        self.logger.info("Starting enhanced multi-strategy entity extraction")
-        
-        all_candidates = []
-        entities = {}
-        
-        # Process each text unit
-        for kanda_path in self._get_kanda_directories(corpus_path):
-            self.logger.info(f"Processing {kanda_path.name}")
-            kanda_candidates = self._process_kanda_enhanced(kanda_path)
-            all_candidates.extend(kanda_candidates)
-        
-        # Consolidate and rank candidates
-        entities = self._consolidate_candidates(all_candidates)
-        
-        # Post-process with external verification if enabled
-        if self.use_external_apis:
-            entities = self._verify_with_external_apis(entities)
-        
-        self._log_extraction_statistics()
-        
-        return {
-            'entities': entities,
-            'candidates': all_candidates,
-            'statistics': self.extraction_stats
-        }
-    
-    def _process_kanda_enhanced(self, kanda_path: Path) -> List[EntityCandidate]:
-        """Process a kanda with enhanced extraction strategies"""
-        candidates = []
-        
-        sarga_files = self._group_sarga_files(kanda_path)
-        
-        for sarga_id, files in sarga_files.items():
-            if len(files) == 3:  # sloka, translation, meaning
-                sarga_candidates = self._extract_from_sarga_enhanced(
-                    kanda_path.name, sarga_id, files
-                )
-                candidates.extend(sarga_candidates)
-        
-        return candidates
-    
-    def _extract_from_sarga_enhanced(self, kanda_name: str, sarga_id: str, 
-                                   files: Dict[str, Path]) -> List[EntityCandidate]:
-        """Enhanced extraction from a single sarga"""
-        candidates = []
-        
-        # Read all three file types
-        sanskrit_text = self._read_file_content(files.get('sloka'))
-        translation_text = self._read_file_content(files.get('translation'))
-        meaning_text = self._read_file_content(files.get('meaning'))
-        
-        for i, sloka_line in enumerate(sanskrit_text):
-            sloka_data = self._parse_sloka_line(sloka_line)
-            if not sloka_data:
-                continue
+            # Batch insert mentions
+            conn.executemany("""
+                INSERT OR IGNORE INTO text_entity_mentions 
+                (text_unit_id, entity_id, span_start, span_end, confidence, source_type)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, mentions_data)
             
-            kanda_num, sarga_num, sloka_num, sanskrit_content = sloka_data
-            text_unit_id = f"{kanda_num}.{sarga_num}.{sloka_num}"
-            
-            # Find corresponding texts
-            translation = self._find_corresponding_text(translation_text, kanda_num, sarga_num, sloka_num)
-            meaning = self._find_corresponding_text(meaning_text, kanda_num, sarga_num, sloka_num)
-            
-            # Strategy 1: Sanskrit pattern extraction
-            sanskrit_candidates = self._extract_sanskrit_patterns(
-                sanskrit_content, text_unit_id, 'sanskrit'
-            )
-            candidates.extend(sanskrit_candidates)
-            
-            # Strategy 2: English NLP extraction  
-            if translation:
-                english_candidates = self._extract_english_nlp(
-                    translation, text_unit_id, 'translation'
-                )
-                candidates.extend(english_candidates)
-            
-            # Strategy 3: Meaning-based extraction
-            if meaning:
-                meaning_candidates = self._extract_meaning_based(
-                    meaning, text_unit_id, 'meaning'
-                )
-                candidates.extend(meaning_candidates)
-            
-            # Strategy 4: Context-based epithet recognition
-            context_candidates = self._extract_context_epithets(
-                sanskrit_content, translation, meaning, text_unit_id
-            )
-            candidates.extend(context_candidates)
-            
-            self.extraction_stats['total_processed'] += 1
-        
-        return candidates
+            conn.commit()
+            self.logger.debug(f"Stored {len(entities_data)} entities and {len(mentions_data)} mentions")
     
-    def _extract_sanskrit_patterns(self, text: str, text_unit_id: str, 
-                                 source_type: str) -> List[EntityCandidate]:
-        """Extract entities using Sanskrit patterns"""
-        candidates = []
+    def _store_or_update_entity(self, conn, entity_id: str, extractions: List[Dict[str, Any]]):
+        """Store or update entity information"""
+        if not extractions:
+            return
         
-        if not text:
-            return candidates
+        first_extraction = extractions[0]
+        entity_type = first_extraction['entity_type']
         
-        # Try each entity type pattern
-        for entity_type, patterns in self.sanskrit_patterns.items():
-            for pattern in patterns:
-                for match in re.finditer(pattern, text):
-                    candidate = EntityCandidate(
-                        text=match.group(),
-                        start=match.start(),
-                        end=match.end(),
-                        entity_type=entity_type.replace('_patterns', ''),
-                        confidence=0.7,
-                        extraction_method='sanskrit_pattern',
-                        context=text[max(0, match.start()-50):match.end()+50],
-                        transliterated_form=self._transliterate(match.group())
-                    )
-                    candidates.append(candidate)
-                    self.extraction_stats['methods_used']['sanskrit_pattern'] += 1
+        # Find corresponding pattern for labels and properties
+        pattern = next((p for p in self.entity_patterns if p.entity_id == entity_id), None)
+        if not pattern:
+            return
         
-        return candidates
-    
-    def _extract_english_nlp(self, text: str, text_unit_id: str, 
-                           source_type: str) -> List[EntityCandidate]:
-        """Extract entities using English NLP models"""
-        candidates = []
+        # Calculate aggregated confidence and occurrence count
+        total_confidence = sum(e['confidence'] for e in extractions)
+        avg_confidence = total_confidence / len(extractions)
+        occurrence_count = len(extractions)
         
-        if not text or not self.nlp_model:
-            return candidates
-        
-        # Use spaCy NER
-        doc = self.nlp_model(text)
-        for ent in doc.ents:
-            if ent.label_ in ['PERSON', 'GPE', 'LOC', 'ORG']:  # Relevant entity types
-                candidate = EntityCandidate(
-                    text=ent.text,
-                    start=ent.start_char,
-                    end=ent.end_char,
-                    entity_type=self._map_spacy_label(ent.label_),
-                    confidence=0.8,
-                    extraction_method='spacy_ner',
-                    context=text[max(0, ent.start_char-50):ent.end_char+50],
-                    english_translation=ent.text
-                )
-                candidates.append(candidate)
-                self.extraction_stats['methods_used']['spacy_ner'] += 1
-        
-        # Use transformer NER if available
-        if self.ner_pipeline:
-            try:
-                ner_results = self.ner_pipeline(text)
-                for result in ner_results:
-                    if result['entity_group'] in ['PER', 'LOC', 'ORG']:
-                        candidate = EntityCandidate(
-                            text=result['word'],
-                            start=result['start'],
-                            end=result['end'],
-                            entity_type=self._map_transformer_label(result['entity_group']),
-                            confidence=result['score'],
-                            extraction_method='transformer_ner',
-                            context=text[max(0, result['start']-50):result['end']+50],
-                            english_translation=result['word']
-                        )
-                        candidates.append(candidate)
-                        self.extraction_stats['methods_used']['transformer_ner'] += 1
-            except Exception as e:
-                self.logger.warning(f"Transformer NER failed: {e}")
-        
-        return candidates
-    
-    def _extract_meaning_based(self, text: str, text_unit_id: str, 
-                             source_type: str) -> List[EntityCandidate]:
-        """Extract entities from word-by-word meanings"""
-        candidates = []
-        
-        if not text:
-            return candidates
-        
-        # Look for Sanskrit words in meanings (often formatted as "word = meaning")
-        meaning_patterns = [
-            r'([^\s=]+)\s*=\s*([^,;]+)',  # word = meaning
-            r'([^\s\-]+)\s*\-\s*([^,;]+)',  # word - meaning  
-            r'\b([A-Za-z]+)\s*:\s*([^,;]+)',  # word: meaning
-        ]
-        
-        for pattern in meaning_patterns:
-            for match in re.finditer(pattern, text):
-                sanskrit_word = match.group(1).strip()
-                english_meaning = match.group(2).strip()
-                
-                # Check if this looks like a proper noun
-                if self._is_likely_proper_noun(sanskrit_word, english_meaning):
-                    candidate = EntityCandidate(
-                        text=sanskrit_word,
-                        start=match.start(1),
-                        end=match.end(1),
-                        entity_type=self._classify_from_meaning(english_meaning),
-                        confidence=0.6,
-                        extraction_method='meaning_analysis',
-                        context=match.group(0),
-                        english_translation=english_meaning
-                    )
-                    candidates.append(candidate)
-                    self.extraction_stats['methods_used']['meaning_analysis'] += 1
-        
-        return candidates
-    
-    def _extract_context_epithets(self, sanskrit: str, translation: str, 
-                                 meaning: str, text_unit_id: str) -> List[EntityCandidate]:
-        """Extract entities based on known epithets and context"""
-        candidates = []
-        
-        # Check for known epithets in Sanskrit text
-        for character, epithets in self.known_epithets.items():
-            for epithet in epithets:
-                for text, source_type in [(sanskrit, 'sanskrit'), (translation, 'translation'), (meaning, 'meaning')]:
-                    if not text:
-                        continue
-                    
-                    for match in re.finditer(re.escape(epithet), text):
-                        candidate = EntityCandidate(
-                            text=match.group(),
-                            start=match.start(),
-                            end=match.end(),
-                            entity_type='person',
-                            confidence=0.9,  # High confidence for known epithets
-                            extraction_method='epithet_recognition',
-                            context=text[max(0, match.start()-50):match.end()+50],
-                            transliterated_form=character.title()
-                        )
-                        candidates.append(candidate)
-                        self.extraction_stats['methods_used']['epithet_recognition'] += 1
-        
-        return candidates
-    
-    def _consolidate_candidates(self, candidates: List[EntityCandidate]) -> Dict[str, KGEntity]:
-        """Consolidate overlapping candidates and create final entities"""
-        entities = {}
-        
-        # Group candidates by normalized text
-        candidate_groups = defaultdict(list)
-        for candidate in candidates:
-            # Normalize the text for grouping
-            normalized = self._normalize_entity_text(candidate.text)
-            candidate_groups[normalized].append(candidate)
-        
-        # Process each group
-        for normalized_text, group in candidate_groups.items():
-            if len(group) < 2:  # Skip entities with only one mention
-                continue
-            
-            # Calculate aggregate confidence
-            confidence = self._calculate_aggregate_confidence(group)
-            
-            # Determine best entity type
-            entity_type = self._determine_entity_type(group)
-            
-            # Create entity
-            entity_id = f"entity_{len(entities) + 1}"
-            
-            # Get best translations
-            english_name = self._get_best_english_name(group)
-            sanskrit_name = self._get_best_sanskrit_name(group)
-            
-            entity = KGEntity(
-                kg_id=f"http://ramayanam.hanuma.com/entity/{entity_id}",
-                entity_type=EntityType(entity_type.upper()),
-                labels={
-                    'en': english_name,
-                    'sa': sanskrit_name
-                },
-                properties={
-                    'extraction_confidence': confidence,
-                    'mention_count': len(group),
-                    'extraction_methods': list(set(c.extraction_method for c in group)),
-                    'validation_status': 'pending'
-                }
-            )
-            
-            entities[entity_id] = entity
-            self.extraction_stats['entities_found'][entity_type] += 1
-        
-        return entities
-    
-    # Helper methods
-    def _get_kanda_directories(self, corpus_path: str) -> List[Path]:
-        """Get all kanda directories"""
-        data_dir = Path(corpus_path)
-        return [d for d in data_dir.iterdir() if d.is_dir()]
-    
-    def _group_sarga_files(self, kanda_path: Path) -> Dict[str, Dict[str, Path]]:
-        """Group sarga files by sarga number"""
-        sarga_files = defaultdict(dict)
-        
-        for file_path in kanda_path.glob("*.txt"):
-            parts = file_path.stem.split('_')
-            if len(parts) >= 4:
-                sarga_num = parts[2]
-                file_type = parts[3]
-                sarga_files[sarga_num][file_type] = file_path
-        
-        return dict(sarga_files)
-    
-    def _read_file_content(self, file_path: Optional[Path]) -> List[str]:
-        """Read file content as lines"""
-        if not file_path or not file_path.exists():
-            return []
-        
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                return [line.strip() for line in f if line.strip()]
-        except Exception as e:
-            self.logger.warning(f"Failed to read {file_path}: {e}")
-            return []
-    
-    def _parse_sloka_line(self, line: str) -> Optional[Tuple[str, str, str, str]]:
-        """Parse sloka line format: kanda::sarga::sloka::content"""
-        if '::' not in line:
-            return None
-        
-        parts = line.split('::', 3)
-        if len(parts) != 4:
-            return None
-        
-        return parts[0], parts[1], parts[2], parts[3]
-    
-    def _find_corresponding_text(self, text_lines: List[str], kanda: str, sarga: str, sloka: str) -> str:
-        """Find corresponding translation/meaning for a sloka"""
-        target_prefix = f"{kanda}::{sarga}::{sloka}::"
-        
-        for line in text_lines:
-            if line.startswith(target_prefix):
-                return line[len(target_prefix):]
-        
-        return ""
-    
-    def _transliterate(self, sanskrit_text: str) -> str:
-        """Simple transliteration of Sanskrit to Roman"""
-        return self.transliteration_map.get(sanskrit_text, sanskrit_text)
-    
-    def _map_spacy_label(self, label: str) -> str:
-        """Map spaCy entity labels to our types"""
-        mapping = {
-            'PERSON': 'person',
-            'GPE': 'place',
-            'LOC': 'place',
-            'ORG': 'organization'
-        }
-        return mapping.get(label, 'other')
-    
-    def _map_transformer_label(self, label: str) -> str:
-        """Map transformer entity labels to our types"""
-        mapping = {
-            'PER': 'person',
-            'LOC': 'place',
-            'ORG': 'organization'
-        }
-        return mapping.get(label, 'other')
-    
-    def _is_likely_proper_noun(self, word: str, meaning: str) -> bool:
-        """Check if word is likely a proper noun based on meaning"""
-        proper_noun_indicators = [
-            'name of', 'called', 'known as', 'son of', 'daughter of',
-            'king', 'queen', 'prince', 'princess', 'sage', 'demon',
-            'city', 'mountain', 'river', 'forest', 'place'
-        ]
-        
-        return any(indicator in meaning.lower() for indicator in proper_noun_indicators)
-    
-    def _classify_from_meaning(self, meaning: str) -> str:
-        """Classify entity type from English meaning"""
-        if any(word in meaning.lower() for word in ['king', 'queen', 'prince', 'princess', 'sage', 'demon', 'son', 'daughter']):
-            return 'person'
-        elif any(word in meaning.lower() for word in ['city', 'place', 'mountain', 'river', 'forest']):
-            return 'place'
-        elif any(word in meaning.lower() for word in ['dharma', 'duty', 'virtue', 'concept']):
-            return 'concept'
-        else:
-            return 'other'
-    
-    def _normalize_entity_text(self, text: str) -> str:
-        """Normalize entity text for grouping"""
-        # Remove common Sanskrit case endings
-        normalized = re.sub(r'[ःं]$|म्$|स्य$', '', text)
-        return normalized.lower().strip()
-    
-    def _calculate_aggregate_confidence(self, candidates: List[EntityCandidate]) -> float:
-        """Calculate aggregate confidence from multiple candidates"""
-        if not candidates:
-            return 0.0
-        
-        # Weight by extraction method reliability
-        method_weights = {
-            'epithet_recognition': 1.0,
-            'sanskrit_pattern': 0.8,
-            'spacy_ner': 0.9,
-            'transformer_ner': 0.95,
-            'meaning_analysis': 0.6
+        # Prepare labels
+        labels = {
+            'en': pattern.primary_names[0] if pattern.primary_names else entity_id,
+            'sa': pattern.primary_names[0] if pattern.primary_names else entity_id
         }
         
-        weighted_sum = sum(
-            c.confidence * method_weights.get(c.extraction_method, 0.5) 
-            for c in candidates
-        )
-        total_weight = sum(method_weights.get(c.extraction_method, 0.5) for c in candidates)
+        # Prepare properties  
+        properties = {
+            'epithets': pattern.epithets,
+            'confidence_score': avg_confidence,
+            'occurrence_count': occurrence_count,
+            'extraction_confidence': avg_confidence,
+            'alternative_names': pattern.alternative_names,
+            'context_words': pattern.context_words
+        }
         
-        return min(0.99, weighted_sum / total_weight if total_weight > 0 else 0.5)
-    
-    def _determine_entity_type(self, candidates: List[EntityCandidate]) -> str:
-        """Determine entity type from candidates"""
-        type_counts = Counter(c.entity_type for c in candidates)
-        return type_counts.most_common(1)[0][0] if type_counts else 'other'
-    
-    def _get_best_english_name(self, candidates: List[EntityCandidate]) -> str:
-        """Get best English name from candidates"""
-        english_names = [c.english_translation for c in candidates if c.english_translation]
-        if english_names:
-            return Counter(english_names).most_common(1)[0][0]
+        # Store/update entity
+        kg_id = f"http://ramayanam.hanuma.com/entity/{entity_id}"
         
-        # Fallback to transliterated form
-        transliterations = [c.transliterated_form for c in candidates if c.transliterated_form]
-        if transliterations:
-            return transliterations[0]
-        
-        return candidates[0].text if candidates else 'Unknown'
+        conn.execute("""
+            INSERT OR REPLACE INTO kg_entities 
+            (kg_id, entity_type, labels, properties, extraction_method, extraction_confidence, updated_at)
+            VALUES (?, ?, ?, ?, 'automated', ?, CURRENT_TIMESTAMP)
+        """, (
+            kg_id,
+            entity_type,
+            json.dumps(labels),
+            json.dumps(properties),
+            avg_confidence
+        ))
     
-    def _get_best_sanskrit_name(self, candidates: List[EntityCandidate]) -> str:
-        """Get best Sanskrit name from candidates"""
-        sanskrit_names = [c.text for c in candidates if self._is_sanskrit_text(c.text)]
-        if sanskrit_names:
-            return Counter(sanskrit_names).most_common(1)[0][0]
-        
-        return candidates[0].text if candidates else 'Unknown'
+    def get_processing_statistics(self) -> Dict[str, Any]:
+        """Get current processing statistics"""
+        with self.get_connection() as conn:
+            stats = {
+                'total_entities': conn.execute("SELECT COUNT(*) as count FROM kg_entities").fetchone()['count'],
+                'total_mentions': conn.execute("SELECT COUNT(*) as count FROM text_entity_mentions").fetchone()['count'],
+                'processed_slokas': conn.execute("SELECT COUNT(DISTINCT text_unit_id) as count FROM text_entity_mentions").fetchone()['count'],
+                'total_slokas': conn.execute("SELECT COUNT(*) as count FROM slokas").fetchone()['count']
+            }
+            
+            stats['completion_percentage'] = (stats['processed_slokas'] / stats['total_slokas']) * 100
+            
+            return stats
+
+
+def run_scaled_extraction():
+    """Main function to run scaled entity extraction"""
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
-    def _is_sanskrit_text(self, text: str) -> bool:
-        """Check if text contains Sanskrit (Devanagari) characters"""
-        return bool(re.search(r'[\u0900-\u097F]', text))
+    extractor = ScalableEntityExtractor()
     
-    def _verify_with_external_apis(self, entities: Dict[str, KGEntity]) -> Dict[str, KGEntity]:
-        """Verify entities using external APIs (Google, Wikipedia, etc.)"""
-        # This would implement external API calls for verification
-        # For now, just return the entities as-is
-        self.logger.info("External API verification not implemented yet")
-        return entities
+    print("🚀 Starting Phase 1: Scaled Entity Discovery")
+    print("=" * 60)
     
-    def _log_extraction_statistics(self):
-        """Log extraction statistics"""
-        stats = self.extraction_stats
-        
-        self.logger.info(f"Enhanced Entity Extraction Complete:")
-        self.logger.info(f"  Total processed: {stats['total_processed']}")
-        self.logger.info(f"  Entities found by type: {dict(stats['entities_found'])}")
-        self.logger.info(f"  Methods used: {dict(stats['methods_used'])}")
+    # Get initial statistics
+    initial_stats = extractor.get_processing_statistics()
+    print(f"Initial state: {initial_stats['total_entities']} entities, "
+          f"{initial_stats['processed_slokas']}/{initial_stats['total_slokas']} slokas processed "
+          f"({initial_stats['completion_percentage']:.1f}%)")
+    
+    # Run scaled extraction
+    results = extractor.process_corpus_batch(batch_size=500, max_workers=4)
+    
+    # Get final statistics
+    final_stats = extractor.get_processing_statistics()
+    
+    print("\n📊 Extraction Complete!")
+    print(f"Final state: {final_stats['total_entities']} entities (+{final_stats['total_entities'] - initial_stats['total_entities']})")
+    print(f"Processed: {final_stats['processed_slokas']}/{final_stats['total_slokas']} slokas ({final_stats['completion_percentage']:.1f}%)")
+    print(f"Total mentions: {final_stats['total_mentions']:,}")
+    print(f"Processing time: {results['statistics']['processing_time']:.2f} seconds")
+    
+    return results
 
 
 if __name__ == "__main__":
-    # Test the enhanced extractor
-    logging.basicConfig(level=logging.INFO)
-    
-    extractor = SanskritEntityExtractor(use_external_apis=False)
-    results = extractor.extract_entities_from_corpus()
-    
-    print(f"Enhanced extraction found {len(results['entities'])} entities")
-    print(f"Candidates generated: {len(results['candidates'])}")
-    print(f"Statistics: {results['statistics']}")
+    run_scaled_extraction()
