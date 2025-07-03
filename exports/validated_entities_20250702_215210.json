@@ -1,0 +1,34 @@
+{
+  "export_timestamp": "2025-07-02T21:52:10.060290",
+  "total_count": 2,
+  "entities": [
+    {
+      "id": "http://ramayanam.hanuma.com/entity/dandaka",
+      "entity_type": "Place",
+      "english_name": "Dandaka Forest",
+      "sanskrit_name": "दण्डक[ःम्]?",
+      "validation_status": "validated",
+      "validated_by": "api_user",
+      "validated_at": "2025-07-03 01:02:38",
+      "mention_count": 439,
+      "confidence_score": 1.0,
+      "epithets": [],
+      "correction_notes": "Corrected to be more specific about the location",
+      "extraction_method": "automated"
+    },
+    {
+      "id": "http://ramayanam.hanuma.com/entity/ayodhya",
+      "entity_type": "Place",
+      "english_name": "Ayodhya",
+      "sanskrit_name": "अयोध्या[म्ं]?",
+      "validation_status": "validated",
+      "validated_by": "api_user",
+      "validated_at": "2025-07-03 00:47:19",
+      "mention_count": 402,
+      "confidence_score": 1.0,
+      "epithets": [],
+      "correction_notes": "",
+      "extraction_method": "automated"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+id,entity_type,english_name,sanskrit_name,mention_count,confidence_score,epithets,needs_validation,validation_decision,validation_notes,corrected_name,corrected_type
+http://ramayanam.hanuma.com/entity/rama,Person,Rama,राम[ःोम्स्य]?,10982,1.2,"राघव, दाशरथि, काकुत्स्थ",True,,,,
+http://ramayanam.hanuma.com/entity/sita,Person,Sita,सीता[म्ं]?,3631,1.0,"मैथिली, वैदेही, जानकी",True,,,,
+http://ramayanam.hanuma.com/entity/lakshmana,Person,Lakshmana,लक्ष्मण[ःम्स्य]?,3016,1.0,सौमित्रि,True,,,,
+http://ramayanam.hanuma.com/entity/dharma,Concept,dharma,धर्म[ःम्स्य]?,2166,1.0,,True,,,,
+http://ramayanam.hanuma.com/entity/ravana,Person,Ravana,रावण[ःम्स्य]?,1686,1.0,"दशग्रीव, लङ्केश",True,,,,
+http://ramayanam.hanuma.com/entity/hanuman,Person,Hanuman,हनुमा[न्त्]?,1435,1.0,"पवनात्मज, वायुपुत्र, मारुति",True,,,,
+http://ramayanam.hanuma.com/entity/lanka,Place,Lanka,लङ्का[म्ं]?,478,1.0,,True,,,,

@@ -1,0 +1,3 @@
+id,entity_type,english_name,sanskrit_name,validation_status,validated_by,validated_at,mention_count,confidence_score,epithets,correction_notes,extraction_method
+http://ramayanam.hanuma.com/entity/dandaka,Place,Dandaka Forest,दण्डक[ःम्]?,validated,api_user,2025-07-03 01:02:38,439,1.0,[],Corrected to be more specific about the location,automated
+http://ramayanam.hanuma.com/entity/ayodhya,Place,Ayodhya,अयोध्या[म्ं]?,validated,api_user,2025-07-03 00:47:19,402,1.0,[],,automated

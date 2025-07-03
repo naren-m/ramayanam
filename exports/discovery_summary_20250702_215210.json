@@ -1,0 +1,43 @@
+{
+  "export_timestamp": "2025-07-02T21:52:10.062980",
+  "database_location": "/Users/narenmudivarthy/Projects/ramayanam/data/db/ramayanam.db",
+  "summary_statistics": [
+    {
+      "validation_status": "pending",
+      "entity_type": "Concept",
+      "count": 1,
+      "avg_mentions": 2166.0,
+      "total_mentions": 2166
+    },
+    {
+      "validation_status": "pending",
+      "entity_type": "Person",
+      "count": 5,
+      "avg_mentions": 4150.0,
+      "total_mentions": 20750
+    },
+    {
+      "validation_status": "pending",
+      "entity_type": "Place",
+      "count": 1,
+      "avg_mentions": 478.0,
+      "total_mentions": 478
+    },
+    {
+      "validation_status": "rejected",
+      "entity_type": "Concept",
+      "count": 1,
+      "avg_mentions": 1084.0,
+      "total_mentions": 1084
+    },
+    {
+      "validation_status": "validated",
+      "entity_type": "Place",
+      "count": 2,
+      "avg_mentions": 420.5,
+      "total_mentions": 841
+    }
+  ],
+  "total_entities": 10,
+  "total_mentions": 25319
+}
