@@ -448,7 +448,9 @@ class RamayanaEntityExtractor:
             labels=labels,
             properties={
                 'epithets': pattern.epithets,
-                'confidence_score': pattern.confidence_boost
+                'confidence_score': pattern.confidence_boost,
+                'extraction_method': 'automated',
+                'validation_status': 'pending'
             }
         )
     

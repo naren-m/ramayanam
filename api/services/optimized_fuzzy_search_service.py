@@ -211,6 +211,7 @@ class OptimizedFuzzySearchService:
                                 "translation": highlighted_text,
                                 "meaning": item['meaning'],
                                 "ratio": ratio,
+                                "source": "ramayana",
                             })
                     
                     elif search_field in ['sloka_text', 'sanskrit']:
@@ -234,6 +235,7 @@ class OptimizedFuzzySearchService:
                                 "translation": item['translation'],
                                 "meaning": highlighted_meaning,
                                 "ratio": ratio,
+                                "source": "ramayana",
                             })
                 
                 except Exception as e:

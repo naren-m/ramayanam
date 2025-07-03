@@ -149,11 +149,12 @@ def get_entities_in_text_unit(text_unit_id: str):
 def get_statistics():
     """Get knowledge graph statistics"""
     try:
-        stats = kg_service.get_statistics()
+        # Use enhanced statistics from the service
+        enhanced_stats = kg_service.get_enhanced_statistics()
         
         return jsonify({
             'success': True,
-            'statistics': stats
+            'statistics': enhanced_stats
         })
     
     except Exception as e:
@@ -195,6 +196,11 @@ def run_extraction():
         # Import here to avoid circular imports
         from api.services.kg_database_service import run_automated_extraction_and_store
         
+        # Get settings from request
+        settings = request.json or {}
+        confidence_threshold = settings.get('confidence_threshold', 0.7)
+        max_entities_per_sloka = settings.get('max_entities_per_sloka', 10)
+        
         # This might take a while, so we should ideally run it async
         # For now, keep it simple
         stats = run_automated_extraction_and_store()
@@ -202,7 +208,8 @@ def run_extraction():
         return jsonify({
             'success': True,
             'message': 'Extraction completed',
-            'statistics': stats
+            'statistics': stats,
+            'totalSlokas': 24000  # Approximate total for progress tracking
         })
     
     except Exception as e:
@@ -211,6 +218,113 @@ def run_extraction():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@kg_blueprint.route('/entities/pending', methods=['GET'])
+def get_kg_pending_entities():
+    """Get entities pending validation"""
+    try:
+        limit = int(request.args.get('limit', 100))
+        pending_entities = kg_service.get_pending_entities(limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'entities': pending_entities,
+            'count': len(pending_entities)
+        })
+    
+    except Exception as e:
+        logger.error(f"Error getting pending entities: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@kg_blueprint.route('/entities/validate', methods=['POST'])
+def validate_kg_entity():
+    """Validate discovered entity"""
+    try:
+        entity_id = request.json.get('entity_id')
+        validation = request.json.get('validation')
+        
+        if not entity_id or not validation:
+            return jsonify({
+                'success': False,
+                'error': 'entity_id and validation are required'
+            }), 400
+        
+        # Use the service to validate the entity
+        kg_service.validate_entity(entity_id, validation, validated_by='api_user')
+        
+        return jsonify({
+            'success': True,
+            'message': f"Entity {entity_id} validated successfully"
+        })
+    
+    except Exception as e:
+        logger.error(f"Error validating entity: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@kg_blueprint.route('/conflicts', methods=['GET'])
+def get_entity_conflicts():
+    """Get entity conflicts that need resolution"""
+    try:
+        limit = int(request.args.get('limit', 50))
+        conflicts = kg_service.get_entity_conflicts(limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'conflicts': conflicts,
+            'count': len(conflicts)
+        })
+    
+    except Exception as e:
+        logger.error(f"Error getting conflicts: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@kg_blueprint.route('/conflicts/resolve', methods=['POST'])
+def resolve_conflict():
+    """Resolve entity conflict"""
+    try:
+        conflict_id = request.json.get('conflict_id')
+        resolution = request.json.get('resolution')
+        
+        if not conflict_id or not resolution:
+            return jsonify({
+                'success': False,
+                'error': 'conflict_id and resolution are required'
+            }), 400
+        
+        # Use the service to resolve the conflict
+        kg_service.resolve_entity_conflict(conflict_id, resolution, resolved_by='api_user')
+        
+        return jsonify({
+            'success': True,
+            'message': f"Conflict {conflict_id} resolved successfully"
+        })
+    
+    except Exception as e:
+        logger.error(f"Error resolving conflict: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# Test endpoint
+@kg_blueprint.route('/test', methods=['GET'])
+def test_route():
+    """Test route to verify KG endpoints are working"""
+    return jsonify({'message': 'KG routes are loaded', 'success': True})
 
 
 # Error handlers

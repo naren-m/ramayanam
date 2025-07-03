@@ -56,6 +56,11 @@ class Ramayanam:
             'id': 5,
             'name': "SundaraKanda",
             'sargas': 68
+        },
+        6: {
+            'id': 6,
+            'name': "YuddhaKanda",
+            'sargas': 128
         }
     })
 
@@ -155,7 +160,7 @@ class Kanda:
         kanda = cls(name=kandaMetadata['name'],
                     number=kandaMetadata['id'],
                     totalSargas=kandaMetadata['sargas'])
-        for s in range(kanda.totalSargas):
+        for s in range(1, kanda.totalSargas + 1):
             sarga = Sarga.loadFromDB(number=s, kanda=kanda, db=db)
             kanda.addSarga(sarga)
         return kanda
@@ -195,7 +200,7 @@ class Sarga:
         sarga = cls(number=number, kanda=kanda)
         columns = 'kanda_id, sarga_id, sloka_id, sloka, meaning, translation'
         where = 'kanda_id={} and sarga_id={}'.format(kanda.number,
-                                                     sarga.number)
+                                                     number)
         rows = db.get(table='slokas', columns=columns, where=where)
 
         for row in rows:

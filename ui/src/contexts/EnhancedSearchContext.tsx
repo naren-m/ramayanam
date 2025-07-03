@@ -97,6 +97,9 @@ export const EnhancedSearchProvider: React.FC<{ children: React.ReactNode }> = (
     // Search precision
     apiFilters.minRatio = filters.minRatio;
     
+    // Text selection
+    apiFilters.texts = filters.texts;
+    
     // Text length
     if (filters.textLength.min !== undefined) {
       apiFilters.minLength = filters.textLength.min;

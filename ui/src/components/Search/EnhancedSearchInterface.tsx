@@ -48,16 +48,13 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
     setActiveTab('sanskrit');
   };
 
-  // Handle search execution
+  // Handle search execution - Remove individual key handlers to avoid conflicts with form submission
   const handleKeyDown = (e: React.KeyboardEvent, type: 'english' | 'sanskrit') => {
+    console.log(`EnhancedSearch: Key pressed: ${e.key} in ${type} field`);
+    // Let the form handle Enter key submission naturally
     if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      const query = type === 'english' ? englishQuery : sanskritQuery;
-      if (query.trim()) {
-        console.log(`EnhancedSearch: Enter key pressed for ${type} search with query: "${query}"`);
-        searchVerses(query, type);
-      }
+      console.log(`EnhancedSearch: Enter key detected in ${type} field - allowing form submission`);
+      // Don't prevent default - let the form handle it
     }
   };
 
@@ -74,16 +71,31 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
     executeSearch(type);
   };
 
-  // Form submission handler
+  // Form submission handler - Enhanced to be more robust
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(`EnhancedSearch: Form submitted with activeTab: ${activeTab}`);
-    if (activeTab === 'english' && englishQuery.trim()) {
+    console.log(`EnhancedSearch: Form submitted`);
+    console.log(`EnhancedSearch: englishQuery: "${englishQuery}", sanskritQuery: "${sanskritQuery}"`);
+    console.log(`EnhancedSearch: activeTab: "${activeTab}"`);
+    
+    // Determine which search to execute based on the active field and content
+    const hasEnglishQuery = englishQuery.trim().length > 0;
+    const hasSanskritQuery = sanskritQuery.trim().length > 0;
+    
+    if (hasEnglishQuery && (!hasSanskritQuery || activeTab === 'english')) {
       console.log(`EnhancedSearch: Executing English search via form submit: "${englishQuery}"`);
       executeSearch('english');
-    } else if (activeTab === 'sanskrit' && sanskritQuery.trim()) {
+    } else if (hasSanskritQuery && (!hasEnglishQuery || activeTab === 'sanskrit')) {
       console.log(`EnhancedSearch: Executing Sanskrit search via form submit: "${sanskritQuery}"`);
       executeSearch('sanskrit');
+    } else if (hasEnglishQuery) {
+      console.log(`EnhancedSearch: Fallback to English search: "${englishQuery}"`);
+      executeSearch('english');
+    } else if (hasSanskritQuery) {
+      console.log(`EnhancedSearch: Fallback to Sanskrit search: "${sanskritQuery}"`);
+      executeSearch('sanskrit');
+    } else {
+      console.log('EnhancedSearch: No query provided for form submission');
     }
   };
 
@@ -176,7 +188,7 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
                 )}
                 <button
                   type="submit"
-                  disabled={loading || !englishQuery.trim()}
+                  disabled={loading}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
                   aria-label="Search English"
                 >
@@ -217,7 +229,7 @@ export const EnhancedSearchInterface: React.FC<EnhancedSearchInterfaceProps> = (
                 )}
                 <button
                   type="submit"
-                  disabled={loading || !sanskritQuery.trim()}
+                  disabled={loading}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 disabled:text-gray-300 dark:disabled:text-gray-600"
                   aria-label="Search Sanskrit"
                 >

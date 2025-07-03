@@ -34,6 +34,10 @@ app.register_blueprint(chat_blueprint, url_prefix='/api/chat')
 from api.controllers.kg_controller import kg_blueprint
 app.register_blueprint(kg_blueprint, url_prefix='/api/kg')
 
+# Register entity discovery blueprint
+from api.controllers.entity_discovery_controller import discovery_blueprint
+app.register_blueprint(discovery_blueprint, url_prefix='/api/entity-discovery')
+
 # Health check endpoint for testing - MUST be before catch-all route
 @app.route('/health')
 def health_check():

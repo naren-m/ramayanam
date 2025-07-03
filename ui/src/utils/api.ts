@@ -62,7 +62,7 @@ class SearchAPI {
     ];
   }
 
-  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters, page: number = 1, pageSize: number = 10): Promise<{ verses: Verse[], pagination?: any }> {
+  async search(query: string, type: 'english' | 'sanskrit', filters: SearchFilters | any, page: number = 1, pageSize: number = 10): Promise<{ verses: Verse[], pagination?: any }> {
     const endpoint = type === 'english' ? 'fuzzy-search' : 'fuzzy-search-sanskrit';
     const kandaParam = filters.kanda ? `&kanda=${filters.kanda}` : '';
     const textsParam = filters.texts && filters.texts.length > 0 ? `&texts=${filters.texts.join(',')}` : '';
@@ -98,7 +98,8 @@ class SearchAPI {
     }
     
     // Filter by minimum ratio if specified
-    let filteredResults = results.filter((verse: Verse) => verse.ratio >= filters.minRatio);
+    const minRatio = filters.minRatio || 0;
+    let filteredResults = results.filter((verse: Verse) => verse.ratio >= minRatio);
     
     // If cross-text search is enabled, simulate cross-text results
     if (filters.texts && filters.texts.length > 1) {

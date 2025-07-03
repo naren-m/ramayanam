@@ -1,38 +1,28 @@
-# Multi-stage Dockerfile: Build React UI + Flask Backend
-
-# Stage 1: Build React UI
-FROM node:18-alpine AS ui-builder
+# Multi-stage Dockerfile that builds UI during Docker build
+FROM node:20-alpine AS ui-builder
 
 WORKDIR /app/ui
 
-# Copy package files for dependency installation
+# Copy UI package files
 COPY ui/package*.json ./
 
-# Install Node.js dependencies
-RUN npm install
+# Copy UI source code first
+COPY ui/ ./
 
-# Copy UI source code
-COPY ui/ .
+# Clean install dependencies (ARM64 fix)
+RUN rm -rf package-lock.json node_modules && \
+    npm install && \
+    npm run build
 
-# Build the React application
-RUN npm run build
-
-# Stage 2: Flask Application with Built UI
+# Main application stage
 FROM python:3.11-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    FLASK_APP=api/app.py \
-    FLASK_ENV=production \
-    PORT=5000
-
-# Set the working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including curl for health checks
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
@@ -40,23 +30,25 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy built UI from first stage
+# Copy built UI assets from the builder stage
 COPY --from=ui-builder /app/ui/dist /app/dist
 
-# Copy the Flask application code
+# Copy application code
 COPY . .
 
-# Create non-root user for security
+# Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
+
+# Switch to non-root user
 USER app
 
-# Expose the port
+# Expose port
 EXPOSE 5000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:5000/api/ramayanam/kandas/1')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:5000/api/ramayanam/kandas/1 || exit 1
 
-# Run the application with gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "api.app:app"]
+# Run the application
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--worker-class", "sync", "--timeout", "120", "run:app"]
