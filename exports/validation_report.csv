@@ -1,0 +1,11 @@
+Entity ID,Type,English Name,Sanskrit Name,Validation Status,Extraction Confidence,Validation Confidence,Mention Count,Validation Reason,Needs Manual Review,Created At,Validation Timestamp
+rama,Person,राम,राम,validated,0.8832142857142857,0.9,14203,Rule: high_confidence_high_occurrence,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+sita,Person,सीता,सीता,validated,0.8540845070422536,0.9,4413,Rule: high_confidence_high_occurrence,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+ravana,Person,रावण,रावण,validated,0.8309375000000001,0.85,3641,Rule: known_entity_patterns,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+lakshmana,Person,लक्ष्मण,लक्ष्मण,validated,0.8270588235294118,0.85,4297,Rule: known_entity_patterns,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+dandaka,Place,दण्डक,दण्डक,validated,0.8150000000000001,0.8,459,Rule: high_occurrence_validate,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+hanuman,Person,हनुमान्,हनुमान्,validated,0.7945945945945947,0.85,2017,Rule: known_entity_patterns,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+ayodhya,Place,अयोध्या,अयोध्या,validated,0.7523684210526316,0.8,483,Rule: high_occurrence_validate,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+karma,Concept,कर्म,कर्म,validated,0.726,0.8,1507,Rule: high_occurrence_validate,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+lanka,Place,लंका,लंका,validated,0.7225,0.8,948,Rule: high_occurrence_validate,False,2025-07-03 15:05:23,2025-07-03 08:08:55
+dharma,Concept,धर्म,धर्म,validated,0.715,0.8,2697,Rule: high_occurrence_validate,False,2025-07-03 15:05:23,2025-07-03 08:08:55
