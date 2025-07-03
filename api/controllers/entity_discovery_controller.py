@@ -93,12 +93,18 @@ def validate_entities():
         data = request.json
         entity_ids = data.get('entity_ids', [])
         action = data.get('action')  # 'approve' or 'reject'
+        corrections = data.get('corrections', {})
         
         if not entity_ids or not action:
             return jsonify({
                 'success': False,
                 'error': 'entity_ids and action are required'
             }), 400
+        
+        # If corrections are provided, apply them first
+        if corrections and entity_ids:
+            entity_id = entity_ids[0]  # For single entity editing
+            kg_service.apply_entity_corrections(entity_id, corrections)
         
         result = kg_service.bulk_validate_entities(entity_ids, action, validated_by='api_user')
         

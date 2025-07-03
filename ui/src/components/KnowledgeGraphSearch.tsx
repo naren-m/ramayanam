@@ -190,7 +190,7 @@ const KnowledgeGraphSearch: React.FC = () => {
               <div className="text-sm text-gray-600 dark:text-gray-400">Total Entities</div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-              <div className="text-2xl font-bold text-blue-600">{statistics.total_mentions.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-blue-600">{(statistics.total_mentions || 0).toLocaleString()}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Text Mentions</div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
@@ -337,7 +337,7 @@ const KnowledgeGraphSearch: React.FC = () => {
 
                       <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
                         {entity.properties.occurrence_count && (
-                          <span>Mentions: {entity.properties.occurrence_count.toLocaleString()}</span>
+                          <span>Mentions: {(entity.properties.occurrence_count || 0).toLocaleString()}</span>
                         )}
                         {entity.properties.confidence_score && (
                           <span>Confidence: {(entity.properties.confidence_score * 100).toFixed(0)}%</span>
@@ -431,7 +431,7 @@ const KnowledgeGraphSearch: React.FC = () => {
                 {selectedEntity.properties.occurrence_count && (
                   <div>
                     <strong className="text-gray-700 dark:text-gray-300">Occurrences:</strong>
-                    <div className="text-2xl font-bold text-orange-600">{selectedEntity.properties.occurrence_count.toLocaleString()}</div>
+                    <div className="text-2xl font-bold text-orange-600">{(selectedEntity.properties.occurrence_count || 0).toLocaleString()}</div>
                   </div>
                 )}
                 {selectedEntity.properties.confidence_score && (

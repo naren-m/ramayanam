@@ -271,15 +271,26 @@ export const useEntityDiscovery = () => {
 
       // Send validation to the backend
       const action = validation.status === 'validated' ? 'approve' : 'reject';
+      const requestBody: any = {
+        entity_ids: [entityId],
+        action: action
+      };
+
+      // Add correction fields if provided
+      if (validation.correctedName || validation.correctedType || validation.notes) {
+        requestBody.corrections = {
+          correctedName: validation.correctedName,
+          correctedType: validation.correctedType,
+          notes: validation.notes
+        };
+      }
+
       const response = await fetch('/api/entity-discovery/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          entity_ids: [entityId],
-          action: action
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {

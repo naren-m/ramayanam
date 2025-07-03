@@ -142,7 +142,7 @@ export const EntityNode: React.FC<EntityNodeProps> = ({
                     <div>
                       <span className="text-gray-500 dark:text-gray-400">Mentions:</span>
                       <span className="ml-1 font-medium text-gray-800 dark:text-gray-200">
-                        {node.mentions.toLocaleString()}
+                        {(node.mentions || 0).toLocaleString()}
                       </span>
                     </div>
                     <div>

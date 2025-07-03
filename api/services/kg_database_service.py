@@ -739,7 +739,7 @@ class KGDatabaseService:
         with self.get_connection() as conn:
             # Update entities
             placeholders = ','.join(['?' for _ in entity_ids])
-            conn.execute(f"""
+            cursor = conn.execute(f"""
                 UPDATE kg_entities 
                 SET validation_status = ?,
                     validated_by = ?,
@@ -747,7 +747,7 @@ class KGDatabaseService:
                 WHERE kg_id IN ({placeholders})
             """, [status, validated_by] + entity_ids)
             
-            processed = conn.rowcount
+            processed = cursor.rowcount
             conn.commit()
         
         self.logger.info(f"Bulk {action}: {processed} entities processed")
@@ -757,6 +757,57 @@ class KGDatabaseService:
             'action': action,
             'status': status
         }
+    
+    def apply_entity_corrections(self, entity_id: str, corrections: Dict[str, Any]):
+        """Apply corrections to an entity before validation"""
+        with self.get_connection() as conn:
+            # Get current entity data
+            entity_row = conn.execute(
+                "SELECT * FROM kg_entities WHERE kg_id = ?", 
+                (entity_id,)
+            ).fetchone()
+            
+            if not entity_row:
+                raise ValueError(f"Entity {entity_id} not found")
+            
+            # Parse current labels and properties
+            current_labels = json.loads(entity_row['labels'])
+            current_properties = json.loads(entity_row['properties'])
+            
+            # Apply corrections
+            corrected_name = corrections.get('correctedName')
+            corrected_type = corrections.get('correctedType')
+            notes = corrections.get('notes')
+            
+            # Update labels if name was corrected
+            if corrected_name:
+                current_labels['en'] = corrected_name
+            
+            # Add correction notes to properties
+            if notes:
+                current_properties['correction_notes'] = notes
+                current_properties['original_form'] = current_labels.get('en', 'unknown')
+            
+            # Update the entity
+            new_type = corrected_type if corrected_type else entity_row['entity_type']
+            
+            conn.execute("""
+                UPDATE kg_entities 
+                SET entity_type = ?,
+                    labels = ?,
+                    properties = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE kg_id = ?
+            """, (
+                new_type,
+                json.dumps(current_labels),
+                json.dumps(current_properties),
+                entity_id
+            ))
+            
+            conn.commit()
+        
+        self.logger.info(f"Applied corrections to entity {entity_id}: {corrections}")
 
 
 def run_automated_extraction_and_store():

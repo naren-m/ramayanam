@@ -73,6 +73,12 @@ export const EntityValidationPanel: React.FC<EntityValidationPanelProps> = ({
   const [selectedConflict, setSelectedConflict] = useState<EntityConflict | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingEntity, setEditingEntity] = useState<DiscoveredEntity | null>(null);
+  const [editForm, setEditForm] = useState({
+    normalizedForm: '',
+    type: 'Person' as 'Person' | 'Place' | 'Event' | 'Object' | 'Concept',
+    notes: ''
+  });
 
   const entityTypeIcons = {
     Person: User,
@@ -110,6 +116,32 @@ export const EntityValidationPanel: React.FC<EntityValidationPanelProps> = ({
   const handleValidateEntity = (entityId: string, status: 'validated' | 'rejected') => {
     onValidateEntity(entityId, { status });
     setSelectedEntity(null);
+  };
+
+  const handleEditEntity = (entity: DiscoveredEntity) => {
+    setEditingEntity(entity);
+    setEditForm({
+      normalizedForm: entity.normalizedForm,
+      type: entity.type,
+      notes: ''
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingEntity) {
+      onValidateEntity(editingEntity.id, {
+        status: 'validated',
+        correctedName: editForm.normalizedForm,
+        correctedType: editForm.type,
+        notes: editForm.notes
+      });
+      setEditingEntity(null);
+      setSelectedEntity(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEntity(null);
   };
 
   return (
@@ -328,7 +360,10 @@ export const EntityValidationPanel: React.FC<EntityValidationPanelProps> = ({
                     <ThumbsDown className="w-4 h-4" />
                     Reject
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                  <button 
+                    onClick={() => handleEditEntity(selectedEntity)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                  >
                     <Edit className="w-4 h-4" />
                     Edit
                   </button>
@@ -401,6 +436,76 @@ export const EntityValidationPanel: React.FC<EntityValidationPanelProps> = ({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingEntity && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+              Edit Entity: {editingEntity.text}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Normalized Form
+                </label>
+                <input
+                  type="text"
+                  value={editForm.normalizedForm}
+                  onChange={(e) => setEditForm({ ...editForm, normalizedForm: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Entity Type
+                </label>
+                <select
+                  value={editForm.type}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value as typeof editForm.type })}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="Person">Person</option>
+                  <option value="Place">Place</option>
+                  <option value="Event">Event</option>
+                  <option value="Object">Object</option>
+                  <option value="Concept">Concept</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  value={editForm.notes}
+                  onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Add any correction notes..."
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSaveEdit}
+                className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+              >
+                Save & Validate
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
