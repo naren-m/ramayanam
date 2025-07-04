@@ -521,17 +521,63 @@ class RamayanamRAGSystem:
         
         return search_results
     
+    def get_sloka_by_reference(self, reference: str) -> Optional[RamayanamSloka]:
+        """Get a specific sloka by its reference (e.g., 'BalaKanda.1.5')"""
+        if self.collection is None:
+            return None
+        
+        try:
+            # Parse reference
+            parts = reference.split('.')
+            if len(parts) != 3:
+                return None
+            
+            kanda, sarga, sloka_num = parts[0], int(parts[1]), int(parts[2])
+            
+            # Search for exact match using where clause only
+            results = self.collection.query(
+                query_texts=["dummy"],  # ChromaDB requires a query_text but we're filtering by metadata
+                where={"kanda": kanda, "sarga": sarga, "sloka_number": sloka_num},
+                n_results=1,
+                include=['metadatas']
+            )
+            
+            if results['metadatas'] and results['metadatas'][0]:
+                metadata = results['metadatas'][0][0]
+                return RamayanamSloka(
+                    kanda=metadata['kanda'],
+                    sarga=metadata['sarga'],
+                    sloka_number=metadata['sloka_number'],
+                    sanskrit_text=metadata['sanskrit'],
+                    word_meanings=metadata['meanings'],
+                    translation=metadata['translation'],
+                    source_file=metadata['source']
+                )
+        except Exception as e:
+            logger.warning(f"Error retrieving sloka {reference}: {e}")
+            # Fallback: search through loaded slokas in memory
+            try:
+                for sloka in self.slokas:
+                    if (sloka.kanda == kanda and 
+                        sloka.sarga == sarga and 
+                        sloka.sloka_number == sloka_num):
+                        return sloka
+            except Exception as e2:
+                logger.warning(f"Fallback search also failed: {e2}")
+        
+        return None
+    
     def get_context(self, query: str, top_k: int = 5) -> str:
-        """Get formatted context for LLM generation"""
+        """Get formatted context for LLM generation with clear sloka references"""
         results = self.search(query, top_k)
         
         context_parts = []
         for i, sloka in enumerate(results, 1):
-            context_parts.append(f"""Reference {i} ({sloka.get_full_reference()}):
-Sanskrit: {sloka.sanskrit_text}
-Word Meanings: {sloka.word_meanings}
-Translation: {sloka.translation}
-""")
+            context_parts.append(f"""SLOKA REFERENCE {i}: {sloka.get_full_reference()}
+Sanskrit Text: {sloka.sanskrit_text}
+Word-by-Word Meanings: {sloka.word_meanings}
+English Translation: {sloka.translation}
+---""")
         
         return "\n".join(context_parts)
     
@@ -555,15 +601,17 @@ Translation: {sloka.translation}
         # Get relevant context
         context = self.get_context(query, top_k)
         
-        # Create prompt
-        prompt = f"""You are an expert on the Ramayanam, the ancient Sanskrit epic. Use the following context from the Ramayanam to answer the user's question. If the context doesn't contain relevant information, say so clearly.
+        # Create prompt with explicit citation instructions
+        prompt = f"""You are an expert on the Ramayanam, the ancient Sanskrit epic. Use the following context from the Ramayanam to answer the user's question.
+
+IMPORTANT: When referencing information from the context, ALWAYS cite the specific sloka reference (e.g., "BalaKanda.1.5" or "AyodhyaKanda.25.10"). Use the format: [Reference: SlokaReference] when citing.
 
 Context from Ramayanam:
 {context}
 
 User Question: {query}
 
-Please provide a comprehensive answer based on the context above. Include relevant Sanskrit verses when appropriate, and explain their meanings clearly."""
+Please provide a comprehensive answer based on the context above. Always include sloka references when citing specific information. Include relevant Sanskrit verses when appropriate, and explain their meanings clearly. Format citations as [Reference: KandaName.Sarga.SlokaNumber]."""
         
         # Generate response
         response = self.ollama.generate(model, prompt)
@@ -591,14 +639,15 @@ Please provide a comprehensive answer based on the context above. Include releva
             # Get relevant context
             context = self.get_context(last_user_message, top_k=3)
             
-            # Add system message with context
+            # Add system message with context and citation instructions
             system_message = {
                 "role": "system",
-                "content": f"""You are an expert on the Ramayanam. Use this context when relevant:
+                "content": f"""You are an expert on the Ramayanam. Use this context when relevant and ALWAYS cite sloka references when mentioning specific information.
 
+Context from Ramayanam:
 {context}
 
-Provide helpful and accurate information about the Ramayanam, Sanskrit culture, and Hindu philosophy."""
+IMPORTANT: When referencing information from the context, cite the specific sloka reference using format [Reference: KandaName.Sarga.SlokaNumber]. Provide helpful and accurate information about the Ramayanam, Sanskrit culture, and Hindu philosophy."""
             }
             
             chat_messages = [system_message] + messages
